@@ -12,7 +12,13 @@ namespace _Scripts.LobbyScripts
         public bool IsHost;
         public bool IsReady;
 
-        public PlayerData(string name, string lobbyId, ulong networkId, bool isHost, bool isReady)
+        public PlayerData(
+            FixedString64Bytes name,
+            FixedString64Bytes lobbyId,
+            ulong networkId,
+            bool isHost,
+            bool isReady
+        )
         {
             PlayerName = name;
             PlayerLobbyId = lobbyId;

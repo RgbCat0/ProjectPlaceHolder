@@ -24,16 +24,14 @@ namespace _Scripts.LobbyScripts
 
         public async Task<string> HostNetworkTask()
         {
-            RelayServerData relayServerData;
-            relayServerData = await StartHostAllocation(4);
+            RelayServerData relayServerData = await StartHostAllocation(4);
             StartNetworkingTask(true, relayServerData);
             return _relayJoinCode;
         }
 
         public async Task ClientNetworkTask(string relayJoinCode)
         {
-            RelayServerData relayServerData;
-            relayServerData = await StartClientAllocation(relayJoinCode);
+            RelayServerData relayServerData = await StartClientAllocation(relayJoinCode);
             StartNetworkingTask(false, relayServerData);
         }
 
@@ -44,7 +42,7 @@ namespace _Scripts.LobbyScripts
                 var service = RelayService.Instance;
                 Allocation allocation = await service.CreateAllocationAsync(maxPlayers);
                 _relayJoinCode = await service.GetJoinCodeAsync(allocation.AllocationId);
-                return allocation.ToRelayServerData("dtls");
+                return allocation.ToRelayServerData("wss");
             }
             catch (Exception e)
             {
@@ -59,7 +57,7 @@ namespace _Scripts.LobbyScripts
             {
                 var service = RelayService.Instance;
                 JoinAllocation allocation = await service.JoinAllocationAsync(code);
-                return allocation.ToRelayServerData("dtls");
+                return allocation.ToRelayServerData("wss");
             }
             catch (Exception e)
             {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -41,6 +43,24 @@ namespace _Scripts.LobbyScripts
         private TMP_InputField createLobbyNameField;
         public event Action<string> OnCreateLobby;
 
+        [Header("Join Lobby")]
+        [SerializeField]
+        private GameObject joinLobbyPanel;
+
+        [SerializeField]
+        private GameObject joinLobbyPrefab;
+        private List<GameObject> _lobbies = new();
+        public event Action<Lobby> OnJoinLobby;
+
+        [Header("Lobby")]
+        [SerializeField]
+        private GameObject playerLobbyPanel;
+
+        [SerializeField]
+        private GameObject playerLobbyPrefab;
+        private List<GameObject> _playerLobbyPanels = new();
+
+        [Header("Misc")]
         [SerializeField]
         private TextMeshProUGUI statusText;
 
@@ -53,6 +73,8 @@ namespace _Scripts.LobbyScripts
             createLobbyNameField?.onValueChanged.AddListener(LobbyNameEdit);
 
             createLobbyButton?.onClick.AddListener(CreateLobby);
+            GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
+                UpdateLobbyPlayers();
         }
 
         private void LobbyNameEdit(string arg0)
@@ -93,6 +115,7 @@ namespace _Scripts.LobbyScripts
         {
             OnMenuJoin?.Invoke(nameInputField.text);
             ChangeMenu(joinParent);
+            PopulateLobbies(); // TODO add refresh button (already implemented in UI)
         }
 
         private void CreateLobby()
@@ -105,6 +128,33 @@ namespace _Scripts.LobbyScripts
             }
             createLobbyButton.interactable = false;
             OnCreateLobby?.Invoke(lobbyName);
+            ChangeMenu(lobbyParent);
+        }
+
+        private async void PopulateLobbies()
+        {
+            foreach (var obj in _lobbies)
+            {
+                Destroy(obj);
+            }
+            _lobbies.Clear();
+            // get lobbies from lobbyService
+            List<Lobby> lobbies = await LobbyController.Instance.GetLobbies();
+            foreach (var lobby in lobbies)
+            {
+                var newPanel = Instantiate(joinLobbyPrefab, joinLobbyPanel.transform);
+                newPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                    $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
+                newPanel
+                    .GetComponentInChildren<Button>()
+                    .onClick.AddListener(() => JoinLobby(lobby));
+                _lobbies.Add(newPanel);
+            }
+        }
+
+        private void JoinLobby(Lobby lobby)
+        {
+            OnJoinLobby?.Invoke(lobby);
             ChangeMenu(lobbyParent);
         }
 
@@ -123,6 +173,23 @@ namespace _Scripts.LobbyScripts
             mainParent.SetActive(false);
             lobbyParent.SetActive(false);
             menu?.SetActive(true);
+        }
+
+        private void UpdateLobbyPlayers()
+        {
+            foreach (var obj in _playerLobbyPanels)
+            {
+                Destroy(obj);
+            }
+            _playerLobbyPanels.Clear();
+            var playerDataSync = GetComponent<PlayerDataSync>();
+            foreach (var playerData in playerDataSync.SyncedPlayerList)
+            {
+                var newPanel = Instantiate(playerLobbyPrefab, playerLobbyPanel.transform);
+                newPanel.GetComponentInChildren<TextMeshProUGUI>().text =
+                    playerData.PlayerName.ToString();
+                _playerLobbyPanels.Add(newPanel);
+            }
         }
     }
 }
