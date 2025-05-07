@@ -20,7 +20,7 @@ namespace _Scripts.LobbyScripts
                 Data = new Dictionary<string, DataObject>
                 {
                     {
-                        "relayJoinCode",
+                        "RelayJoinCode",
                         new DataObject(DataObject.VisibilityOptions.Public, relayJoinCode)
                     },
                     {
@@ -34,6 +34,17 @@ namespace _Scripts.LobbyScripts
             };
             Lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, 4, options);
             StartHeartbeat();
+        }
+
+        public async Task JoinLobbyTask(string lobbyId)
+        {
+            await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+        }
+
+        public async Task<List<Lobby>> GetLobbiesAsync()
+        {
+            QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync();
+            return response.Results;
         }
 
         private void StartHeartbeat()
