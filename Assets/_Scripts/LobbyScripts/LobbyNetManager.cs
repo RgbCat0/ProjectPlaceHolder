@@ -14,6 +14,7 @@ namespace _Scripts.LobbyScripts
     public class LobbyNetManager : NetworkBehaviour
     {
         private string _relayJoinCode;
+        public string PlayerName { get; private set; }
 
         public async Task SignInTask()
         {
@@ -74,6 +75,7 @@ namespace _Scripts.LobbyScripts
                 NetworkManager
                     .Singleton.GetComponent<UnityTransport>()
                     .SetRelayServerData(relayServerData);
+                Debug.Log("Test");
                 if (isHost)
                     NetworkManager.Singleton.StartHost();
                 else
@@ -91,6 +93,7 @@ namespace _Scripts.LobbyScripts
             try
             {
                 await AuthenticationService.Instance.UpdatePlayerNameAsync(newName);
+                PlayerName = newName;
             }
             catch (Exception e)
             {

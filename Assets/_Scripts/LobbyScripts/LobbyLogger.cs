@@ -8,12 +8,12 @@ namespace _Scripts.LobbyScripts
         public static bool EnableLogging = true;
         public static bool EnableWarnings = true;
         public static bool EnableErrors = true;
-        private static TextMeshProUGUI StatusText;
+        private static TextMeshProUGUI _statusText;
 
         public static void Initialize(TextMeshProUGUI statusText)
         {
-            StatusText = statusText;
-            StatusText.gameObject.SetActive(true);
+            _statusText = statusText;
+            _statusText.gameObject.SetActive(true);
         }
 
         public static void Log(object message)
@@ -48,8 +48,8 @@ namespace _Scripts.LobbyScripts
         {
             if (color == default)
                 color = Color.white;
-            StatusText.color = color;
-            StatusText.text = message;
+            _statusText.color = color;
+            _statusText.text = message;
         }
     }
 }

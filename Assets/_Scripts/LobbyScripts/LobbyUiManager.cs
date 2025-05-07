@@ -105,6 +105,7 @@ namespace _Scripts.LobbyScripts
             }
             createLobbyButton.interactable = false;
             OnCreateLobby?.Invoke(lobbyName);
+            ChangeMenu(lobbyParent);
         }
 
         public void ShowMainMenu()

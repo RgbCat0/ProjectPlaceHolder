@@ -1,5 +1,6 @@
 using System;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 
 namespace _Scripts.LobbyScripts
@@ -7,7 +8,7 @@ namespace _Scripts.LobbyScripts
     public class LobbyController : NetworkBehaviour
     {
         private LobbyUiManager _uiManager;
-        private LobbyNetManager _networkManager;
+        private LobbyNetManager _lobbyNetManager;
         private LobbyServiceManager _serviceManager;
         private PlayerDataSync _playerDataSync;
 
@@ -32,10 +33,10 @@ namespace _Scripts.LobbyScripts
             try
             {
                 _uiManager = GetComponent<LobbyUiManager>();
-                _networkManager = GetComponent<LobbyNetManager>();
+                _lobbyNetManager = GetComponent<LobbyNetManager>();
                 _serviceManager = GetComponent<LobbyServiceManager>();
                 _playerDataSync = GetComponent<PlayerDataSync>();
-                await _networkManager.SignInTask();
+                await _lobbyNetManager.SignInTask();
                 _uiManager.OnCreateLobby += HandleCreateLobby;
                 _uiManager.OnMenuCreate += OnHostClicked;
                 _uiManager.OnMenuJoin += OnClientClicked;
@@ -52,24 +53,31 @@ namespace _Scripts.LobbyScripts
         {
             LobbyLogger.StatusMessage("Updating name...");
 
-            await _networkManager.UpdateName(obj);
+            await _lobbyNetManager.UpdateName(obj);
             LobbyLogger.StatusMessage("");
         }
 
         private async void OnClientClicked(string obj)
         {
             LobbyLogger.StatusMessage("Updating name...");
-            await _networkManager.UpdateName(obj);
+            await _lobbyNetManager.UpdateName(obj);
             LobbyLogger.StatusMessage("");
         }
 
         private async void HandleCreateLobby(string obj)
         {
             LobbyLogger.StatusMessage("Starting Networking...");
-            string relayJoinCode = await _networkManager.HostNetworkTask();
+            string relayJoinCode = await _lobbyNetManager.HostNetworkTask();
             LobbyLogger.StatusMessage("Creating Lobby...");
             await _serviceManager.HostLobbyTask(obj, relayJoinCode);
-            // PlayerDataSync.instance.RegisterPlayerServerRpc(playerName);
+            LobbyLogger.StatusMessage("");
+
+            _playerDataSync.RegisterPlayerServerRpc(
+                _lobbyNetManager.PlayerName,
+                AuthenticationService.Instance.PlayerId,
+                NetworkManager.LocalClientId,
+                NetworkManager.IsHost
+            );
         }
     }
 }

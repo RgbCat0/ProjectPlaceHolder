@@ -8,13 +8,17 @@ namespace _Scripts.LobbyScripts
     {
         public FixedString64Bytes PlayerName;
         public FixedString64Bytes PlayerLobbyId;
-        public FixedString64Bytes PlayerNetworkId;
+        public ulong PlayerNetworkId;
+        public bool IsHost;
+        public bool IsReady;
 
-        public PlayerData(string name, string lobbyId, string networkId)
+        public PlayerData(string name, string lobbyId, ulong networkId, bool isHost, bool isReady)
         {
             PlayerName = name;
             PlayerLobbyId = lobbyId;
             PlayerNetworkId = networkId;
+            IsHost = isHost;
+            IsReady = isReady;
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer)

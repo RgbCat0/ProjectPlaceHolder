@@ -6,6 +6,8 @@ namespace _Scripts.LobbyScripts
     {
         public NetworkList<PlayerData> SyncedPlayerList;
 
+        // public event Action<PlayerData>/
+
         private void Awake()
         {
             SyncedPlayerList = new NetworkList<PlayerData>();
@@ -20,9 +22,14 @@ namespace _Scripts.LobbyScripts
         // }
 
         [Rpc(SendTo.Server)]
-        public void RegisterPlayerServerRpc(string playerName, string lobbyId, string networkId)
+        public void RegisterPlayerServerRpc(
+            string playerName,
+            string lobbyId,
+            ulong networkId,
+            bool isHost
+        )
         {
-            var newData = new PlayerData(playerName, lobbyId, networkId);
+            var newData = new PlayerData(playerName, lobbyId, networkId, isHost, false);
 
             // Avoid duplicates (e.g., reconnects)
             foreach (var data in SyncedPlayerList)
