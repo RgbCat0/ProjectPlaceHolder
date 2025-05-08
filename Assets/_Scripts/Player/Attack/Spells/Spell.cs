@@ -5,6 +5,7 @@ public class Spell : ScriptableObject
 {
     public enum SpellType
     {
+        None,
         Fire,
         Ice,
         Lightning,
@@ -23,7 +24,8 @@ public class Spell : ScriptableObject
     public GameObject hitboxPrefab;
     public GameObject spellPrefab;
     public SpellType spellType;
-    public AreaOfEffect arreaOfEffect;
+    public AreaOfEffect areaOfEffect;
+    public float areaOfEffectRadius;
     public bool isPiercing;
     public int damage;
     public int manaCost;
@@ -31,5 +33,5 @@ public class Spell : ScriptableObject
     public float castTime;
     public float cooldown;
     public float duration;
-
+    public float travelSpeed;
 }
