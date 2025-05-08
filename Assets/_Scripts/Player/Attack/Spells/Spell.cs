@@ -20,6 +20,7 @@ public class Spell : ScriptableObject
         Cone,
     }
 
+    public GameObject hitboxPrefab;
     public GameObject spellPrefab;
     public SpellType spellType;
     public AreaOfEffect arreaOfEffect;
