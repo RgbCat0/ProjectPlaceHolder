@@ -25,7 +25,7 @@ namespace _Scripts.Enemies
         {
             if (_target == null)
             {
-                _target = GameObject.FindGameObjectWithTag("Player").transform;
+                _target = GameObject.FindGameObjectWithTag("Player")?.transform;
                 return;
             }
             _navMeshAgent.SetDestination(_target.position);

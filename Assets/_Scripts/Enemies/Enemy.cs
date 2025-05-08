@@ -26,6 +26,7 @@ namespace _Scripts.Enemies
             Health -= damage;
             if (Health <= 0f)
                 Die();
+            Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
         }
 
         private void Die()
