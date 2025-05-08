@@ -15,7 +15,7 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private string movementActionName = "Move";
     //[SerializeField] private string jumpActionName = "Jump";
     //[SerializeField] private string sprintActionName = "Sprint";
-    //[SerializeField] private string shootActionName = "Shoot";
+    [SerializeField] private string attackActionName = "attack";
     //[SerializeField] private string aimActionName = "Aim";
     //[SerializeField] private string reloadActionName = "Reload";
     //[SerializeField] private string switchWeaponActionName = "Swap";
@@ -25,7 +25,7 @@ public class InputHandler : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction sprintAction;
-    private InputAction shootAction;
+    private InputAction attackAction;
     private InputAction aimAction;
     private InputAction reloadAction;
     public InputAction switchWeaponAction;
@@ -40,7 +40,7 @@ public class InputHandler : MonoBehaviour
 
     //public bool jumpTriggered { get; private set; }
 
-    //public bool shootTriggered { get; set; }
+    public bool attackTriggered { get; set; }
 
     //public bool aimTriggered { get; private set; }
 
@@ -71,7 +71,7 @@ public class InputHandler : MonoBehaviour
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(movementActionName);
         //sprintAction = playerControls.FindActionMap(actionMapName).FindAction(sprintActionName);
         //jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jumpActionName);
-        //shootAction = playerControls.FindActionMap(actionMapName).FindAction(shootActionName);
+        attackAction = playerControls.FindActionMap(actionMapName).FindAction(attackActionName);
         //aimAction = playerControls.FindActionMap(actionMapName).FindAction(aimActionName);
         //reloadAction = playerControls.FindActionMap(actionMapName).FindAction(reloadActionName);
         //switchWeaponAction = playerControls.FindActionMap(actionMapName).FindAction(switchWeaponActionName);
@@ -91,8 +91,8 @@ public class InputHandler : MonoBehaviour
         //jumpAction.performed += context => jumpTriggered = true;
         //jumpAction.canceled += context => jumpTriggered = false;
 
-        //shootAction.performed += context => shootTriggered = true;
-        //shootAction.canceled += context => shootTriggered = false;
+        attackAction.performed += context => attackTriggered = true;
+        attackAction.canceled += context => attackTriggered = false;
 
         //aimAction.performed += context => aimTriggered = true;
         //aimAction.canceled += context => aimTriggered = false;
@@ -114,7 +114,7 @@ public class InputHandler : MonoBehaviour
         moveAction.Enable();
         //sprintAction.Enable();
         //jumpAction.Enable();    
-        //shootAction.Enable();
+        attackAction.Enable();
         //aimAction.Enable();
         //reloadAction.Enable();
         //switchWeaponAction.Enable();
@@ -128,7 +128,7 @@ public class InputHandler : MonoBehaviour
         moveAction.Disable();
         //sprintAction.Disable();
         //jumpAction.Disable();
-        //shootAction.Disable();
+        attackAction.Disable();
         //aimAction.Disable();
         //reloadAction.Disable();
         //switchWeaponAction.Disable();
