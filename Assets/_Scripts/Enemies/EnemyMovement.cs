@@ -15,6 +15,12 @@ namespace _Scripts.Enemies
             _navMeshAgent = GetComponent<NavMeshAgent>();
         }
 
+        public void SetSpeed(float speed)
+        {
+            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _navMeshAgent.speed = speed;
+        }
+
         private void FixedUpdate()
         {
             if (_target == null)

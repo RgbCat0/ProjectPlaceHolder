@@ -1,7 +1,6 @@
-﻿namespace _Scripts.Enemies
+﻿using UnityEngine;
+
+namespace _Scripts.Enemies
 {
-    public class EnemyAttack
-    {
-        
-    }
+    public class EnemyAttack : MonoBehaviour { }
 }
