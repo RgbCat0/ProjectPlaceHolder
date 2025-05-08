@@ -80,6 +80,14 @@ namespace _Scripts.Enemies
                 yield return new WaitForSeconds(currentWave.spawnInterval);
             }
         }
+
+        private void FixedUpdate()
+        {
+            if (enemies.Count == 0)
+            {
+                OnWaveCompleteEvent?.Invoke();
+            }
+        }
     }
 
     [Serializable]

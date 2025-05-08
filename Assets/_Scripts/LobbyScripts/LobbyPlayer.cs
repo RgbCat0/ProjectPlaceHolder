@@ -1,17 +1,17 @@
-using System;
 using Unity.Netcode;
-using UnityEngine;
-using _Scripts.LobbyScripts;
 
-public class LobbyPlayer : NetworkBehaviour
+namespace _Scripts.LobbyScripts
 {
-    private void Start()
+    public class LobbyPlayer : NetworkBehaviour
     {
-        if (!IsOwner)
+        private void Start()
         {
-            enabled = false;
-            return;
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
+            LobbyController.Instance.HandleNewPlayer(NetworkObject.NetworkObjectId); // Register the player
         }
-        LobbyController.Instance.HandleNewPlayer(NetworkObject.NetworkObjectId); // Register the player
     }
 }

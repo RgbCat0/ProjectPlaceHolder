@@ -47,6 +47,7 @@ namespace _Scripts.LobbyScripts
             catch (Exception e)
             {
                 // TODO handle error properly
+                Debug.LogError($"Failed to create relay allocation: {e.Message}");
                 throw;
             }
         }
@@ -62,6 +63,7 @@ namespace _Scripts.LobbyScripts
             catch (Exception e)
             {
                 // TODO handle error properly
+                Debug.LogError($"Failed to join relay allocation: {e.Message}");
                 throw;
             }
         }
@@ -82,6 +84,7 @@ namespace _Scripts.LobbyScripts
             catch (Exception e)
             {
                 // TODO handle error properly
+                Debug.LogError($"Failed to start networking: {e.Message}");
                 throw;
             }
         }

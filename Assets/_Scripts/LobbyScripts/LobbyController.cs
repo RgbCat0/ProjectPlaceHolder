@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
-using UnityEngine;
 
 namespace _Scripts.LobbyScripts
 {
