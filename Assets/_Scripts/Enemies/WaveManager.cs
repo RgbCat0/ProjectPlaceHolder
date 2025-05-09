@@ -25,6 +25,7 @@ namespace _Scripts.Enemies
 
         [SerializeField]
         private List<Transform> spawnPoints = new();
+        private bool _waitingForUpgrade = false;
 
         // events
         public event Action OnWaveCompleteEvent; // send from this script to notify other scripts
