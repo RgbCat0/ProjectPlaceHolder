@@ -155,16 +155,17 @@ public class AttackManager : MonoBehaviour
 
         else if(spell.areaOfEffect == Spell.AreaOfEffect.Circle)
         {
-            while (Vector3.Distance(castedSpell.transform.position, pos) > 0.01f)
+            while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
             {
                 castedSpell.transform.position = Vector3.Slerp(castedSpell.transform.position, pos, spell.travelSpeed * Time.deltaTime);
-                yield return new WaitForEndOfFrame();
+                Debug.Log("Moving");
+                yield return null;
             }
-            spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2 * 3, spell.areaOfEffectRadius / 2 * 3, spell.areaOfEffectRadius / 2 * 3);
+            Destroy(castedSpell);
+            spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2);
             GameObject hitbox = Instantiate(spell.hitboxPrefab, pos, Quaternion.identity);
             yield return new WaitForSeconds(spell.duration);
             Destroy(hitbox);
-            Destroy(castedSpell);
         }
 
 
@@ -215,14 +216,8 @@ public class AttackManager : MonoBehaviour
         return null;
     }
 
-    public Spell GetSpell(Spells spelName)
+    public Spell GetSpell()
     {
-        if(_spellDictionary.TryGetValue(spelName, out var spell))
-        {
-            Debug.Log($"Spell found: {spell.name}");
-            return spell;
-        }
-        Debug.LogWarning("Spell not found");
-        return null;
+        return _selectedSpell;
     }
 }
