@@ -36,6 +36,7 @@ public class AttackManager : NetworkBehaviour
         HandleSpellSelection();
         HandleCasting();
 
+
         RaycastHit hit;
         if (InputHandler.Instance.attackTriggered)
         {
@@ -49,6 +50,7 @@ public class AttackManager : NetworkBehaviour
             }
         }
     }
+
 
     #region Initialization
     private void Start()
