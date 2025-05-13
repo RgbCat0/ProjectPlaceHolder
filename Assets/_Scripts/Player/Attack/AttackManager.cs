@@ -125,14 +125,22 @@ public class AttackManager : MonoBehaviour
 
         //}
         cd = Time.time + spell.cooldown;
+        float castTime = Time.time + spell.castTime;
 
         GameObject castedSpell = Instantiate(spell.spellPrefab, spellObject.transform.position, Quaternion.identity);
 
         castedSpell.GetComponent<Rigidbody>().useGravity = false;
+        while(Time.time < castTime)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
+            yield return new WaitForFixedUpdate();
+        }
         yield return new WaitForSeconds(spell.castTime);
         castedSpell.GetComponent<Rigidbody>().useGravity = true;
         Debug.Log("Instantiated");
 
+        // Basic attack
         if (spell.areaOfEffect == Spell.AreaOfEffect.None)
         {
             Vector3 origin = spellObject.transform.position;
@@ -153,6 +161,7 @@ public class AttackManager : MonoBehaviour
         }
 
 
+        // Circle AOE Spells
         else if(spell.areaOfEffect == Spell.AreaOfEffect.Circle)
         {
             while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
@@ -168,13 +177,24 @@ public class AttackManager : MonoBehaviour
             Destroy(hitbox);
         }
 
-
+        // Line AOE Spells
         else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
         {
-            castedSpell.transform.position = transform.position + transform.forward * spell.range;
+            // Implement line spell visual effects
+
+            Debug.Log("Line Spell");
+            spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, 3, (spell.range / 4) * 2);
+            GameObject hitbox = Instantiate(spell.hitboxPrefab, transform.position, Quaternion.identity);
+            hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
+            hitbox.transform.position += hitbox.transform.forward * 6;
+            Destroy(castedSpell);
+            yield return new WaitForSeconds(spell.duration);
+            Debug.Log("Destroying hitbox");
+            Destroy(hitbox);
+            //Destroy(castedSpell);
         }
 
-
+        // Cone AOE Spells
         else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
         {
             castedSpell.transform.position = transform.position + transform.forward * spell.range;
