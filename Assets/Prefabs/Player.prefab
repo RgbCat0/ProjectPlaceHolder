@@ -768,6 +768,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6785562044364266881}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1000101673356641984}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
@@ -790,6 +793,31 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
   m_PrefabInstance: {fileID: 8754276376327814599}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6785562044364266881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8483662577808818326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 869895514
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1000101673356641984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -802,6 +830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f290fec9a874d1c4aa89e8445f101287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   canMove: 1
   moveSpeed: 3
   rotationSpeed: 10
@@ -818,6 +847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d77092e48b992a04e98ca92e999a05a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   spellObject: {fileID: 5553282695057615338}
   fireballIndicator: {fileID: 5926298510273118814}
   boltIndicator: {fileID: 3673170543029252298}
@@ -837,6 +867,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51ce17e8a50e44d38f92923eae66f665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   baseMana: 0
   baseMaxMana: 100
   baseManaRegen: 1
@@ -866,6 +897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0011bdb16030124f9022973bc32b414, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!54 &2425175666386412249
 Rigidbody:
   m_ObjectHideFlags: 0

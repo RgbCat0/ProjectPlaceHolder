@@ -52,6 +52,15 @@ namespace _Scripts.LobbyScripts
             _heartBeatCoroutine = StartCoroutine(SendHeartbeatCoroutine());
         }
 
+        private void StopHeartbeat()
+        {
+            if (_heartBeatCoroutine != null)
+            {
+                StopCoroutine(_heartBeatCoroutine);
+                _heartBeatCoroutine = null;
+            }
+        }
+
         private IEnumerator SendHeartbeatCoroutine()
         {
             while (Lobby != null)

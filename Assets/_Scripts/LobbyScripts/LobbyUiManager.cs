@@ -67,6 +67,7 @@ namespace _Scripts.LobbyScripts
         [SerializeField]
         private GameObject playerLobbyPrefab;
         private List<GameObject> _playerLobbyPanels = new();
+        public event Action OnStartGame;
 
         [Header("Misc")]
         [SerializeField]
@@ -81,6 +82,7 @@ namespace _Scripts.LobbyScripts
             nameInputField?.onValueChanged.AddListener(NameEdit);
             createLobbyNameField?.onValueChanged.AddListener(LobbyNameEdit);
             createLobbyButton?.onClick.AddListener(CreateLobby);
+            startGameButton?.onClick.AddListener(StartGame);
             // GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
             //     UpdateLobbyPlayers();
         }
@@ -221,8 +223,6 @@ namespace _Scripts.LobbyScripts
                 {
                     toggle.interactable = false;
                 }
-
-                toggle.isOn = playerData.IsReady;
                 _playerLobbyPanels.Add(newPanel);
             }
         }
@@ -276,9 +276,17 @@ namespace _Scripts.LobbyScripts
                     .transform.GetChild(0)
                     .GetChild(1)
                     .GetComponent<Toggle>()
-                    .isOn = true;
+                    .isOn = playerDataSync.SyncedPlayerList[i].IsReady;
             }
             LobbyController.Instance.CanStartGame(true);
+        }
+
+        public void StartGame()
+        {
+            if (NetworkManager.IsHost)
+            {
+                OnStartGame?.Invoke();
+            }
         }
     }
 }

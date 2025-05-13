@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
+using UnityEngine.SceneManagement;
 
 namespace _Scripts.LobbyScripts
 {
@@ -43,6 +44,7 @@ namespace _Scripts.LobbyScripts
                 _uiManager.OnMenuCreate += OnHostClicked;
                 _uiManager.OnMenuJoin += OnClientClicked;
                 _uiManager.OnJoinLobby += HandleJoinLobby;
+                _uiManager.OnStartGame += StartGameRpc;
                 _uiManager.ShowMainMenu();
             }
             catch (Exception e)
@@ -88,12 +90,12 @@ namespace _Scripts.LobbyScripts
 
         public void CanStartGame(bool canStart)
         {
-            var allReady = true;
-            foreach (var playerData in _playerDataSync.SyncedPlayerList)
+            if (!NetworkManager.IsHost)
             {
-                if (!playerData.IsReady)
-                    allReady = false;
+                _uiManager.DisableStartGameButton();
+                return;
             }
+            var allReady = _playerDataSync.SyncedPlayerList.TrueForAll(p => p.IsReady);
             if (allReady && canStart)
             {
                 _uiManager.EnableStartGameButton();
@@ -123,6 +125,16 @@ namespace _Scripts.LobbyScripts
             StartCoroutine(
                 _playerDataSync.RegisterPlayerServer(playerName, playerId, clientId, isHost)
             );
+
+        [Rpc(SendTo.Server, RequireOwnership = true)]
+        private void StartGameRpc()
+        {
+            if (NetworkManager.IsHost)
+            {
+                // TODO: add a countdown
+                NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
+            }
+        }
 
         public async Task<List<Lobby>> GetLobbies()
         {
