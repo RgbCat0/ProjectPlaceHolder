@@ -1,10 +1,13 @@
+using _Scripts.Player;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private PlayerStats _playerStats;
+
     private Vector2 _moveInput;
     private Rigidbody _rb;
-
+    public  bool canMove = true;
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotationSpeed;
@@ -12,16 +15,20 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        _playerStats = GetComponent<PlayerStats>();
         _rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
+        moveSpeed *= _playerStats.speedMultiplier;
+        maxVel *= _playerStats.speedMultiplier;
         _moveInput = InputHandler.Instance.moveInput;
     }
 
     private void FixedUpdate()
     {
+        if (!canMove) return;
         Move();
     }
 

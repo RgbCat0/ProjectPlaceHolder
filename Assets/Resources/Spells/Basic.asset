@@ -18,7 +18,7 @@ MonoBehaviour:
   areaOfEffect: 0
   areaOfEffectRadius: 0
   isPiercing: 0
-  damage: 3
+  damage: 4
   manaCost: 0
   range: 15
   castTime: 0

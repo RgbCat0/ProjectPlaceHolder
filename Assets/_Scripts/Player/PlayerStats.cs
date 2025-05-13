@@ -7,20 +7,63 @@ using Random = UnityEngine.Random;
 
 namespace _Scripts.Player
 {
-    public class PlayerUpgrade : MonoBehaviour
+    public class PlayerStats : MonoBehaviour
     {
+        // Base stats
+        [Header("----------Base Stats----------")]
+        public float baseMana;
+        public float baseMaxMana = 100f;
+        public float baseManaRegen = 1f;
+        public float baseMaxHealth = 100f;
+        public float baseHealthRegen = 1f;
+
+        // Current active stats modified by upgrades
+        [Header("----------Current Stats----------")]
+        public float currentMana;
+        public float currentMaxMana;
+        public float currentManaRegen;
+        public float currentMaxHealth;
+        public float currentHealthRegen;
+
+        private float manaRegenTimer;
         public List<Upgrade> upgrades = new();
+
+        [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
         public float damageMultiplier = 1f;
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
+        public float manaRegenMultiplier = 1f;
         public float cooldownMultiplier = 1f;
 
         public event Action<float> OnHealthChanged;
         public event Action<float> OnDamageChanged;
         public event Action<float> OnSpeedChanged;
         public event Action<float> OnManaChanged;
+        public event Action<float> OnManaRegenChanged;
         public event Action<float> OnCooldownChanged;
+
+        private void Start()
+        {
+            currentMana = baseMaxMana;
+        }
+        private void Update()
+        {
+            currentMaxHealth = baseMaxHealth * healthMultiplier;
+            currentMaxMana = baseMaxMana * manaMultiplier;
+
+            if (currentMana < currentMaxMana)
+            {
+                manaRegenTimer += Time.deltaTime;
+                if (manaRegenTimer >= 1f)
+                {
+                    currentMana += currentManaRegen;
+                    if (currentMana > currentMaxMana)
+                        currentMana = currentMaxMana;
+                    manaRegenTimer = 0f;
+                }
+            }
+        }
 
         public void ApplyUpgrade(SingleUpgrade upgrade)
         {
@@ -42,8 +85,12 @@ namespace _Scripts.Player
                     manaMultiplier += upgrade.value / 100f;
                     OnManaChanged?.Invoke(manaMultiplier);
                     break;
+                case UpgradeTypes.ManaRegen:
+                    manaRegenMultiplier += upgrade.value / 100f;
+                    OnManaRegenChanged?.Invoke(manaRegenMultiplier);
+                    break;
                 case UpgradeTypes.Cooldown:
-                    cooldownMultiplier += upgrade.value / 100f;
+                    cooldownMultiplier -= upgrade.value / 100f;
                     OnCooldownChanged?.Invoke(cooldownMultiplier);
                     break;
                 default:
@@ -114,6 +161,7 @@ namespace _Scripts.Player
         Damage,
         Speed,
         Mana,
-        Cooldown
+        ManaRegen,
+        Cooldown,
     }
 }

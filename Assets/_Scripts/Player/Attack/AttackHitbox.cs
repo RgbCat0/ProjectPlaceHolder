@@ -1,23 +1,32 @@
 using _Scripts.Enemies;
+using _Scripts.Player;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class AttackHitbox : MonoBehaviour
 {
-
+    private PlayerStats _playerStats;
     private AttackManager _attackManager;
-    void Start()
+
+    public void SetCaster(GameObject player)
     {
-        _attackManager = FindAnyObjectByType<AttackManager>();
+        _playerStats = player.GetComponent<PlayerStats>();
+        _attackManager = player.GetComponent<AttackManager>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
-            Enemy enemy = other.GetComponent<Enemy>();
-            if (other != null)
+            Debug.Log($"Hit {other.name}");
+            Enemy enemy = other.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
             {
-                enemy.TakeDamage(_attackManager.GetSpell().damage);
+                enemy.TakeDamage(_attackManager.GetCastedSpell().damage * _playerStats.damageMultiplier);
+            }
+            else
+            {
+                Debug.LogWarning("Enemy script not found.");
             }
         }
     }

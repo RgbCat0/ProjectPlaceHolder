@@ -614,6 +614,7 @@ GameObject:
   - component: {fileID: 430245355}
   - component: {fileID: 430245354}
   - component: {fileID: 430245353}
+  - component: {fileID: 430245357}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -706,6 +707,25 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &430245357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430245352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee63ab3459929bd45912055495595c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 989841533}
+  manaBar: {fileID: 492292842}
+  healthText: {fileID: 433867054}
+  manaText: {fileID: 1069992438}
+  upgradeMenu: {fileID: 266070518}
+  upgradePrefab: {fileID: 0}
+  smallUpgradePrefab: {fileID: 0}
 --- !u!1 &433867052
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,7 +979,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2e334af7049abbf4f9f50fc46f8c4df6, type: 2}
+  - {fileID: -4332899707949017842, guid: 4d27b4309290cba4ca0502c8812aa256, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1440,7 +1460,7 @@ GameObject:
   - component: {fileID: 1042723090}
   - component: {fileID: 1042723089}
   - component: {fileID: 1042723088}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2819,9 +2839,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4073585264626957247, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4214075142328633743, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
       propertyPath: m_LocalScale.z
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4240800674479617989, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 4848992932247000433, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
       propertyPath: m_IsActive
@@ -2934,8 +2962,61 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8483662577808818326, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+      insertIndex: 3
+      addedObject: {fileID: 2183975818217627851}
+    - targetCorrespondingSourceObject: {fileID: 8483662577808818326, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 2183975818217627850}
   m_SourcePrefab: {fileID: 100100000, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+--- !u!1 &2183975818217627849 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8483662577808818326, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+  m_PrefabInstance: {fileID: 2183975818217627848}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2183975818217627850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2183975818217627849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0011bdb16030124f9022973bc32b414, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2183975818217627851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2183975818217627849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51ce17e8a50e44d38f92923eae66f665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMana: 0
+  baseMaxMana: 100
+  baseManaRegen: 1
+  baseMaxHealth: 100
+  baseHealthRegen: 1
+  currentMana: 0
+  currentMaxMana: 100
+  currentManaRegen: 1
+  currentMaxHealth: 100
+  currentHealthRegen: 1
+  upgrades: []
+  healthMultiplier: 1
+  damageMultiplier: 1
+  speedMultiplier: 1
+  manaMultiplier: 1
+  manaRegenMultiplier: 1
+  cooldownMultiplier: 1
+  rangeMultiplier: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

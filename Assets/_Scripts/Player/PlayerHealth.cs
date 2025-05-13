@@ -1,19 +1,38 @@
 using UnityEngine;
 using _Scripts.Managers;
 
-namespace _Scripts.Player.Movement
+namespace _Scripts.Player
 {
     public class PlayerHealth : MonoBehaviour, IDamageable
     {
+        private PlayerStats _playerStats;
+
         public float Health { get; private set; }
         public float MaxHealth { get; private set; }
 
+        private float healthRegenTimer = 0f;
+
         private void Start()
         {
-            Health = 100f; // Set initial health
-            MaxHealth = Health;
+            _playerStats = GetComponent<PlayerStats>();
+            MaxHealth = _playerStats.baseMaxHealth;
+            Health = MaxHealth; // Set initial health
         }
 
+        private void Update()
+        {
+                MaxHealth = _playerStats.currentMaxHealth;
+                UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
+
+            healthRegenTimer += Time.deltaTime;
+            if (healthRegenTimer >= 1f)
+            {
+                Health += _playerStats.currentHealthRegen;
+                if (Health > MaxHealth)
+                    Health = MaxHealth;
+                healthRegenTimer = 0f;
+            }
+        }
         public void TakeDamage(float damage)
         {
             Health -= damage;

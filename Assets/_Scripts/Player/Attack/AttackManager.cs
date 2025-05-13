@@ -2,39 +2,72 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using _Scripts.Player;
+using static UnityEditor.PlayerSettings;
+using static UnityEngine.Rendering.DebugUI;
 
 public class AttackManager : MonoBehaviour
 {
     public enum Spells { Basic, Fireball, Bolt, Arcane }
 
     private readonly Dictionary<Spells, Spell> _spellDictionary = new();
+    private readonly Dictionary<Spells, float> _spellCooldowns = new();
     private readonly Dictionary<Spells, GameObject> _indicators = new();
     private Spell _selectedSpell;
     private Spells _currentSpell;
+    private Spell _castedSpell;
+
+    private PlayerStats _playerStats;
+    private PlayerMovement _playerMovement;
 
     [SerializeField] private GameObject spellObject;
     [SerializeField] private RawImage fireballIndicator;
     [SerializeField] private Canvas boltIndicator;
     [SerializeField] private Canvas arcaneIndicator;
 
-    private float cd;
+    [SerializeField] private LayerMask groundMask;
 
-   
+    private bool _cd;
+    private void Update()
+    {
+        HandleSpellSelection();
+        HandleCasting();
 
+        RaycastHit hit;
+        if (InputHandler.Instance.attackTriggered)
+        {
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask) && Time.time > _spellCooldowns[_currentSpell] && !_cd)
+            {
+                Vector3 hitPos = hit.point;
+                StartCoroutine(CastSpell(_selectedSpell, hitPos));
+                _castedSpell = _selectedSpell;
+                _spellCooldowns[_currentSpell] = Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+                _selectedSpell = SetSpell(Spells.Basic);
+            }
+        }
+    }
+
+    #region Initialization
     private void Start()
     {
+        groundMask = LayerMask.GetMask("Ground");
         InitializeSpells();
         InitializeIndicators();
+        _playerStats = GetComponent<PlayerStats>();
+        _playerMovement = GetComponent<PlayerMovement>();
         _selectedSpell = SetSpell(Spells.Basic);
     }
+
 
     private void InitializeSpells()
     {
         foreach (var spell in Resources.LoadAll<Spell>("Spells"))
         {
-            Debug.Log(spell);
             if (System.Enum.TryParse(spell.name, out Spells spellEnum))
+            {
                 _spellDictionary[spellEnum] = spell;
+                _spellCooldowns[spellEnum] = 0f;
+            }
         }
     }
     private void InitializeIndicators()
@@ -43,35 +76,16 @@ public class AttackManager : MonoBehaviour
         _indicators[Spells.Bolt] = boltIndicator.gameObject;
         _indicators[Spells.Arcane] = arcaneIndicator.gameObject;
     }
-
-    private void Update()
-    {
-        HandleSpellSelection();
-        HandleCasting();
-    }
+    #endregion
     
-    private void HandleSpellSelection()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1) && _currentSpell != Spells.Fireball) SelectSpell(Spells.Fireball);
-        else if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSpell(Spells.Basic);
-        if (Input.GetKeyDown(KeyCode.Alpha2) && _currentSpell != Spells.Bolt) SelectSpell(Spells.Bolt);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSpell(Spells.Basic);
-        if (Input.GetKeyDown(KeyCode.Alpha3) && _currentSpell != Spells.Arcane) SelectSpell(Spells.Arcane);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSpell(Spells.Basic);
-    }
 
-    private void SelectSpell(Spells selectedSpell)
-    {
-        SetSpell(selectedSpell);
-        SetIndicator(selectedSpell);
-    }
-
+    #region Setting indicator values
     private void HandleCasting()
     {
 
         // Indicators
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask))
         {
             Vector3 hitPos = hit.point;
             if (_indicators.TryGetValue(Spells.Fireball, out var fireballIndicator) && fireballIndicator.activeSelf)
@@ -82,7 +96,7 @@ public class AttackManager : MonoBehaviour
 
             foreach (var indicator in _indicators)
             {
-                if(_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line || _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
+                if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line || _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
                 {
                     indicator.Value.transform.GetComponent<RectTransform>().localScale = new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
                 }
@@ -103,104 +117,136 @@ public class AttackManager : MonoBehaviour
                 }
             }
         }
-
-
-        // Casting
-        if(InputHandler.Instance.attackTriggered)
-        {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit) && Time.time > cd)
-            {
-                Debug.Log("Casting spell: " + _selectedSpell.name);
-                Vector3 hitPos = hit.point;
-                StartCoroutine(CastSpell(_selectedSpell, hitPos));
-            }
-        }
-
     }
+        #endregion
 
+    #region Spell Casting
     private IEnumerator CastSpell(Spell spell, Vector3 pos)
     {
-        //if(playerMana >= spell.manaCost)
-        //{
-
-        //}
-        cd = Time.time + spell.cooldown;
-        float castTime = Time.time + spell.castTime;
-
-        GameObject castedSpell = Instantiate(spell.spellPrefab, spellObject.transform.position, Quaternion.identity);
-
-        castedSpell.GetComponent<Rigidbody>().useGravity = false;
-        while(Time.time < castTime)
+        if (_playerStats.currentMana >= spell.manaCost)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
-            yield return new WaitForFixedUpdate();
-        }
-        yield return new WaitForSeconds(spell.castTime);
-        castedSpell.GetComponent<Rigidbody>().useGravity = true;
-        Debug.Log("Instantiated");
+            
+            _playerStats.currentMana -= spell.manaCost;
+            float castTime = Time.time + spell.castTime;
 
-        // Basic attack
-        if (spell.areaOfEffect == Spell.AreaOfEffect.None)
-        {
-            Vector3 origin = spellObject.transform.position;
-            bool travel = true;
+            GameObject castedSpell = Instantiate(spell.spellPrefab, spellObject.transform.position, Quaternion.identity);
+
             castedSpell.GetComponent<Rigidbody>().useGravity = false;
-            castedSpell.GetComponent<Rigidbody>().linearVelocity = (pos - transform.position).normalized * spell.travelSpeed;
-            while (travel == true)
+
+
+            while (Time.time < castTime)
             {
-                float distance = Vector3.Distance(origin, castedSpell.transform.position);
-                if(distance > spell.range)
-                {
-                    Destroy(castedSpell);
-                    travel = false;
-                    yield break;
-                }
-                yield return null;
+                _cd = true;
+                _playerMovement.canMove = false;
+                Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
+                yield return new WaitForFixedUpdate();
             }
-        }
 
+            _playerMovement.canMove = true;
+            _cd = false;
 
-        // Circle AOE Spells
-        else if(spell.areaOfEffect == Spell.AreaOfEffect.Circle)
-        {
-            while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
+            // Basic attack
+            if (spell.areaOfEffect == Spell.AreaOfEffect.None)
             {
-                castedSpell.transform.position = Vector3.Slerp(castedSpell.transform.position, pos, spell.travelSpeed * Time.deltaTime);
-                Debug.Log("Moving");
-                yield return null;
+                StartCoroutine(BasicAttack(castedSpell, spell, pos));
             }
-            Destroy(castedSpell);
-            spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2);
-            GameObject hitbox = Instantiate(spell.hitboxPrefab, pos, Quaternion.identity);
-            yield return new WaitForSeconds(spell.duration);
-            Destroy(hitbox);
+
+
+            // Circle AOE Spells
+            else if (spell.areaOfEffect == Spell.AreaOfEffect.Circle)
+            {
+                StartCoroutine(CircleAoeAttack(castedSpell, spell, pos));
+            }
+
+            // Line AOE Spells
+            else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
+            {
+                StartCoroutine(LineAoeAttack(castedSpell, spell, pos));
+            }
+
+            // Cone AOE Spells
+            else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
+            {
+                StartCoroutine(ConeAoeAttack(castedSpell, spell, pos));
+            }
+
+            
         }
 
-        // Line AOE Spells
-        else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
+        else 
         {
-            // Implement line spell visual effects
-
-            Debug.Log("Line Spell");
-            spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, 3, (spell.range / 4) * 2);
-            GameObject hitbox = Instantiate(spell.hitboxPrefab, transform.position, Quaternion.identity);
-            hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
-            hitbox.transform.position += hitbox.transform.forward * 6;
-            Destroy(castedSpell);
-            yield return new WaitForSeconds(spell.duration);
-            Debug.Log("Destroying hitbox");
-            Destroy(hitbox);
-            //Destroy(castedSpell);
+            Debug.Log("Not enough mana to cast " + spell.name);
         }
+    }
 
-        // Cone AOE Spells
-        else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
+    private IEnumerator BasicAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    {
+        Vector3 origin = spellObject.transform.position;
+        bool travel = true;
+        castedSpell.GetComponent<Rigidbody>().useGravity = false;
+        castedSpell.GetComponent<Rigidbody>().linearVelocity = (pos - transform.position).normalized * spell.travelSpeed;
+        while (travel == true)
         {
-            castedSpell.transform.position = transform.position + transform.forward * spell.range;
+            float distance = Vector3.Distance(origin, castedSpell.transform.position);
+            if (distance > spell.range)
+            {
+                Destroy(castedSpell);
+                travel = false;
+                yield break;
+            }
+            yield return null;
         }
+    }
+
+    private IEnumerator CircleAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    {
+        while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
+        {
+            castedSpell.transform.position = Vector3.Slerp(castedSpell.transform.position, pos, spell.travelSpeed * Time.deltaTime);
+            yield return null;
+        }
+        Destroy(castedSpell);
+        spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2);
+        GameObject hitbox = Instantiate(spell.hitboxPrefab, pos, Quaternion.identity);
+        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+        yield return new WaitForSeconds(spell.duration);
+        Destroy(hitbox);
+    }
+
+    private IEnumerator LineAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    {
+        // Implement line spell visual effects
+
+        spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, 3, (spell.range / 4) * 2);
+        GameObject hitbox = Instantiate(spell.hitboxPrefab, transform.position, Quaternion.identity);
+        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+        hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
+        hitbox.transform.position += hitbox.transform.forward * 6;
+        Destroy(castedSpell);
+        yield return new WaitForSeconds(spell.duration);
+        Destroy(hitbox);
+        //Destroy(castedSpell);
+    }
+
+    private IEnumerator ConeAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    {
+        //hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+        throw new System.NotImplementedException();
+    }
+    #endregion
 
 
+    #region Setting & Selecting
+
+    private void HandleSpellSelection()
+    {
+            if (Input.GetKeyDown(KeyCode.Alpha1) && _currentSpell != Spells.Fireball) SetSpell(Spells.Fireball);
+            else if (Input.GetKeyDown(KeyCode.Alpha1)) SetSpell(Spells.Basic);
+            if (Input.GetKeyDown(KeyCode.Alpha2) && _currentSpell != Spells.Bolt) SetSpell(Spells.Bolt);
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) SetSpell(Spells.Basic);
+            if (Input.GetKeyDown(KeyCode.Alpha3) && _currentSpell != Spells.Arcane) SetSpell(Spells.Arcane);
+            else if (Input.GetKeyDown(KeyCode.Alpha3)) SetSpell(Spells.Basic);
     }
 
     private void SetIndicator(Spells selectedSpell)
@@ -214,30 +260,37 @@ public class AttackManager : MonoBehaviour
         {
             indicator.SetActive(true);
         }
-
-        if (selectedSpell == Spells.Basic)
-        {
-            Debug.Log("Basic Attack Selected");
-        }
     }
 
     public Spell SetSpell(Spells spellName)
     {
   
-        if (_spellDictionary.TryGetValue(spellName, out var spell))
+        if (_spellDictionary.TryGetValue(spellName, out var spell) && spell != null)
         {
-            Debug.Log($"Spell found: {spell.name}");
-            _selectedSpell = spell;
-            _currentSpell = spellName;
-            return spell;
+            if (_playerStats.currentMana >= spell.manaCost)
+            {
+                _selectedSpell = spell;
+                _currentSpell = spellName;
+                SetIndicator(spellName);
+                return spell;
+            }
+            else
+            {
+                Debug.Log("Not enough mana to cast " + spell.name);
+                _selectedSpell = _spellDictionary[Spells.Basic];
+                _currentSpell = Spells.Basic;
+                SetIndicator(Spells.Basic);
+                return _selectedSpell;
+            }
         }
 
         Debug.LogWarning("Spell not found " + spellName);
         return null;
     }
 
-    public Spell GetSpell()
+    public Spell GetCastedSpell()
     {
-        return _selectedSpell;
+        return _castedSpell;
     }
+    #endregion
 }
