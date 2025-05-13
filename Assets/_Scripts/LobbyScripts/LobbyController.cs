@@ -163,6 +163,11 @@ namespace _Scripts.LobbyScripts
         {
             _serviceManager.StopHeartbeat();
             NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
+            NetworkManager.SceneManager.OnLoadComplete += (id, _, _) =>
+            {
+                if (id == NetworkManager.LocalClientId)
+                    GameManager.Instance.StartGame();
+            };
             yield return null;
         }
 

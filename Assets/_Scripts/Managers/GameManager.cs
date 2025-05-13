@@ -18,13 +18,13 @@ public class GameManager : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-        if (NetworkManager.IsHost)
-        {
-            NetworkObject.SpawnWithOwnership(0);
-        }
+        // if (NetworkManager.IsHost)
+        // {
+        //     // NetworkObject.SpawnWithOwnership(0);
+        // }
     }
 
-    private void Start()
+    public void StartGame()
     {
         // spawns the players
         if (NetworkManager.IsHost)
