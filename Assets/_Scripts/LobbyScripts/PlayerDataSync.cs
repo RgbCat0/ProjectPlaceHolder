@@ -31,6 +31,7 @@ namespace _Scripts.LobbyScripts
             bool isHost
         )
         {
+            LobbyController.Instance.CanStartGame(false);
             while (true)
             {
                 if (!_isActuallySpawned)
@@ -39,7 +40,6 @@ namespace _Scripts.LobbyScripts
                 }
                 else
                 {
-                    Debug.Log(networkId);
                     RegisterPlayerServerRpc(playerName, lobbyId, networkId, isHost);
                     yield break;
                 }
@@ -73,6 +73,7 @@ namespace _Scripts.LobbyScripts
 
             SyncedPlayerList.Add(newData);
             NewPlayerJoinRpc();
+            LobbyController.Instance.CanStartGame(true);
         }
 
         [Rpc(SendTo.Everyone)]

@@ -74,6 +74,7 @@ namespace _Scripts.LobbyScripts
             LobbyLogger.StatusMessage("Creating Lobby...");
             await _serviceManager.HostLobbyTask(obj, relayJoinCode);
             LobbyLogger.StatusMessage("");
+            CanStartGame(true);
         }
 
         private async void HandleJoinLobby(Lobby lobby)
@@ -83,6 +84,24 @@ namespace _Scripts.LobbyScripts
             LobbyLogger.StatusMessage("Starting Networking...");
             await _lobbyNetManager.ClientNetworkTask(lobby.Data["RelayJoinCode"].Value);
             LobbyLogger.StatusMessage("");
+        }
+
+        public void CanStartGame(bool canStart)
+        {
+            var allReady = true;
+            foreach (var playerData in _playerDataSync.SyncedPlayerList)
+            {
+                if (!playerData.IsReady)
+                    allReady = false;
+            }
+            if (canStart && allReady)
+            {
+                _uiManager.EnableStartGameButton();
+            }
+            else
+            {
+                _uiManager.DisableStartGameButton();
+            }
         }
 
         // needs to run local first for correct data.
