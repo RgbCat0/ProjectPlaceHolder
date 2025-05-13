@@ -47,13 +47,9 @@ namespace _Scripts.Player
 
         private void Start()
         {
-            if (!IsOwner)
-            {
-                enabled = false;
-                return;
-            }
             currentMana = baseMaxMana;
         }
+
         private void Update()
         {
             currentMaxHealth = baseMaxHealth * healthMultiplier;

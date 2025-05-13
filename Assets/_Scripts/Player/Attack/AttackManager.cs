@@ -1,14 +1,20 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
+using System.Collections.Generic;
 using _Scripts.Player;
 using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
 public class AttackManager : NetworkBehaviour
 {
-    public enum Spells { Basic, Fireball, Bolt, Arcane }
+    public enum Spells
+    {
+        Basic,
+        Fireball,
+        Bolt,
+        Arcane,
+    }
 
     private readonly Dictionary<Spells, Spell> _spellDictionary = new();
     private readonly Dictionary<Spells, float> _spellCooldowns = new();
@@ -21,54 +27,76 @@ public class AttackManager : NetworkBehaviour
     private PlayerStats _playerStats;
     private PlayerMovement _playerMovement;
 
-    [SerializeField] private GameObject spellObject;
-    [SerializeField] private RawImage fireballIndicator;
-    [SerializeField] private Canvas boltIndicator;
-    [SerializeField] private Canvas arcaneIndicator;
+    [SerializeField]
+    private GameObject spellObject;
 
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField]
+    private RawImage fireballIndicator;
+
+    [SerializeField]
+    private Canvas boltIndicator;
+
+    [SerializeField]
+    private Canvas arcaneIndicator;
+
+    [SerializeField]
+    private LayerMask groundMask;
 
     private ulong _playerId;
 
     private bool _cd;
+
     private void Update()
     {
+        if (!IsOwner)
+            return;
         HandleSpellSelection();
         HandleCasting();
-
 
         RaycastHit hit;
         if (InputHandler.Instance.attackTriggered)
         {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask) && Time.time > _spellCooldowns[_currentSpell] && !_cd)
+            if (
+                Physics.Raycast(
+                    Camera.main.ScreenPointToRay(Input.mousePosition),
+                    out hit,
+                    Mathf.Infinity,
+                    groundMask
+                )
+                && Time.time > _spellCooldowns[_currentSpell]
+                && !_cd
+            )
             {
                 Vector3 hitPos = hit.point;
                 _castedSpell = _selectedSpell;
-                _spellCooldowns[_currentSpell] = Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
-                CastSpellRpc(hitPos);
-                _selectedSpell = SetSpell(Spells.Basic);
+                _spellCooldowns[_currentSpell] =
+                    Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+
+                CastSpellRpc(hitPos, (int)_currentSpell);
+
+                // _selectedSpell = SetSpell(Spells.Basic);
             }
         }
     }
 
+    [Rpc(SendTo.Everyone)]
+    private void WAITRpc()
+    {
+        _selectedSpell = SetSpell(Spells.Basic);
+    }
 
     #region Initialization
     private void Start()
     {
-        if (!IsOwner)
-        {
-            enabled = false;
-            return;
-        }
         _playerId = NetworkManager.Singleton.LocalClientId;
         groundMask = LayerMask.GetMask("Ground");
         InitializeSpells();
         InitializeIndicators();
         _playerStats = GetComponent<PlayerStats>();
         _playerMovement = GetComponent<PlayerMovement>();
+
         _selectedSpell = SetSpell(Spells.Basic);
     }
-
 
     private void InitializeSpells()
     {
@@ -81,6 +109,7 @@ public class AttackManager : NetworkBehaviour
             }
         }
     }
+
     private void InitializeIndicators()
     {
         _indicators[Spells.Fireball] = fireballIndicator.gameObject;
@@ -88,36 +117,62 @@ public class AttackManager : NetworkBehaviour
         _indicators[Spells.Arcane] = arcaneIndicator.gameObject;
     }
     #endregion
-    
+
 
     #region Setting indicator values
     private void HandleCasting()
     {
-
         // Indicators
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask))
+        if (
+            Physics.Raycast(
+                Camera.main.ScreenPointToRay(Input.mousePosition),
+                out hit,
+                Mathf.Infinity,
+                groundMask
+            )
+        )
         {
             Vector3 hitPos = hit.point;
-            if (_indicators.TryGetValue(Spells.Fireball, out var fireballIndicator) && fireballIndicator.activeSelf)
+            if (
+                _indicators.TryGetValue(Spells.Fireball, out var fireballIndicator)
+                && fireballIndicator.activeSelf
+            )
             {
                 fireballIndicator.transform.Find("TargetIndicator").position = hitPos;
-                fireballIndicator.transform.Find("TargetIndicator").GetComponent<RectTransform>().localScale = new Vector3(_selectedSpell.areaOfEffectRadius / 2, _selectedSpell.areaOfEffectRadius / 2, 0);
+                fireballIndicator
+                    .transform.Find("TargetIndicator")
+                    .GetComponent<RectTransform>()
+                    .localScale = new Vector3(
+                    _selectedSpell.areaOfEffectRadius / 2,
+                    _selectedSpell.areaOfEffectRadius / 2,
+                    0
+                );
             }
 
             foreach (var indicator in _indicators)
             {
-                if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line || _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
+                if (
+                    _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line
+                    || _selectedSpell != null
+                        && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone
+                )
                 {
-                    indicator.Value.transform.GetComponent<RectTransform>().localScale = new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
+                    indicator.Value.transform.GetComponent<RectTransform>().localScale =
+                        new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
                 }
-
-                else if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Circle)
+                else if (
+                    _selectedSpell != null
+                    && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Circle
+                )
                 {
-                    indicator.Value.transform.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-                    indicator.Value.transform.GetComponent<RectTransform>().sizeDelta = new Vector3(_selectedSpell.range / 2, _selectedSpell.range / 2);
+                    indicator.Value.transform.GetComponent<RectTransform>().localScale =
+                        new Vector3(1, 1, 1);
+                    indicator.Value.transform.GetComponent<RectTransform>().sizeDelta = new Vector3(
+                        _selectedSpell.range / 2,
+                        _selectedSpell.range / 2
+                    );
                 }
-
 
                 if (indicator.Key != Spells.Fireball && indicator.Value.activeSelf)
                 {
@@ -134,17 +189,28 @@ public class AttackManager : NetworkBehaviour
 
     #region Spell Casting
     [Rpc(SendTo.Server)]
-    private void CastSpellRpc(Vector3 pos)
+    private void CastSpellRpc(Vector3 pos, int spellIndex)
     {
-        if (_playerStats.currentMana >= _castedSpell.manaCost)
+        if (!_spellDictionary.TryGetValue((Spells)spellIndex, out var spell))
         {
-            _playerStats.currentMana -= _castedSpell.manaCost;
-            castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(_castedSpell.spellPrefab, _playerId, position: spellObject.transform.position, rotation: Quaternion.identity);
+            Debug.LogError($"Server: Could not find spell for index {spellIndex}");
+            return;
+        }
 
+        if (_playerStats.currentMana >= spell.manaCost)
+        {
+            _playerStats.currentMana -= spell.manaCost;
+            _castedSpell = spell; // update server-side reference
+
+            castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+                spell.spellPrefab,
+                _playerId,
+                position: spellObject.transform.position,
+                rotation: Quaternion.identity
+            );
             castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
-            // Start the local coroutine for cast time and spell logic
-            StartCoroutine(CastSpell(_castedSpell, pos));
+            StartCoroutine(CastSpell(spell, pos));
         }
         else
         {
@@ -156,6 +222,7 @@ public class AttackManager : NetworkBehaviour
                 Debug.LogError("_castedSpell is null");
         }
     }
+
     private IEnumerator CastSpell(Spell spell, Vector3 pos)
     {
         float castTime = Time.time + spell.castTime;
@@ -164,8 +231,14 @@ public class AttackManager : NetworkBehaviour
         {
             _cd = true;
             _playerMovement.canMove = false;
-            Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
+            Quaternion targetRotation = Quaternion
+                .LookRotation(pos - transform.position)
+                .normalized;
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                spell.castTime * Time.deltaTime * 10f
+            );
             yield return new WaitForFixedUpdate();
         }
 
@@ -177,25 +250,22 @@ public class AttackManager : NetworkBehaviour
         {
             SpawnBasicAttackRpc(pos);
         }
-
-
         // Circle AOE Spells
         else if (spell.areaOfEffect == Spell.AreaOfEffect.Circle)
         {
             SpawnCircleAoeAttackRpc(pos);
         }
-
         // Line AOE Spells
         else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
         {
             SpawnLineAoeAttackRpc(pos);
         }
-
         // Cone AOE Spells
         else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
         {
             SpawnConeAoeAttackRpc(pos);
         }
+        WAITRpc();
     }
 
     [Rpc(SendTo.Server)]
@@ -209,7 +279,8 @@ public class AttackManager : NetworkBehaviour
         Vector3 origin = spellObject.transform.position;
         bool travel = true;
         castedSpell.GetComponent<Rigidbody>().useGravity = false;
-        castedSpell.GetComponent<Rigidbody>().linearVelocity = (pos - transform.position).normalized * _castedSpell.travelSpeed;
+        castedSpell.GetComponent<Rigidbody>().linearVelocity =
+            (pos - transform.position).normalized * _castedSpell.travelSpeed;
         while (travel == true)
         {
             float distance = Vector3.Distance(origin, castedSpell.transform.position);
@@ -222,12 +293,31 @@ public class AttackManager : NetworkBehaviour
             yield return null;
         }
     }
+
     [Rpc(SendTo.Server)]
     private void SpawnCircleAoeAttackRpc(Vector3 pos)
     {
-
-        _castedSpell.hitboxPrefab.transform.localScale = new Vector3(_castedSpell.areaOfEffectRadius / 2, _castedSpell.areaOfEffectRadius / 2, _castedSpell.areaOfEffectRadius / 2);
-        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(_castedSpell.hitboxPrefab, _playerId, position: pos, rotation: Quaternion.identity);
+        if (_castedSpell == null)
+        {
+            Debug.LogWarning("_castedSpell is null in SpawnCircleAoeAttackRpc");
+            return;
+        }
+        if (_castedSpell.hitboxPrefab == null)
+        {
+            Debug.LogWarning("_castedSpell.hitboxPrefab is null in SpawnCircleAoeAttackRpc");
+            return;
+        }
+        _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
+            _castedSpell.areaOfEffectRadius / 2,
+            _castedSpell.areaOfEffectRadius / 2,
+            _castedSpell.areaOfEffectRadius / 2
+        );
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+            _castedSpell.hitboxPrefab,
+            _playerId,
+            position: pos,
+            rotation: Quaternion.identity
+        );
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
 
         StartCoroutine(CircleAoeAttack(hitbox, pos));
@@ -237,7 +327,11 @@ public class AttackManager : NetworkBehaviour
     {
         while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
         {
-            castedSpell.transform.position = Vector3.Slerp(castedSpell.transform.position, pos, _castedSpell.travelSpeed * Time.deltaTime);
+            castedSpell.transform.position = Vector3.Slerp(
+                castedSpell.transform.position,
+                pos,
+                _castedSpell.travelSpeed * Time.deltaTime
+            );
             yield return null;
         }
 
@@ -249,11 +343,20 @@ public class AttackManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void SpawnLineAoeAttackRpc(Vector3 pos)
     {
-        _castedSpell.hitboxPrefab.transform.localScale = new Vector3(_castedSpell.areaOfEffectRadius / 2, 3, (_castedSpell.range / 4) * 2);
+        _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
+            _castedSpell.areaOfEffectRadius / 2,
+            3,
+            (_castedSpell.range / 4) * 2
+        );
         Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
         Vector3 hitboxPosition = transform.position + hitboxRotation * Vector3.forward * 6;
 
-        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(_castedSpell.hitboxPrefab, _playerId, position: hitboxPosition, rotation: hitboxRotation);
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+            _castedSpell.hitboxPrefab,
+            _playerId,
+            position: hitboxPosition,
+            rotation: hitboxRotation
+        );
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
         hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
 
@@ -274,7 +377,12 @@ public class AttackManager : NetworkBehaviour
     private void SpawnConeAoeAttackRpc(Vector3 pos)
     {
         Spell spell = _castedSpell;
-        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.hitboxPrefab, _playerId, position: pos, rotation: Quaternion.identity);
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+            spell.hitboxPrefab,
+            _playerId,
+            position: pos,
+            rotation: Quaternion.identity
+        );
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
 
         StartCoroutine(ConeAoeAttack(hitbox, spell, pos));
@@ -292,12 +400,18 @@ public class AttackManager : NetworkBehaviour
 
     private void HandleSpellSelection()
     {
-            if (Input.GetKeyDown(KeyCode.Alpha1) && _currentSpell != Spells.Fireball) SetSpell(Spells.Fireball);
-            else if (Input.GetKeyDown(KeyCode.Alpha1)) SetSpell(Spells.Basic);
-            if (Input.GetKeyDown(KeyCode.Alpha2) && _currentSpell != Spells.Bolt) SetSpell(Spells.Bolt);
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) SetSpell(Spells.Basic);
-            if (Input.GetKeyDown(KeyCode.Alpha3) && _currentSpell != Spells.Arcane) SetSpell(Spells.Arcane);
-            else if (Input.GetKeyDown(KeyCode.Alpha3)) SetSpell(Spells.Basic);
+        if (Input.GetKeyDown(KeyCode.Alpha1) && _currentSpell != Spells.Fireball)
+            SetSpell(Spells.Fireball);
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
+            SetSpell(Spells.Basic);
+        if (Input.GetKeyDown(KeyCode.Alpha2) && _currentSpell != Spells.Bolt)
+            SetSpell(Spells.Bolt);
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+            SetSpell(Spells.Basic);
+        if (Input.GetKeyDown(KeyCode.Alpha3) && _currentSpell != Spells.Arcane)
+            SetSpell(Spells.Arcane);
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+            SetSpell(Spells.Basic);
     }
 
     private void SetIndicator(Spells selectedSpell)
@@ -315,7 +429,6 @@ public class AttackManager : NetworkBehaviour
 
     public Spell SetSpell(Spells spellName)
     {
-  
         if (_spellDictionary.TryGetValue(spellName, out var spell) && spell != null)
         {
             if (_playerStats.currentMana >= spell.manaCost)
