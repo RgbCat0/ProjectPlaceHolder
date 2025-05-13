@@ -478,7 +478,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3999573275423389246, guid: 367f5aef3951ff14fb2ff658019bed27, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4043868649502678797, guid: 367f5aef3951ff14fb2ff658019bed27, type: 3}
       propertyPath: m_Name
@@ -651,6 +651,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6005859515141433654, guid: 367f5aef3951ff14fb2ff658019bed27, type: 3}
   m_PrefabInstance: {fileID: 539296037}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &636567003 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 458970233168501869, guid: 367f5aef3951ff14fb2ff658019bed27, type: 3}
+  m_PrefabInstance: {fileID: 539296037}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1010505375
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,6 +986,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  SyncedPlayerList: []
+  listIsSynced:
+    m_InternalValue: 0
 --- !u!114 &1644267332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -987,6 +1001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bed9f841184057b30eec79826efdb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   mainParent: {fileID: 539296047}
   createParent: {fileID: 539296046}
   joinParent: {fileID: 539296045}
@@ -998,6 +1013,8 @@ MonoBehaviour:
   createLobbyNameField: {fileID: 539296040}
   joinLobbyPanel: {fileID: 1235507148}
   joinLobbyPrefab: {fileID: 1718740832640351193, guid: 9ddf1738ad27e234d8b3639026cbca85, type: 3}
+  startGameButton: {fileID: 636567003}
+  readyButton: {fileID: 0}
   playerLobbyPanel: {fileID: 1459922626}
   playerLobbyPrefab: {fileID: 2587740302861711695, guid: a9092252bca7df841a1ec7f08e66a0ed, type: 3}
   statusText: {fileID: 539296038}
