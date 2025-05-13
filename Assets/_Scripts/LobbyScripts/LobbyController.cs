@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
@@ -11,6 +12,9 @@ namespace _Scripts.LobbyScripts
 {
     public class LobbyController : NetworkBehaviour
     {
+#if UNITY_EDITOR
+        public bool quickTest;
+#endif
         private LobbyUiManager _uiManager;
         private LobbyNetManager _lobbyNetManager;
         private LobbyServiceManager _serviceManager;
@@ -48,6 +52,12 @@ namespace _Scripts.LobbyScripts
                 _uiManager.OnStartGame += StartGameRpc;
                 _uiManager.ShowMainMenu();
                 _playerDataSync.OnPlayerJoin += () => LobbyLogger.StatusMessage("");
+#if UNITY_EDITOR
+                if (quickTest)
+                {
+                    HandleCreateLobby("TestLobby");
+                }
+#endif
             }
             catch (Exception e)
             {
@@ -80,6 +90,10 @@ namespace _Scripts.LobbyScripts
             NetworkManager.OnClientConnectedCallback += _ => _uiManager.ResetReadyStatusRpc();
             NetworkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
             CanStartGame(true);
+#if UNITY_EDITOR
+            if (quickTest)
+                StartGameRpc();
+#endif
         }
 
         private void NetworkManagerOnOnClientConnectedCallback(ulong obj)
@@ -121,7 +135,7 @@ namespace _Scripts.LobbyScripts
             HandleNewPlayerRpc(
                 NetworkManager.LocalClientId,
                 AuthenticationService.Instance.PlayerId,
-                _lobbyNetManager.PlayerName,
+                AuthenticationService.Instance.PlayerName,
                 NetworkManager.IsHost
             );
 
@@ -141,10 +155,15 @@ namespace _Scripts.LobbyScripts
         {
             if (NetworkManager.IsHost)
             {
-                // TODO: add a countdown
-                _serviceManager.StopHeartbeat();
-                NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
+                StartCoroutine(StartGame());
             }
+        }
+
+        private IEnumerator StartGame()
+        {
+            _serviceManager.StopHeartbeat();
+            NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
+            yield return null;
         }
 
         public async Task<List<Lobby>> GetLobbies()

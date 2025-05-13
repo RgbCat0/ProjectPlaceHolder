@@ -14,7 +14,6 @@ namespace _Scripts.LobbyScripts
     public class LobbyNetManager : NetworkBehaviour
     {
         private string _relayJoinCode;
-        public string PlayerName { get; private set; }
 
         public async Task SignInTask()
         {
@@ -93,7 +92,6 @@ namespace _Scripts.LobbyScripts
             try
             {
                 await AuthenticationService.Instance.UpdatePlayerNameAsync(newName);
-                PlayerName = newName;
             }
             catch (Exception e)
             {
