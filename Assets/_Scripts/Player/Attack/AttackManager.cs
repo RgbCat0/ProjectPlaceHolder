@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine.UI;
 using _Scripts.Player;
 using Unity.Netcode;
+using static UnityEngine.Rendering.DebugUI;
 
 public class AttackManager : NetworkBehaviour
 {
@@ -15,6 +16,7 @@ public class AttackManager : NetworkBehaviour
     private Spell _selectedSpell;
     private Spells _currentSpell;
     private Spell _castedSpell;
+    private NetworkObject castedSpell;
 
     private PlayerStats _playerStats;
     private PlayerMovement _playerMovement;
@@ -25,6 +27,8 @@ public class AttackManager : NetworkBehaviour
     [SerializeField] private Canvas arcaneIndicator;
 
     [SerializeField] private LayerMask groundMask;
+
+    private ulong _playerId;
 
     private bool _cd;
     private void Update()
@@ -38,7 +42,7 @@ public class AttackManager : NetworkBehaviour
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask) && Time.time > _spellCooldowns[_currentSpell] && !_cd)
             {
                 Vector3 hitPos = hit.point;
-                StartCoroutine(CastSpell(_selectedSpell, hitPos));
+                CastSpellRpc(hitPos);
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] = Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
                 _selectedSpell = SetSpell(Spells.Basic);
@@ -54,6 +58,7 @@ public class AttackManager : NetworkBehaviour
             enabled = false;
             return;
         }
+        _playerId = NetworkManager.Singleton.LocalClientId;
         groundMask = LayerMask.GetMask("Ground");
         InitializeSpells();
         InitializeIndicators();
@@ -122,69 +127,80 @@ public class AttackManager : NetworkBehaviour
             }
         }
     }
-        #endregion
+    #endregion
+
 
     #region Spell Casting
-    private IEnumerator CastSpell(Spell spell, Vector3 pos)
+    [Rpc(SendTo.Server)]
+    private void CastSpellRpc(Vector3 pos)
     {
-        if (_playerStats.currentMana >= spell.manaCost)
+        if (_playerStats.currentMana >= _castedSpell.manaCost)
         {
-            
-            _playerStats.currentMana -= spell.manaCost;
-            float castTime = Time.time + spell.castTime;
-
-            GameObject castedSpell = Instantiate(spell.spellPrefab, spellObject.transform.position, Quaternion.identity);
+            _playerStats.currentMana -= _castedSpell.manaCost;
+            castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(_castedSpell.spellPrefab, _playerId, position: spellObject.transform.position, rotation: Quaternion.identity);
 
             castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
+            // Start the local coroutine for cast time and spell logic
+            StartCoroutine(CastSpell(_castedSpell, pos));
+        }
+        else
+        {
+            Debug.Log("Not enough mana to cast " + _castedSpell.name);
+        }
+    }
+    private IEnumerator CastSpell(Spell spell, Vector3 pos)
+    {
+        float castTime = Time.time + spell.castTime;
 
-            while (Time.time < castTime)
-            {
-                _cd = true;
-                _playerMovement.canMove = false;
-                Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
-                yield return new WaitForFixedUpdate();
-            }
-
-            _playerMovement.canMove = true;
-            _cd = false;
-
-            // Basic attack
-            if (spell.areaOfEffect == Spell.AreaOfEffect.None)
-            {
-                StartCoroutine(BasicAttack(castedSpell, spell, pos));
-            }
-
-
-            // Circle AOE Spells
-            else if (spell.areaOfEffect == Spell.AreaOfEffect.Circle)
-            {
-                StartCoroutine(CircleAoeAttack(castedSpell, spell, pos));
-            }
-
-            // Line AOE Spells
-            else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
-            {
-                StartCoroutine(LineAoeAttack(castedSpell, spell, pos));
-            }
-
-            // Cone AOE Spells
-            else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
-            {
-                StartCoroutine(ConeAoeAttack(castedSpell, spell, pos));
-            }
-
-            
+        while (Time.time < castTime)
+        {
+            _cd = true;
+            _playerMovement.canMove = false;
+            Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
+            yield return new WaitForFixedUpdate();
         }
 
-        else 
+        _playerMovement.canMove = true;
+        _cd = false;
+
+        // Basic attack
+        if (spell.areaOfEffect == Spell.AreaOfEffect.None)
         {
-            Debug.Log("Not enough mana to cast " + spell.name);
+            SpawnBasicAttackRpc(pos);
+        }
+
+
+        // Circle AOE Spells
+        else if (spell.areaOfEffect == Spell.AreaOfEffect.Circle)
+        {
+            SpawnCircleAoeAttackRpc(pos);
+        }
+
+        // Line AOE Spells
+        else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)
+        {
+            SpawnLineAoeAttackRpc(pos);
+        }
+
+        // Cone AOE Spells
+        else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone)
+        {
+            SpawnConeAoeAttackRpc(pos);
         }
     }
 
-    private IEnumerator BasicAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    [Rpc(SendTo.Server)]
+    private void SpawnBasicAttackRpc(Vector3 pos)
+    {
+        Spell spell = _castedSpell;
+        castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.spellPrefab, _playerId, position: spellObject.transform.position, rotation: Quaternion.identity);
+
+        StartCoroutine(BasicAttack(castedSpell, spell, pos));
+    }
+
+    private IEnumerator BasicAttack(NetworkObject castedSpell, Spell spell, Vector3 pos)
     {
         Vector3 origin = spellObject.transform.position;
         bool travel = true;
@@ -202,38 +218,66 @@ public class AttackManager : NetworkBehaviour
             yield return null;
         }
     }
+    [Rpc(SendTo.Server)]
+    private void SpawnCircleAoeAttackRpc(Vector3 pos)
+    {
+        Spell spell = _castedSpell;
 
-    private IEnumerator CircleAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+        spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2);
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.hitboxPrefab, _playerId, position: transform.position, rotation: Quaternion.identity);
+        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+
+        StartCoroutine(CircleAoeAttack(hitbox, spell, pos));
+    }
+
+    private IEnumerator CircleAoeAttack(NetworkObject hitbox, Spell spell, Vector3 pos)
     {
         while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
         {
             castedSpell.transform.position = Vector3.Slerp(castedSpell.transform.position, pos, spell.travelSpeed * Time.deltaTime);
             yield return null;
         }
+
         Destroy(castedSpell);
-        spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2, spell.areaOfEffectRadius / 2);
-        GameObject hitbox = Instantiate(spell.hitboxPrefab, pos, Quaternion.identity);
-        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
         yield return new WaitForSeconds(spell.duration);
         Destroy(hitbox);
     }
 
-    private IEnumerator LineAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    [Rpc(SendTo.Server)]
+    private void SpawnLineAoeAttackRpc(Vector3 pos)
     {
-        // Implement line spell visual effects
+        Spell spell = _castedSpell;
 
         spell.hitboxPrefab.transform.localScale = new Vector3(spell.areaOfEffectRadius / 2, 3, (spell.range / 4) * 2);
-        GameObject hitbox = Instantiate(spell.hitboxPrefab, transform.position, Quaternion.identity);
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.hitboxPrefab, _playerId, position: transform.position, rotation: Quaternion.identity);
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
         hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
         hitbox.transform.position += hitbox.transform.forward * 6;
+
+        StartCoroutine(LineAoeAttack(hitbox, spell, pos));
+    }
+
+    private IEnumerator LineAoeAttack(NetworkObject hitbox, Spell spell, Vector3 pos)
+    {
+        // Implement line spell visual effects
+
         Destroy(castedSpell);
         yield return new WaitForSeconds(spell.duration);
         Destroy(hitbox);
         //Destroy(castedSpell);
     }
 
-    private IEnumerator ConeAoeAttack(GameObject castedSpell, Spell spell, Vector3 pos)
+    [Rpc(SendTo.Server)]
+    private void SpawnConeAoeAttackRpc(Vector3 pos)
+    {
+        Spell spell = _castedSpell;
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.hitboxPrefab, _playerId, position: transform.position, rotation: Quaternion.identity);
+        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+
+        StartCoroutine(ConeAoeAttack(hitbox, spell, pos));
+    }
+
+    private IEnumerator ConeAoeAttack(NetworkObject castedSpell, Spell spell, Vector3 pos)
     {
         //hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
         throw new System.NotImplementedException();
