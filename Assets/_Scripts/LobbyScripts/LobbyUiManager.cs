@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -79,11 +80,9 @@ namespace _Scripts.LobbyScripts
             clientMenuButton?.onClick.AddListener(ClientMenuClicked);
             nameInputField?.onValueChanged.AddListener(NameEdit);
             createLobbyNameField?.onValueChanged.AddListener(LobbyNameEdit);
-
             createLobbyButton?.onClick.AddListener(CreateLobby);
-            readyButton.onClick.AddListener(UpdateReadyButton);
-            GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
-                UpdateLobbyPlayers();
+            // GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
+            //     UpdateLobbyPlayers();
         }
 
         private void LobbyNameEdit(string arg0)
@@ -195,44 +194,91 @@ namespace _Scripts.LobbyScripts
             menu?.SetActive(true);
         }
 
-        private void UpdateLobbyPlayers()
+        public IEnumerator AddNewPlayer()
         {
+            var playerDataSync = GetComponent<PlayerDataSync>();
+            while (!playerDataSync.listIsSynced.Value)
+                yield return null;
+
             foreach (var obj in _playerLobbyPanels)
             {
                 Destroy(obj);
             }
             _playerLobbyPanels.Clear();
-            var playerDataSync = GetComponent<PlayerDataSync>();
             foreach (var playerData in playerDataSync.SyncedPlayerList)
             {
                 var newPanel = Instantiate(playerLobbyPrefab, playerLobbyPanel.transform);
-                newPanel.GetComponentInChildren<TextMeshProUGUI>().text =
+                newPanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text =
                     playerData.PlayerName.ToString();
+                var toggle = newPanel.transform.GetChild(0).GetChild(1).GetComponent<Toggle>();
+                if (playerData.PlayerNetworkId == NetworkManager.LocalClientId)
+                {
+                    toggle.onValueChanged.AddListener(arg0 =>
+                        UpdateReadyButtonRpc(arg0, NetworkManager.LocalClientId)
+                    );
+                }
+                else
+                {
+                    toggle.interactable = false;
+                }
+
+                toggle.isOn = playerData.IsReady;
                 _playerLobbyPanels.Add(newPanel);
             }
         }
 
-        public void UpdateReadyButton()
+        [Rpc(SendTo.Server)]
+        public void UpdateReadyButtonRpc(bool arg0, ulong arg1)
         {
-            _localPlayerReady = !_localPlayerReady;
-            var playerDataSync = GetComponent<PlayerDataSync>();
-            // playerDataSync.SyncedPlayerList[].IsReady =
-            // _localPlayerReady; TODO: This should be done in LobbyPlayer
-            UpdateReadyStatusRpc();
+            try
+            {
+                _localPlayerReady = arg0;
+                var playerDataSync = GetComponent<PlayerDataSync>();
+                var playerList = playerDataSync.SyncedPlayerList;
+                for (int i = 0; i < playerList.Count; i++)
+                {
+                    if (playerList[i].PlayerNetworkId == arg1)
+                    {
+                        var data = playerList[i];
+                        data.IsReady = arg0;
+                        playerList[i] = data; // ✅ Triggers sync
+                        // break;
+                    }
+                }
+                playerDataSync.SendFullListRpc();
+                UpdateReadyStatusRpc();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error in UpdateReadyButtonRpc: {e.Message}");
+            }
         }
 
         [Rpc(SendTo.Everyone)]
         private void UpdateReadyStatusRpc()
         {
+            StartCoroutine(UpdateReadyStatus());
+        }
+
+        private IEnumerator UpdateReadyStatus()
+        {
             var playerDataSync = GetComponent<PlayerDataSync>();
-            for (int i = 0; i < _playerLobbyPanels.Count - 1; i++)
+            while (!playerDataSync.listIsSynced.Value)
+                yield return null;
+            for (int i = 0; i < _playerLobbyPanels.Count; i++)
             {
                 var playerNameText = _playerLobbyPanels[i]
                     .GetComponentInChildren<TextMeshProUGUI>();
                 playerNameText.color = playerDataSync.SyncedPlayerList[i].IsReady
                     ? Color.green
                     : Color.white;
+                _playerLobbyPanels[i]
+                    .transform.GetChild(0)
+                    .GetChild(1)
+                    .GetComponent<Toggle>()
+                    .isOn = true;
             }
+            LobbyController.Instance.CanStartGame(true);
         }
     }
 }

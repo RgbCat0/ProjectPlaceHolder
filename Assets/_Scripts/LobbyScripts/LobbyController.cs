@@ -94,7 +94,7 @@ namespace _Scripts.LobbyScripts
                 if (!playerData.IsReady)
                     allReady = false;
             }
-            if (canStart && allReady)
+            if (allReady && canStart)
             {
                 _uiManager.EnableStartGameButton();
             }
@@ -107,7 +107,7 @@ namespace _Scripts.LobbyScripts
         // needs to run local first for correct data.
         public void HandleNewPlayer(ulong clientId) =>
             HandleNewPlayerRpc(
-                clientId,
+                NetworkManager.LocalClientId,
                 AuthenticationService.Instance.PlayerId,
                 _lobbyNetManager.PlayerName,
                 NetworkManager.IsHost

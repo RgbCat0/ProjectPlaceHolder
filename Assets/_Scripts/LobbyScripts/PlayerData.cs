@@ -4,7 +4,8 @@ using Unity.Netcode;
 
 namespace _Scripts.LobbyScripts
 {
-    public struct PlayerData : INetworkSerializable, IEquatable<PlayerData>
+    [Serializable]
+    public struct PlayerData : INetworkSerializable
     {
         public FixedString64Bytes PlayerName;
         public FixedString64Bytes PlayerLobbyId;
@@ -33,21 +34,8 @@ namespace _Scripts.LobbyScripts
             serializer.SerializeValue(ref PlayerName);
             serializer.SerializeValue(ref PlayerLobbyId);
             serializer.SerializeValue(ref PlayerNetworkId);
-        }
-
-        public bool Equals(PlayerData other)
-        {
-            return PlayerNetworkId.Equals(other.PlayerNetworkId); // Or use all fields if needed
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is PlayerData other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return PlayerNetworkId.GetHashCode();
+            serializer.SerializeValue(ref IsHost);
+            serializer.SerializeValue(ref IsReady);
         }
     }
 }

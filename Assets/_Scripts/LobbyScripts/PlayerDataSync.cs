@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,13 +9,14 @@ namespace _Scripts.LobbyScripts
 {
     public class PlayerDataSync : NetworkBehaviour
     {
-        public NetworkList<PlayerData> SyncedPlayerList;
+        public List<PlayerData> SyncedPlayerList = new();
+        public NetworkVariable<bool> listIsSynced;
         public event Action OnPlayerJoin;
         private bool _isActuallySpawned;
 
         private void Awake()
         {
-            SyncedPlayerList = new NetworkList<PlayerData>();
+            listIsSynced = new NetworkVariable<bool>();
         }
 
         public override void OnNetworkSpawn()
@@ -72,14 +74,47 @@ namespace _Scripts.LobbyScripts
             }
 
             SyncedPlayerList.Add(newData);
+            if (NetworkManager.ConnectedClientsList.Count == 1) // dont need it for the host
+                listIsSynced.Value = true;
+            else
+                SendFullListRpc();
             NewPlayerJoinRpc();
-            LobbyController.Instance.CanStartGame(true);
         }
 
         [Rpc(SendTo.Everyone)]
         private void NewPlayerJoinRpc() // mainly used to notify of a new player that updates the UI
         {
             OnPlayerJoin?.Invoke();
+
+            StartCoroutine(GetComponent<LobbyUiManager>().AddNewPlayer());
+        }
+
+        [Rpc(SendTo.Server)]
+        public void SendFullListRpc()
+        {
+            if (NetworkManager.ConnectedClientsList.Count == 1)
+                return; // No need to sync if only one player is connected
+            listIsSynced.Value = false; // Set to false to indicate that the list is not synced yet
+
+            UpdateListRpc(SyncedPlayerList.ToArray());
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void UpdateListRpc(PlayerData[] playerList)
+        {
+            SyncedPlayerList.Clear();
+            foreach (var data in playerList)
+            {
+                SyncedPlayerList.Add(data);
+                Debug.Log(data.IsReady);
+            }
+            SyncIsTrueRpc();
+        }
+
+        [Rpc(SendTo.Server)]
+        private void SyncIsTrueRpc()
+        {
+            listIsSynced.Value = true;
         }
 
         // Example helper
@@ -92,6 +127,17 @@ namespace _Scripts.LobbyScripts
             }
 
             return "Unknown";
+        }
+
+        public PlayerData? GetPlayerDataByNetworkId(ulong networkId)
+        {
+            foreach (var data in SyncedPlayerList)
+            {
+                if (data.PlayerNetworkId == networkId)
+                    return data;
+            }
+
+            return null;
         }
     }
 }

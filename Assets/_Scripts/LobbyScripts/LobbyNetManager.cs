@@ -75,7 +75,6 @@ namespace _Scripts.LobbyScripts
                 NetworkManager
                     .Singleton.GetComponent<UnityTransport>()
                     .SetRelayServerData(relayServerData);
-                Debug.Log("Test");
                 if (isHost)
                     NetworkManager.Singleton.StartHost();
                 else
