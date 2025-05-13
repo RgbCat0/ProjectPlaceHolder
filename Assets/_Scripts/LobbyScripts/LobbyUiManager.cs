@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace _Scripts.LobbyScripts
 {
-    public class LobbyUiManager : MonoBehaviour
+    public class LobbyUiManager : NetworkBehaviour
     {
         [Header("Menu Parents")]
         [SerializeField]
@@ -54,6 +55,12 @@ namespace _Scripts.LobbyScripts
 
         [Header("Lobby")]
         [SerializeField]
+        private Button startGameButton;
+
+        [SerializeField]
+        private Button readyButton;
+
+        [SerializeField]
         private GameObject playerLobbyPanel;
 
         [SerializeField]
@@ -63,6 +70,7 @@ namespace _Scripts.LobbyScripts
         [Header("Misc")]
         [SerializeField]
         private TextMeshProUGUI statusText;
+        private bool _localPlayerReady;
 
         private void Start()
         {
@@ -73,6 +81,7 @@ namespace _Scripts.LobbyScripts
             createLobbyNameField?.onValueChanged.AddListener(LobbyNameEdit);
 
             createLobbyButton?.onClick.AddListener(CreateLobby);
+            readyButton.onClick.AddListener(UpdateReadyButton);
             GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
                 UpdateLobbyPlayers();
         }
@@ -156,6 +165,17 @@ namespace _Scripts.LobbyScripts
         {
             OnJoinLobby?.Invoke(lobby);
             ChangeMenu(lobbyParent);
+            startGameButton.interactable = false;
+        }
+
+        public void EnableStartGameButton()
+        {
+            startGameButton.interactable = true;
+        }
+
+        public void DisableStartGameButton()
+        {
+            startGameButton.interactable = false;
         }
 
         public void ShowMainMenu()
@@ -189,6 +209,29 @@ namespace _Scripts.LobbyScripts
                 newPanel.GetComponentInChildren<TextMeshProUGUI>().text =
                     playerData.PlayerName.ToString();
                 _playerLobbyPanels.Add(newPanel);
+            }
+        }
+
+        public void UpdateReadyButton()
+        {
+            _localPlayerReady = !_localPlayerReady;
+            var playerDataSync = GetComponent<PlayerDataSync>();
+            // playerDataSync.SyncedPlayerList[].IsReady =
+            // _localPlayerReady; TODO: This should be done in LobbyPlayer
+            UpdateReadyStatusRpc();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void UpdateReadyStatusRpc()
+        {
+            var playerDataSync = GetComponent<PlayerDataSync>();
+            for (int i = 0; i < _playerLobbyPanels.Count - 1; i++)
+            {
+                var playerNameText = _playerLobbyPanels[i]
+                    .GetComponentInChildren<TextMeshProUGUI>();
+                playerNameText.color = playerDataSync.SyncedPlayerList[i].IsReady
+                    ? Color.green
+                    : Color.white;
             }
         }
     }
