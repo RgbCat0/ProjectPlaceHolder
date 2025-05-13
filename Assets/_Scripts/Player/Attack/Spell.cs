@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SpellObject", menuName = "Scriptable Objects/SpellObject")]
@@ -21,8 +22,8 @@ public class Spell : ScriptableObject
         Cone,
     }
 
-    public GameObject hitboxPrefab;
-    public GameObject spellPrefab;
+    public NetworkObject hitboxPrefab;
+    public NetworkObject spellPrefab;
     public SpellType spellType;
     public AreaOfEffect areaOfEffect;
     public float areaOfEffectRadius;
