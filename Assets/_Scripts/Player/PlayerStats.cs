@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace _Scripts.Player
 {
-    public class PlayerStats : MonoBehaviour
+    public class PlayerStats : NetworkBehaviour
     {
         // Base stats
         [Header("----------Base Stats----------")]
@@ -45,6 +47,11 @@ namespace _Scripts.Player
 
         private void Start()
         {
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
             currentMana = baseMaxMana;
         }
         private void Update()

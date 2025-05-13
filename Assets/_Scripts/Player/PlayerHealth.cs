@@ -1,9 +1,11 @@
 using UnityEngine;
 using _Scripts.Managers;
+using System.Globalization;
+using Unity.Netcode;
 
 namespace _Scripts.Player
 {
-    public class PlayerHealth : MonoBehaviour, IDamageable
+    public class PlayerHealth : NetworkBehaviour, IDamageable
     {
         private PlayerStats _playerStats;
 
@@ -14,6 +16,11 @@ namespace _Scripts.Player
 
         private void Start()
         {
+            if (!IsOwner)
+            {
+                enabled = false;
+                return;
+            }
             _playerStats = GetComponent<PlayerStats>();
             MaxHealth = _playerStats.baseMaxHealth;
             Health = MaxHealth; // Set initial health
