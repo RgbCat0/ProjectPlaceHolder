@@ -1,5 +1,6 @@
 using _Scripts.Enemies;
 using _Scripts.Player;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -16,6 +17,10 @@ public class AttackHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(_playerStats == null || _attackManager == null)
+        {
+            return;
+        }
         if (other.CompareTag("Enemy"))
         {
             Debug.Log($"Hit {other.name}");
