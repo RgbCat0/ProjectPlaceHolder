@@ -1,7 +1,8 @@
 using _Scripts.Player;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     private PlayerStats _playerStats;
 
@@ -15,6 +16,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        if (!IsOwner)
+        {
+            enabled = false;
+            return;
+        }
         _playerStats = GetComponent<PlayerStats>();
         _rb = GetComponent<Rigidbody>();
     }

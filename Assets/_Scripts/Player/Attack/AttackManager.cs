@@ -3,10 +3,9 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using _Scripts.Player;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.Rendering.DebugUI;
+using Unity.Netcode;
 
-public class AttackManager : MonoBehaviour
+public class AttackManager : NetworkBehaviour
 {
     public enum Spells { Basic, Fireball, Bolt, Arcane }
 
@@ -50,6 +49,11 @@ public class AttackManager : MonoBehaviour
     #region Initialization
     private void Start()
     {
+        if (!IsOwner)
+        {
+            enabled = false;
+            return;
+        }
         groundMask = LayerMask.GetMask("Ground");
         InitializeSpells();
         InitializeIndicators();
