@@ -52,7 +52,7 @@ namespace _Scripts.LobbyScripts
             _heartBeatCoroutine = StartCoroutine(SendHeartbeatCoroutine());
         }
 
-        private void StopHeartbeat()
+        public void StopHeartbeat()
         {
             if (_heartBeatCoroutine != null)
             {

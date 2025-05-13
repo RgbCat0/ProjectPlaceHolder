@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace _Scripts.LobbyScripts
@@ -46,6 +47,7 @@ namespace _Scripts.LobbyScripts
                 _uiManager.OnJoinLobby += HandleJoinLobby;
                 _uiManager.OnStartGame += StartGameRpc;
                 _uiManager.ShowMainMenu();
+                _playerDataSync.OnPlayerJoin += () => LobbyLogger.StatusMessage("");
             }
             catch (Exception e)
             {
@@ -75,8 +77,14 @@ namespace _Scripts.LobbyScripts
             string relayJoinCode = await _lobbyNetManager.HostNetworkTask();
             LobbyLogger.StatusMessage("Creating Lobby...");
             await _serviceManager.HostLobbyTask(obj, relayJoinCode);
-            LobbyLogger.StatusMessage("");
+            NetworkManager.OnClientConnectedCallback += _ => _uiManager.ResetReadyStatusRpc();
+            NetworkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
             CanStartGame(true);
+        }
+
+        private void NetworkManagerOnOnClientConnectedCallback(ulong obj)
+        {
+            LobbyLogger.StatusMessage("New Player Joining...");
         }
 
         private async void HandleJoinLobby(Lobby lobby)
@@ -85,7 +93,9 @@ namespace _Scripts.LobbyScripts
             await _serviceManager.JoinLobbyTask(lobby.Id);
             LobbyLogger.StatusMessage("Starting Networking...");
             await _lobbyNetManager.ClientNetworkTask(lobby.Data["RelayJoinCode"].Value);
-            LobbyLogger.StatusMessage("");
+            LobbyLogger.StatusMessage("Hold on...");
+            NetworkManager.OnClientConnectedCallback += _ =>
+                LobbyLogger.StatusMessage("New Player Joining...");
         }
 
         public void CanStartGame(bool canStart)
@@ -95,7 +105,7 @@ namespace _Scripts.LobbyScripts
                 _uiManager.DisableStartGameButton();
                 return;
             }
-            var allReady = _playerDataSync.SyncedPlayerList.TrueForAll(p => p.IsReady);
+            var allReady = _playerDataSync.syncedPlayerList.TrueForAll(p => p.IsReady);
             if (allReady && canStart)
             {
                 _uiManager.EnableStartGameButton();
@@ -132,6 +142,7 @@ namespace _Scripts.LobbyScripts
             if (NetworkManager.IsHost)
             {
                 // TODO: add a countdown
+                _serviceManager.StopHeartbeat();
                 NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
             }
         }

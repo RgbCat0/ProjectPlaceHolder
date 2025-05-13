@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace _Scripts.LobbyScripts
 {
     public class PlayerDataSync : NetworkBehaviour
     {
-        public List<PlayerData> SyncedPlayerList = new();
+        public List<PlayerData> syncedPlayerList = new();
         public NetworkVariable<bool> listIsSynced;
         public event Action OnPlayerJoin;
         private bool _isActuallySpawned;
@@ -65,7 +64,7 @@ namespace _Scripts.LobbyScripts
             );
 
             // Avoid duplicates (e.g., reconnects)
-            foreach (var data in SyncedPlayerList)
+            foreach (var data in syncedPlayerList)
             {
                 if (data.PlayerNetworkId == networkId)
                 {
@@ -73,7 +72,7 @@ namespace _Scripts.LobbyScripts
                 }
             }
 
-            SyncedPlayerList.Add(newData);
+            syncedPlayerList.Add(newData);
             if (NetworkManager.ConnectedClientsList.Count == 1) // dont need it for the host
                 listIsSynced.Value = true;
             else
@@ -96,17 +95,16 @@ namespace _Scripts.LobbyScripts
                 return; // No need to sync if only one player is connected
             listIsSynced.Value = false; // Set to false to indicate that the list is not synced yet
 
-            UpdateListRpc(SyncedPlayerList.ToArray());
+            UpdateListRpc(syncedPlayerList.ToArray());
         }
 
         [Rpc(SendTo.NotServer)]
         private void UpdateListRpc(PlayerData[] playerList)
         {
-            SyncedPlayerList.Clear();
+            syncedPlayerList.Clear();
             foreach (var data in playerList)
             {
-                SyncedPlayerList.Add(data);
-                Debug.Log(data.IsReady);
+                syncedPlayerList.Add(data);
             }
             SyncIsTrueRpc();
         }
@@ -120,7 +118,7 @@ namespace _Scripts.LobbyScripts
         // Example helper
         public string GetPlayerNameByNetworkId(string networkId)
         {
-            foreach (var data in SyncedPlayerList)
+            foreach (var data in syncedPlayerList)
             {
                 if (data.PlayerNetworkId.ToString() == networkId)
                     return data.PlayerName.ToString();
@@ -131,7 +129,7 @@ namespace _Scripts.LobbyScripts
 
         public PlayerData? GetPlayerDataByNetworkId(ulong networkId)
         {
-            foreach (var data in SyncedPlayerList)
+            foreach (var data in syncedPlayerList)
             {
                 if (data.PlayerNetworkId == networkId)
                     return data;

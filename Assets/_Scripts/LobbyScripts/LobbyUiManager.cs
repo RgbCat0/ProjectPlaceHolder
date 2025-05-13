@@ -45,6 +45,9 @@ namespace _Scripts.LobbyScripts
         private TMP_InputField createLobbyNameField;
         public event Action<string> OnCreateLobby;
 
+        [SerializeField]
+        private Button goBackButton;
+
         [Header("Join Lobby")]
         [SerializeField]
         private GameObject joinLobbyPanel;
@@ -52,7 +55,13 @@ namespace _Scripts.LobbyScripts
         [SerializeField]
         private GameObject joinLobbyPrefab;
         private List<GameObject> _lobbies = new();
+
+        [SerializeField]
+        private Button refreshButton;
         public event Action<Lobby> OnJoinLobby;
+
+        [SerializeField]
+        private Button joinGoBackButton;
 
         [Header("Lobby")]
         [SerializeField]
@@ -72,7 +81,6 @@ namespace _Scripts.LobbyScripts
         [Header("Misc")]
         [SerializeField]
         private TextMeshProUGUI statusText;
-        private bool _localPlayerReady;
 
         private void Start()
         {
@@ -83,6 +91,10 @@ namespace _Scripts.LobbyScripts
             createLobbyNameField?.onValueChanged.AddListener(LobbyNameEdit);
             createLobbyButton?.onClick.AddListener(CreateLobby);
             startGameButton?.onClick.AddListener(StartGame);
+            refreshButton?.onClick.AddListener(PopulateLobbies);
+            goBackButton?.onClick.AddListener(ShowMainMenu);
+            joinGoBackButton?.onClick.AddListener(ShowMainMenu);
+
             // GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
             //     UpdateLobbyPlayers();
         }
@@ -143,22 +155,38 @@ namespace _Scripts.LobbyScripts
 
         private async void PopulateLobbies()
         {
-            foreach (var obj in _lobbies)
+            try
             {
-                Destroy(obj);
+                refreshButton.interactable = false;
+                foreach (var obj in _lobbies)
+                {
+                    Destroy(obj);
+                }
+                _lobbies.Clear();
+                // get lobbies from lobbyService
+                List<Lobby> lobbies = await LobbyController.Instance.GetLobbies();
+                foreach (var lobby in lobbies)
+                {
+                    var newPanel = Instantiate(joinLobbyPrefab, joinLobbyPanel.transform);
+                    newPanel
+                        .transform.GetChild(0)
+                        .GetChild(1)
+                        .GetComponent<TextMeshProUGUI>()
+                        .text = $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
+                    newPanel
+                        .GetComponentInChildren<Button>()
+                        .onClick.AddListener(() => JoinLobby(lobby));
+                    _lobbies.Add(newPanel);
+                }
             }
-            _lobbies.Clear();
-            // get lobbies from lobbyService
-            List<Lobby> lobbies = await LobbyController.Instance.GetLobbies();
-            foreach (var lobby in lobbies)
+            catch (Exception e)
             {
-                var newPanel = Instantiate(joinLobbyPrefab, joinLobbyPanel.transform);
-                newPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text =
-                    $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
-                newPanel
-                    .GetComponentInChildren<Button>()
-                    .onClick.AddListener(() => JoinLobby(lobby));
-                _lobbies.Add(newPanel);
+                Debug.LogError($"Error populating lobbies: {e.Message}");
+                LobbyLogger.StatusMessage("Error populating lobbies", Color.red);
+            }
+            finally
+            {
+                refreshButton.interactable = true;
             }
         }
 
@@ -207,7 +235,7 @@ namespace _Scripts.LobbyScripts
                 Destroy(obj);
             }
             _playerLobbyPanels.Clear();
-            foreach (var playerData in playerDataSync.SyncedPlayerList)
+            foreach (var playerData in playerDataSync.syncedPlayerList)
             {
                 var newPanel = Instantiate(playerLobbyPrefab, playerLobbyPanel.transform);
                 newPanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text =
@@ -232,16 +260,15 @@ namespace _Scripts.LobbyScripts
         {
             try
             {
-                _localPlayerReady = arg0;
                 var playerDataSync = GetComponent<PlayerDataSync>();
-                var playerList = playerDataSync.SyncedPlayerList;
+                var playerList = playerDataSync.syncedPlayerList;
                 for (int i = 0; i < playerList.Count; i++)
                 {
                     if (playerList[i].PlayerNetworkId == arg1)
                     {
                         var data = playerList[i];
                         data.IsReady = arg0;
-                        playerList[i] = data; // ✅ Triggers sync
+                        playerList[i] = data;
                         // break;
                     }
                 }
@@ -251,6 +278,19 @@ namespace _Scripts.LobbyScripts
             catch (Exception e)
             {
                 Debug.LogError($"Error in UpdateReadyButtonRpc: {e.Message}");
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        public void ResetReadyStatusRpc()
+        {
+            var playerDataSync = GetComponent<PlayerDataSync>();
+            var playerList = playerDataSync.syncedPlayerList;
+            for (int i = 0; i < playerList.Count; i++)
+            {
+                var data = playerList[i];
+                data.IsReady = false;
+                playerList[i] = data;
             }
         }
 
@@ -269,14 +309,14 @@ namespace _Scripts.LobbyScripts
             {
                 var playerNameText = _playerLobbyPanels[i]
                     .GetComponentInChildren<TextMeshProUGUI>();
-                playerNameText.color = playerDataSync.SyncedPlayerList[i].IsReady
+                playerNameText.color = playerDataSync.syncedPlayerList[i].IsReady
                     ? Color.green
                     : Color.white;
                 _playerLobbyPanels[i]
                     .transform.GetChild(0)
                     .GetChild(1)
                     .GetComponent<Toggle>()
-                    .isOn = playerDataSync.SyncedPlayerList[i].IsReady;
+                    .isOn = playerDataSync.syncedPlayerList[i].IsReady;
             }
             LobbyController.Instance.CanStartGame(true);
         }
