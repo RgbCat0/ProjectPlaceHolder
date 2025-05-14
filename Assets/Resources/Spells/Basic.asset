@@ -18,10 +18,10 @@ MonoBehaviour:
   areaOfEffect: 0
   areaOfEffectRadius: 0
   isPiercing: 0
-  damage: 4
+  damage: 8
   manaCost: 0
   range: 15
-  castTime: 0
+  castTime: 0.5
   cooldown: 0.5
   duration: 0
   travelSpeed: 20

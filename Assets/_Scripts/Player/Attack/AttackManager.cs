@@ -27,7 +27,7 @@ public class AttackManager : NetworkBehaviour
     private PlayerMovement _playerMovement;
 
     [SerializeField]
-    private GameObject spellObject;
+    private GameObject[] spellObject;
 
     [SerializeField]
     private RawImage fireballIndicator;
@@ -153,12 +153,15 @@ public class AttackManager : NetworkBehaviour
             {
                 if (
                     _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line
-                    || _selectedSpell != null
-                        && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone
                 )
                 {
                     indicator.Value.transform.GetComponent<RectTransform>().localScale =
                         new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
+                }
+                else if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
+                {
+                    indicator.Value.transform.GetComponent<RectTransform>().localScale = 
+                        new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 3);
                 }
                 else if (
                     _selectedSpell != null
@@ -200,19 +203,25 @@ public class AttackManager : NetworkBehaviour
         {
             _playerStats.currentMana -= spell.manaCost;
             _castedSpell = spell; // update server-side reference
-            
-            if (_castedSpell == _spellDictionary[Spells.Fireball] || _castedSpell == _spellDictionary[Spells.Basic])
-            {
-                castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
-                    spell.spellPrefab,
-                    _playerId,
-                    position: _castedSpell == _spellDictionary[Spells.Basic] ? 
-                        transform.position + transform.rotation * transform.forward * 6 : spellObject.transform.position,
-                    rotation: Quaternion.identity
-                );
-                castedSpell.GetComponent<Rigidbody>().useGravity = false;
-            }
+            GameObject objectPos;
 
+            if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
+                _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
+                _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
+            {
+                objectPos = spellObject[0];
+            }
+            else
+            {objectPos = spellObject[1];}
+                
+            castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+                spell.spellPrefab,
+                _playerId,
+                position: objectPos.transform.position,
+                rotation: Quaternion.identity
+            );
+
+            castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
             StartCoroutine(CastSpell(spell, pos));
         }
@@ -230,7 +239,7 @@ public class AttackManager : NetworkBehaviour
     private IEnumerator CastSpell(Spell spell, Vector3 pos)
     {
         float castTime = Time.time + spell.castTime;
-
+        
         while (Time.time < castTime)
         {
             _cd = true;
@@ -353,7 +362,8 @@ public class AttackManager : NetworkBehaviour
             (_castedSpell.range / 4) * 2
         );
         Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
-        Vector3 hitboxPosition = transform.position + hitboxRotation * Vector3.forward * 6;
+        float offset = ((((_castedSpell.range / 4) * 2) / 10) * 6);
+        Vector3 hitboxPosition = transform.position + hitboxRotation * Vector3.forward * offset;
 
         NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
             _castedSpell.hitboxPrefab,
@@ -371,7 +381,7 @@ public class AttackManager : NetworkBehaviour
     {
         // Implement line spell visual effects
 
-        castedSpell.Despawn(true);
+        //castedSpell.Despawn(true);
         yield return new WaitForSeconds(_castedSpell.duration);
         hitbox.Despawn(true);
         //Destroy(castedSpell);
@@ -381,14 +391,14 @@ public class AttackManager : NetworkBehaviour
     private void SpawnConeAoeAttackRpc(Vector3 pos)
     {
         _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
-            (_castedSpell.areaOfEffectRadius / 10) * 11,
-            3,
-            (_castedSpell.range / 10) * 8.5f
+            (_castedSpell.areaOfEffectRadius / 5) * 11,
+            (_castedSpell.range / 15) * 8.5f,
+            3
         );
         Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
         hitboxRotation = Quaternion.Euler(
             hitboxRotation.eulerAngles.x - 90, 
-            0, 
+            hitboxRotation.eulerAngles.y + 180, 
             hitboxRotation.eulerAngles.z);
         NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
             _castedSpell.hitboxPrefab,
@@ -403,7 +413,7 @@ public class AttackManager : NetworkBehaviour
 
     private IEnumerator ConeAoeAttack(NetworkObject hitbox, Spell spell, Vector3 pos)
     {
-        castedSpell.Despawn(true);
+        //castedSpell.Despawn(true);
         yield return new WaitForSeconds(_castedSpell.duration);
         hitbox.Despawn(true);
     }

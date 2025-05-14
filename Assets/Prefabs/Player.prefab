@@ -503,7 +503,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6395246600156940766}
   m_Layer: 4
-  m_Name: Spell
+  m_Name: SpellFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -517,8 +517,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5553282695057615338}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.212, z: -0.08}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -626,6 +626,37 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &9083027939735321888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7275113152718522725}
+  m_Layer: 4
+  m_Name: SpellTop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7275113152718522725
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9083027939735321888}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 3.212, z: -0.08}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9149017039344605740}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8754276376327814599
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -768,6 +799,9 @@ PrefabInstance:
       addedObject: {fileID: 1293962034373346024}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7275113152718522725}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6395246600156940766}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
@@ -855,7 +889,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  spellObject: {fileID: 5553282695057615338}
+  spellObject:
+  - {fileID: 5553282695057615338}
+  - {fileID: 9083027939735321888}
   fireballIndicator: {fileID: 5926298510273118814}
   boltIndicator: {fileID: 3673170543029252298}
   arcaneIndicator: {fileID: 3425813410480585077}
