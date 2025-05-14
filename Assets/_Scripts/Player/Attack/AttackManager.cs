@@ -4,7 +4,6 @@ using _Scripts.Player;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
 public class AttackManager : NetworkBehaviour
 {
@@ -201,14 +200,19 @@ public class AttackManager : NetworkBehaviour
         {
             _playerStats.currentMana -= spell.manaCost;
             _castedSpell = spell; // update server-side reference
+            
+            if (_castedSpell == _spellDictionary[Spells.Fireball] || _castedSpell == _spellDictionary[Spells.Basic])
+            {
+                castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+                    spell.spellPrefab,
+                    _playerId,
+                    position: _castedSpell == _spellDictionary[Spells.Basic] ? 
+                        transform.position + transform.rotation * transform.forward * 6 : spellObject.transform.position,
+                    rotation: Quaternion.identity
+                );
+                castedSpell.GetComponent<Rigidbody>().useGravity = false;
+            }
 
-            castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
-                spell.spellPrefab,
-                _playerId,
-                position: spellObject.transform.position,
-                rotation: Quaternion.identity
-            );
-            castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
             StartCoroutine(CastSpell(spell, pos));
         }
@@ -276,7 +280,7 @@ public class AttackManager : NetworkBehaviour
 
     private IEnumerator BasicAttack(Vector3 pos)
     {
-        Vector3 origin = spellObject.transform.position;
+        Vector3 origin = transform.position + transform.rotation * transform.forward * 6;
         bool travel = true;
         castedSpell.GetComponent<Rigidbody>().useGravity = false;
         castedSpell.GetComponent<Rigidbody>().linearVelocity =
@@ -376,22 +380,32 @@ public class AttackManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void SpawnConeAoeAttackRpc(Vector3 pos)
     {
-        Spell spell = _castedSpell;
+        _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
+            (_castedSpell.areaOfEffectRadius / 10) * 11,
+            3,
+            (_castedSpell.range / 10) * 8.5f
+        );
+        Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
+        hitboxRotation = Quaternion.Euler(
+            hitboxRotation.eulerAngles.x - 90, 
+            hitboxRotation.eulerAngles.y, 
+            hitboxRotation.eulerAngles.z);
         NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
-            spell.hitboxPrefab,
+            _castedSpell.hitboxPrefab,
             _playerId,
-            position: pos,
-            rotation: Quaternion.identity
+            position: transform.position,
+            rotation: hitboxRotation    
         );
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
 
-        StartCoroutine(ConeAoeAttack(hitbox, spell, pos));
+        StartCoroutine(ConeAoeAttack(hitbox, _castedSpell, pos));
     }
 
-    private IEnumerator ConeAoeAttack(NetworkObject castedSpell, Spell spell, Vector3 pos)
+    private IEnumerator ConeAoeAttack(NetworkObject hitbox, Spell spell, Vector3 pos)
     {
-        //hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
-        throw new System.NotImplementedException();
+        castedSpell.Despawn(true);
+        yield return new WaitForSeconds(_castedSpell.duration);
+        hitbox.Despawn(true);
     }
     #endregion
 
@@ -455,6 +469,15 @@ public class AttackManager : NetworkBehaviour
     public Spell GetCastedSpell()
     {
         return _castedSpell;
+    }
+
+    public bool CheckCastedSpell(Spells spell)
+    {
+        if (_castedSpell == _spellDictionary[spell])
+        {
+            return true;    
+        }
+        return false;
     }
     #endregion
 }
