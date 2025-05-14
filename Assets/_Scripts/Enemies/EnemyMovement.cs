@@ -1,10 +1,12 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
+using _Scripts.Managers;
 
 namespace _Scripts.Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class EnemyMovement : MonoBehaviour
+    public class EnemyMovement : NetworkBehaviour
     {
         private NavMeshAgent _navMeshAgent;
         private Transform _target;
@@ -22,12 +24,25 @@ namespace _Scripts.Enemies
 
         private void FixedUpdate()
         {
-            if (_target == null)
-            {
-                _target = GameObject.FindGameObjectWithTag("Player")?.transform;
+            if (GameManager.Instance.players.Count == 0)
                 return;
+
+            NetworkObject closestPlayer = null;
+            var closestDistanceSqr = float.MaxValue;
+            Vector3 currentPosition = transform.position;
+
+            foreach (NetworkObject player in GameManager.Instance.players)
+            {
+                float distanceSqr = (player.transform.position - currentPosition).sqrMagnitude;
+                if (distanceSqr > closestDistanceSqr)
+                    continue;
+
+                closestDistanceSqr = distanceSqr;
+                closestPlayer = player;
             }
-            _navMeshAgent.SetDestination(_target.position);
+
+            if (closestPlayer != null)
+                _navMeshAgent.SetDestination(closestPlayer.transform.position);
         }
     }
 }

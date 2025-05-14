@@ -56,6 +56,7 @@ namespace _Scripts.Managers
 
             _maxHealthManaBarWidth = healthBar.sizeDelta.x;
             //GetComponent<WaveManager>().OnWaveCompleteEvent += ShowUpgradeMenu;
+            WaveManager.Instance.OnWaveCompleteEvent += ShowUpgradeMenu;
         }
 
         public void UpdateHealthBar(float currHealth, float maxHealth)
@@ -106,6 +107,7 @@ namespace _Scripts.Managers
 
         private void ShowUpgradeMenu() // called at end of wave
         {
+            upgradeMenu.SetActive(true);
             var currUpgrades = GetComponent<PlayerStats>().GetRandomUpgrades(3);
             foreach (var upgrade in currUpgrades)
             {
@@ -139,6 +141,7 @@ namespace _Scripts.Managers
             {
                 GetComponent<PlayerStats>().ApplyUpgrade(singleUpgrade);
             }
+            WaveManager.Instance.ReportPlayerUpgradeDone();
         }
     }
 }

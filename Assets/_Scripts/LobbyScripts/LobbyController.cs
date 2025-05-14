@@ -7,6 +7,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using _Scripts.Managers;
 
 namespace _Scripts.LobbyScripts
 {

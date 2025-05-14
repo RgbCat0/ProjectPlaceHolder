@@ -2,12 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
+using _Scripts.Enemies;
 
-namespace _Scripts.Enemies
+namespace _Scripts.Managers
 {
-    public class WaveManager : MonoBehaviour
+    public class WaveManager : NetworkBehaviour
     {
+        public static WaveManager Instance { get; private set; }
+
         [SerializeField]
         private List<WaveInfo> waves = new();
 
@@ -15,17 +19,17 @@ namespace _Scripts.Enemies
         private List<Transform> enemies = new();
 
         [SerializeField]
-        private int currentWaveIndex = 0;
+        private int currentWaveIndex;
+
+        private Transform _enemyParent;
 
         [SerializeField]
-        private Transform enemyParent;
-
-        [SerializeField]
-        private GameObject enemyBasePrefab;
+        private NetworkObject enemyBasePrefab;
 
         [SerializeField]
         private List<Transform> spawnPoints = new();
         private bool _waitingForUpgrade = false;
+        private int _playersDoneUpgrading;
 
         // events
         public event Action OnWaveCompleteEvent; // send from this script to notify other scripts
@@ -33,11 +37,25 @@ namespace _Scripts.Enemies
 
         private void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
             StartNextWaveEvent += StartNextWave;
         }
 
-        private void Start()
+        public void Init()
         {
+            _enemyParent = GameObject.Find("EnemyParent").transform;
+            spawnPoints = GameObject
+                .Find("EnemySpawnPoints")
+                .transform.GetComponentsInChildren<Transform>()
+                .ToList();
             if (waves.Count == 0)
             {
                 Debug.LogError("No waves set up");
@@ -70,12 +88,12 @@ namespace _Scripts.Enemies
                     yield break;
                 EnemyInfo enemyInfo = currentWave.GetRandomInfo();
                 Transform spawnPoint = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)];
-                GameObject enemy = Instantiate(
+                NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(
                     enemyBasePrefab,
-                    spawnPoint.position,
-                    Quaternion.identity
+                    position: spawnPoint.position,
+                    rotation: Quaternion.identity
                 );
-                enemy.transform.SetParent(enemyParent);
+                enemy.transform.SetParent(_enemyParent);
                 enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
                 enemies.Add(enemy.transform);
                 yield return new WaitForSeconds(currentWave.spawnInterval);
@@ -84,9 +102,21 @@ namespace _Scripts.Enemies
 
         private void FixedUpdate()
         {
-            if (enemies.Count == 0)
+            if (enemies.Count == 0 && !_waitingForUpgrade)
             {
+                _waitingForUpgrade = true;
                 OnWaveCompleteEvent?.Invoke();
+            }
+        }
+
+        public void ReportPlayerUpgradeDone()
+        {
+            _playersDoneUpgrading++;
+            if (_playersDoneUpgrading == NetworkManager.Singleton.ConnectedClients.Count)
+            {
+                _waitingForUpgrade = false;
+                _playersDoneUpgrading = 0;
+                StartNextWaveEvent?.Invoke();
             }
         }
     }

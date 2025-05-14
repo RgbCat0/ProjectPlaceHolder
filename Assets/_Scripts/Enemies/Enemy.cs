@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 namespace _Scripts.Enemies
 {
-    public class Enemy : MonoBehaviour, IDamageable
+    public class Enemy : NetworkBehaviour, IDamageable
     {
         private EnemyAttack _attack;
         private EnemyMovement _movement;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7217318962388341092}
   - component: {fileID: 6646493349285851848}
   - component: {fileID: 2495708460001263262}
+  - component: {fileID: 5409219445174652452}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2040493291
+  GlobalObjectIdHash: 4176613130
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -72,3 +73,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   playerPrefab: {fileID: 6659156873106866096, guid: fded7fe05e5612d4fb11edd98975dcad, type: 3}
+  players: []
+--- !u!114 &5409219445174652452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8663358488756276622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b8297861ec4b2c489201074c6464c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  waves: []
+  enemies: []
+  currentWaveIndex: 0
+  enemyParent: {fileID: 0}
+  enemyBasePrefab: {fileID: 0}
+  spawnPoints: []
