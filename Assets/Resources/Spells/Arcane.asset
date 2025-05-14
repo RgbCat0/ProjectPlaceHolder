@@ -16,11 +16,11 @@ MonoBehaviour:
   spellPrefab: {fileID: 7554783805920216697, guid: c9f2ade7e7ff4394ab318452d33554b8, type: 3}
   spellType: 5
   areaOfEffect: 3
-  areaOfEffectRadius: 10
+  areaOfEffectRadius: 5
   isPiercing: 0
   damage: 60
   manaCost: 20
-  range: 10
+  range: 15
   castTime: 0.7
   cooldown: 3
   duration: 1

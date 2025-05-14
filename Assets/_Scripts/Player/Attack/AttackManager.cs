@@ -388,7 +388,7 @@ public class AttackManager : NetworkBehaviour
         Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
         hitboxRotation = Quaternion.Euler(
             hitboxRotation.eulerAngles.x - 90, 
-            hitboxRotation.eulerAngles.y, 
+            0, 
             hitboxRotation.eulerAngles.z);
         NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
             _castedSpell.hitboxPrefab,
