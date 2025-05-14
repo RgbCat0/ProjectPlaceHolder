@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2058575567
+  GlobalObjectIdHash: 3350210219
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -141,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c608622e9b1b4f2da2cce6fdeb6223e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &8680456736130079534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15be51f854098fa43b0c9c260f196d50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!195 &4185028047538788279
 NavMeshAgent:
   m_ObjectHideFlags: 0
