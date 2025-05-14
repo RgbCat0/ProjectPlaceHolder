@@ -17,22 +17,35 @@ public class AttackHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(_playerStats == null || _attackManager == null)
+        if (_playerStats == null || _attackManager == null)
         {
             return;
         }
+
         if (other.CompareTag("Enemy"))
         {
-            Debug.Log($"Hit {other.name}");
-            Enemy enemy = other.gameObject.GetComponent<Enemy>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(_attackManager.GetCastedSpell().damage * _playerStats.damageMultiplier);
-            }
-            else
-            {
-                Debug.LogWarning("Enemy script not found.");
-            }
+            SendDamageRpc(other);
         }
     }
+
+    [Rpc(SendTo.Server)]
+    private void SendDamageRpc(Collider other)
+    {
+        Debug.Log($"Hit {other.name}");
+        Enemy enemy = other.gameObject.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(_attackManager.GetCastedSpell().damage * _playerStats.damageMultiplier);
+        }
+        else
+        {
+            Debug.LogWarning("Enemy script not found.");
+        }
+        
+        if (_attackManager.CheckCastedSpell(AttackManager.Spells.Basic))
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
 }
