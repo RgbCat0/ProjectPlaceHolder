@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using _Scripts.Managers;
 using Random = UnityEngine.Random;
 
 namespace _Scripts.Player
@@ -66,6 +67,9 @@ namespace _Scripts.Player
                     manaRegenTimer = 0f;
                 }
             }
+            if (currentMana > currentMaxMana)
+                currentMana = currentMaxMana;
+            UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
         }
 
         public void ApplyUpgrade(SingleUpgrade upgrade)

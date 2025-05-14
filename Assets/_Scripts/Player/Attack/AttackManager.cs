@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using _Scripts.Player;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using _Scripts.Managers;
+using _Scripts.Player;
 
 public class AttackManager : NetworkBehaviour
 {
@@ -44,6 +45,7 @@ public class AttackManager : NetworkBehaviour
     private ulong _playerId;
 
     private bool _cd;
+    private Camera _camera;
 
     private void Update()
     {
@@ -57,7 +59,7 @@ public class AttackManager : NetworkBehaviour
         {
             if (
                 Physics.Raycast(
-                    Camera.main.ScreenPointToRay(Input.mousePosition),
+                    _camera.ScreenPointToRay(Input.mousePosition),
                     out hit,
                     Mathf.Infinity,
                     groundMask
@@ -79,7 +81,7 @@ public class AttackManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.Everyone)]
-    private void WAITRpc()
+    private void WaitRpc()
     {
         _selectedSpell = SetSpell(Spells.Basic);
     }
@@ -95,6 +97,7 @@ public class AttackManager : NetworkBehaviour
         _playerMovement = GetComponent<PlayerMovement>();
 
         _selectedSpell = SetSpell(Spells.Basic);
+        _camera = Camera.main;
     }
 
     private void InitializeSpells()
@@ -125,7 +128,7 @@ public class AttackManager : NetworkBehaviour
         RaycastHit hit;
         if (
             Physics.Raycast(
-                Camera.main.ScreenPointToRay(Input.mousePosition),
+                _camera.ScreenPointToRay(Input.mousePosition),
                 out hit,
                 Mathf.Infinity,
                 groundMask
@@ -152,15 +155,19 @@ public class AttackManager : NetworkBehaviour
             foreach (var indicator in _indicators)
             {
                 if (
-                    _selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line
+                    _selectedSpell != null
+                    && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Line
                 )
                 {
                     indicator.Value.transform.GetComponent<RectTransform>().localScale =
                         new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
                 }
-                else if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
+                else if (
+                    _selectedSpell != null
+                    && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone
+                )
                 {
-                    indicator.Value.transform.GetComponent<RectTransform>().localScale = 
+                    indicator.Value.transform.GetComponent<RectTransform>().localScale =
                         new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 3);
                 }
                 else if (
@@ -205,15 +212,19 @@ public class AttackManager : NetworkBehaviour
             _castedSpell = spell; // update server-side reference
             GameObject objectPos;
 
-            if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
-                _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
-                _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
+            if (
+                _castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone
+                || _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line
+                || _castedSpell.areaOfEffect == Spell.AreaOfEffect.None
+            )
             {
                 objectPos = spellObject[0];
             }
             else
-            {objectPos = spellObject[1];}
-                
+            {
+                objectPos = spellObject[1];
+            }
+
             castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
                 spell.spellPrefab,
                 _playerId,
@@ -239,7 +250,7 @@ public class AttackManager : NetworkBehaviour
     private IEnumerator CastSpell(Spell spell, Vector3 pos)
     {
         float castTime = Time.time + spell.castTime;
-        
+
         while (Time.time < castTime)
         {
             _cd = true;
@@ -278,7 +289,7 @@ public class AttackManager : NetworkBehaviour
         {
             SpawnConeAoeAttackRpc(pos);
         }
-        WAITRpc();
+        WaitRpc();
     }
 
     [Rpc(SendTo.Server)]
@@ -290,17 +301,15 @@ public class AttackManager : NetworkBehaviour
     private IEnumerator BasicAttack(Vector3 pos)
     {
         Vector3 origin = transform.position + transform.rotation * transform.forward * 6;
-        bool travel = true;
         castedSpell.GetComponent<Rigidbody>().useGravity = false;
         castedSpell.GetComponent<Rigidbody>().linearVelocity =
             (pos - transform.position).normalized * _castedSpell.travelSpeed;
-        while (travel == true)
+        while (true)
         {
             float distance = Vector3.Distance(origin, castedSpell.transform.position);
             if (distance > _castedSpell.range)
             {
                 Destroy(castedSpell);
-                travel = false;
                 yield break;
             }
             yield return null;
@@ -397,14 +406,15 @@ public class AttackManager : NetworkBehaviour
         );
         Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
         hitboxRotation = Quaternion.Euler(
-            hitboxRotation.eulerAngles.x - 90, 
-            hitboxRotation.eulerAngles.y + 180, 
-            hitboxRotation.eulerAngles.z);
+            hitboxRotation.eulerAngles.x - 90,
+            hitboxRotation.eulerAngles.y + 180,
+            hitboxRotation.eulerAngles.z
+        );
         NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
             _castedSpell.hitboxPrefab,
             _playerId,
             position: transform.position,
-            rotation: hitboxRotation    
+            rotation: hitboxRotation
         );
         hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
 
@@ -460,6 +470,7 @@ public class AttackManager : NetworkBehaviour
                 _selectedSpell = spell;
                 _currentSpell = spellName;
                 SetIndicator(spellName);
+                UIManager.Instance.UpdateSelectedSpell((int)_currentSpell);
                 return spell;
             }
             else
@@ -467,6 +478,7 @@ public class AttackManager : NetworkBehaviour
                 Debug.Log("Not enough mana to cast " + spell.name);
                 _selectedSpell = _spellDictionary[Spells.Basic];
                 _currentSpell = Spells.Basic;
+                UIManager.Instance.UpdateSelectedSpell((int)_currentSpell);
                 SetIndicator(Spells.Basic);
                 return _selectedSpell;
             }
@@ -485,7 +497,7 @@ public class AttackManager : NetworkBehaviour
     {
         if (_castedSpell == _spellDictionary[spell])
         {
-            return true;    
+            return true;
         }
         return false;
     }
