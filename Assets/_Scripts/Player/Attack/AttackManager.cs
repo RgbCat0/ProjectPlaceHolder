@@ -49,8 +49,7 @@ public class AttackManager : NetworkBehaviour
     public bool cd = false;
     private void Update()
     {
-        if (!IsOwner)
-            return;
+        if (!IsOwner) return;
         HandleSpellSelection();
         HandleCasting();
 
@@ -95,8 +94,7 @@ public class AttackManager : NetworkBehaviour
             {
                 objectPos = spellObject[0];
             }
-            else
-            {objectPos = spellObject[1];}
+            else {objectPos = spellObject[1];}
 
             if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
                 _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
