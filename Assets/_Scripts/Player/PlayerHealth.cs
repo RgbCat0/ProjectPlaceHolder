@@ -1,7 +1,7 @@
-using UnityEngine;
-using _Scripts.Managers;
 using System.Globalization;
 using Unity.Netcode;
+using UnityEngine;
+using _Scripts.Managers;
 
 namespace _Scripts.Player
 {
@@ -28,8 +28,10 @@ namespace _Scripts.Player
 
         private void Update()
         {
-                MaxHealth = _playerStats.currentMaxHealth;
-                UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
+            if (!IsOwner)
+                return;
+            MaxHealth = _playerStats.currentMaxHealth;
+            UIManager.Instance.UpdateHealthBar(Health, MaxHealth); // ui manager is not a network object
 
             healthRegenTimer += Time.deltaTime;
             if (healthRegenTimer >= 1f)
@@ -40,22 +42,24 @@ namespace _Scripts.Player
                 healthRegenTimer = 0f;
             }
         }
+
         public void TakeDamage(float damage)
         {
             Health -= damage;
             if (Health <= 0)
             {
                 Health = 0;
-                Die();
+                DieRpc();
             }
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
         }
 
-        private void Die()
+        [Rpc(SendTo.Server)]
+        private void DieRpc()
         {
             // Handle player death (e.g., play animation, destroy object, etc.)
             Debug.Log($"{gameObject.name} has died.");
-            Destroy(gameObject); // Destroy the player object
+            // NetworkObject.Despawn();
         }
     }
 }

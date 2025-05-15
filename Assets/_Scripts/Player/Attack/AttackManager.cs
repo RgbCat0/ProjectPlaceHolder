@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using _Scripts.Player;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using _Scripts.Managers;
+using _Scripts.Player;
 
 public class AttackManager : NetworkBehaviour
 {
@@ -44,8 +45,8 @@ public class AttackManager : NetworkBehaviour
 
     private ulong _playerId;
 
-    public bool cd = false;
-
+    private Camera _camera;
+    private bool cd = false;
     private void Update()
     {
         if (!IsOwner)
@@ -294,7 +295,7 @@ public class AttackManager : NetworkBehaviour
     
 
     [Rpc(SendTo.Everyone)]
-    private void WAITRpc()
+    private void WaitRpc()
     {
         _selectedSpell = SetSpell(Spells.Basic);
     }
@@ -312,6 +313,7 @@ public class AttackManager : NetworkBehaviour
         _playerAnimator = GetComponent<PlayerAnimator>();
 
         _selectedSpell = SetSpell(Spells.Basic);
+        _camera = Camera.main;
     }
 
     private void InitializeSpells()
@@ -360,9 +362,12 @@ public class AttackManager : NetworkBehaviour
                     indicator.Value.transform.GetComponent<RectTransform>().localScale =
                         new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 4);
                 }
-                else if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone)
+                else if (
+                    _selectedSpell != null
+                    && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Cone
+                )
                 {
-                    indicator.Value.transform.GetComponent<RectTransform>().localScale = 
+                    indicator.Value.transform.GetComponent<RectTransform>().localScale =
                         new Vector3(_selectedSpell.areaOfEffectRadius, 3, _selectedSpell.range / 3);
                 }
                 else if (_selectedSpell != null && _selectedSpell.areaOfEffect == Spell.AreaOfEffect.Circle)
@@ -426,6 +431,7 @@ public class AttackManager : NetworkBehaviour
                 _selectedSpell = spell;
                 _currentSpell = spellName;
                 SetIndicator(spellName);
+                UIManager.Instance.UpdateSelectedSpell((int)_currentSpell);
                 return spell;
             }
             else
@@ -433,6 +439,7 @@ public class AttackManager : NetworkBehaviour
                 Debug.Log("Not enough mana to cast " + spell.name);
                 _selectedSpell = _spellDictionary[Spells.Basic];
                 _currentSpell = Spells.Basic;
+                UIManager.Instance.UpdateSelectedSpell((int)_currentSpell);
                 SetIndicator(Spells.Basic);
                 return _selectedSpell;
             }
@@ -451,7 +458,7 @@ public class AttackManager : NetworkBehaviour
     {
         if (_castedSpell == _spellDictionary[spell])
         {
-            return true;    
+            return true;
         }
         return false;
     }

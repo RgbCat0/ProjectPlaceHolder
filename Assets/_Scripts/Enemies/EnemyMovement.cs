@@ -19,6 +19,7 @@ namespace _Scripts.Enemies
         public void SetSpeed(float speed)
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
+            _navMeshAgent.stoppingDistance = 1f;
             _navMeshAgent.speed = speed;
         }
 

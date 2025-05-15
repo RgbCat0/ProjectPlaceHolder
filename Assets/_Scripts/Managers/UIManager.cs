@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,16 @@ namespace _Scripts.Managers
 
         [SerializeField]
         private TextMeshProUGUI manaText;
+
+        [Header("Spell Selection")]
+        [SerializeField]
+        private List<RawImage> spells;
+
+        [SerializeField]
+        private Texture deselectedSpellImage;
+
+        [SerializeField]
+        private Texture selectedSpellImage;
 
         private float _maxHealthManaBarWidth;
 
@@ -103,6 +114,23 @@ namespace _Scripts.Managers
                 );
                 manaText.text = $"{currMana}/{maxMana}";
             }
+        }
+
+        public void UpdateSelectedSpell(int spellIndex)
+        {
+            if (spellIndex < 0 || spellIndex >= 4)
+            {
+                Debug.LogError("Invalid spell index.");
+                return;
+            }
+
+            foreach (var image in spells)
+            {
+                image.texture = deselectedSpellImage;
+            }
+            if (spellIndex == 0)
+                return; // basic attack has no image
+            spells[spellIndex - 1].texture = selectedSpellImage;
         }
 
         private void ShowUpgradeMenu() // called at end of wave
