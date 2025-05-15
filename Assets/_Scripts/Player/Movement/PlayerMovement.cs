@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerMovement : NetworkBehaviour
 {
     private PlayerStats _playerStats;
-
+    private PlayerAnimator _playerAnimator;
+    private AttackManager _attackManager;
     private Vector2 _moveInput;
     private Rigidbody _rb;
     public  bool canMove = true;
@@ -22,6 +23,8 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
         _playerStats = GetComponent<PlayerStats>();
+        _playerAnimator = GetComponent<PlayerAnimator>();
+        _attackManager = GetComponent<AttackManager>();
         _rb = GetComponent<Rigidbody>();
     }
 
@@ -30,6 +33,10 @@ public class PlayerMovement : NetworkBehaviour
         moveSpeed *= _playerStats.speedMultiplier;
         maxVel *= _playerStats.speedMultiplier;
         _moveInput = InputHandler.Instance.moveInput;
+        if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
+        {
+            _playerAnimator.ChangeAnimation("Idle", 0.2f);
+        }
     }
 
     private void FixedUpdate()
@@ -45,12 +52,14 @@ public class PlayerMovement : NetworkBehaviour
         moveDir.Normalize();
         if (moveDir != Vector3.zero)
         {
+            _playerAnimator.ChangeAnimation("Walking");
             Rotation(moveDir);
             _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
             if (_rb.linearVelocity.magnitude > maxVel)
             {
                 _rb.linearVelocity = _rb.linearVelocity.normalized * maxVel;
             }
+
         }
     }
 
