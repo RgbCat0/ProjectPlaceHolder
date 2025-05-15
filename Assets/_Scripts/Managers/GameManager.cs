@@ -5,9 +5,9 @@ namespace _Scripts.Managers
 {
     public class GameManager : NetworkBehaviour
     {
-        public static GameManager Instance { get; private set; }
         public NetworkObject playerPrefab;
         public List<NetworkObject> players = new();
+        public static GameManager Instance { get; private set; }
 
         private void Awake()
         {
@@ -30,18 +30,14 @@ namespace _Scripts.Managers
         {
             // spawns the players
             if (NetworkManager.IsHost)
-            {
-                for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
+                for (var i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
-                    var newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
-                        playerPrefab,
-                        (ulong)i,
-                        isPlayerObject: true
-                    );
+                    NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
+                        playerPrefab, (ulong)i, isPlayerObject: true);
                     players.Add(newPlayer);
                 }
-            }
+
             GetComponent<WaveManager>().Init();
         }
     }

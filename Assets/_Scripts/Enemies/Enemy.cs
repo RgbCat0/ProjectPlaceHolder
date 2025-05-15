@@ -9,15 +9,17 @@ namespace _Scripts.Enemies
         private EnemyMovement _movement;
         public float Health { get; private set; } = 100f;
 
-        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint)
+        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug = false)
         {
             _attack = GetComponent<EnemyAttack>();
             _movement = GetComponent<EnemyMovement>();
             Health = enemyInfo.health;
             _movement.SetSpeed(enemyInfo.speed);
             transform.position = spawnPoint;
-            var model = Instantiate(enemyInfo.modelPrefab, transform);
-            model.transform.localPosition = enemyInfo.modelPrefab.transform.position;
+            GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
+            model.transform.localPosition = Vector3.zero;
+            if (debug)
+                _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
 
         #region Health

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Default
   m_EditorClassIdentifier: 
   identifier: Default
-  modelPrefab: {fileID: 9047372143234028823, guid: 7efca0451bf350f489610e19aee917b9, type: 3}
+  modelPrefab: {fileID: 8789685859759040801, guid: 07cece731512fd84283ec525a63e2bfe, type: 3}
   health: 100
   speed: 3
