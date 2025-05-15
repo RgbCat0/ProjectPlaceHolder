@@ -46,7 +46,7 @@ public class AttackManager : NetworkBehaviour
     private ulong _playerId;
 
     private Camera _camera;
-    private bool cd = false;
+    public bool cd = false;
     private void Update()
     {
         if (!IsOwner)
@@ -158,7 +158,7 @@ public class AttackManager : NetworkBehaviour
         {
             SpawnConeAoeAttackRpc(pos);
         }
-        WAITRpc();
+        WaitRpc();
         cd = false;
     }
 
