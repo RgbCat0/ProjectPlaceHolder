@@ -136,7 +136,7 @@ namespace _Scripts.Managers
         private void ShowUpgradeMenu() // called at end of wave
         {
             upgradeMenu.SetActive(true);
-            var currUpgrades = GetComponent<PlayerStats>().GetRandomUpgrades(3);
+            var currUpgrades = GetComponent<PlayerStats>().GetRandomUpgrades(3); // TODO: errors on this line exception: NullReference
             foreach (var upgrade in currUpgrades)
             {
                 var upgradeObject = Instantiate(upgradePrefab, upgradeMenu.transform);

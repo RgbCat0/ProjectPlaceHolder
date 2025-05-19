@@ -14,6 +14,6 @@ namespace _Scripts.Managers
             playButton.onClick.AddListener(GoToGame);
         }
 
-        private void GoToGame() => SceneManager.LoadScene("Scenes/Main");
+        private void GoToGame() => SceneManager.LoadScene("Lobby");
     }
 }

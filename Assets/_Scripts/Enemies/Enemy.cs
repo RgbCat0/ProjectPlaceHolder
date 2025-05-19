@@ -1,5 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using _Scripts.Managers;
 
 namespace _Scripts.Enemies
 {
@@ -8,6 +9,10 @@ namespace _Scripts.Enemies
         private EnemyAttack _attack;
         private EnemyMovement _movement;
         public float Health { get; private set; } = 100f;
+
+        #region init
+
+
 
         public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug = false)
         {
@@ -22,6 +27,7 @@ namespace _Scripts.Enemies
             if (debug)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
+        #endregion
 
         #region Health
 
@@ -29,13 +35,16 @@ namespace _Scripts.Enemies
         {
             Health -= damage;
             if (Health <= 0f)
-                Die();
+                DieRpc();
             Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
         }
 
-        private void Die()
+        //ensure running on server
+        [Rpc(SendTo.Server)]
+        private void DieRpc()
         {
             // Handle enemy death (e.g., play animation, destroy object, etc.)
+            WaveManager.Instance.EnemyDeath(NetworkObject);
             Debug.Log($"{gameObject.name} has died.");
             Destroy(gameObject); // Destroy the enemy object
         }

@@ -34,7 +34,10 @@ namespace _Scripts.Managers
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
                     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
-                        playerPrefab, (ulong)i, isPlayerObject: true);
+                        playerPrefab,
+                        (ulong)i,
+                        isPlayerObject: true
+                    );
                     players.Add(newPlayer);
                 }
 

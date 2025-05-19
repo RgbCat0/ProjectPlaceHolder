@@ -46,19 +46,26 @@ namespace _Scripts.Managers
             StartNextWaveEvent += StartNextWave;
         }
 
-        private void FixedUpdate()
-        {
-            if (enemies.Count == 0 && !_waitingForUpgrade)
-            {
-                _waitingForUpgrade = true;
-                OnWaveCompleteEvent?.Invoke();
-            }
-        }
+        // private void FixedUpdate()
+        // {
+        //     if (enemies.Count == 0 && !_waitingForUpgrade)
+        //     {
+        //         _waitingForUpgrade = true;
+        //         Debug.Log("Wave complete, showing upgrade menu");
+        //         OnWaveCompleteEvent?.Invoke();
+        //     }
+        // }
 
         // events
         public event Action OnWaveCompleteEvent; // send from this script to notify other scripts
         public event Action StartNextWaveEvent; // used in another script to notify starting the next wave
+        #region init
 
+
+
+        /// <summary>
+        /// Tells the WaveManager to initialize and start the first wave.
+        /// </summary>
         public void Init()
         {
             _enemyParent = GameObject.Find("EnemyParent").transform;
@@ -82,6 +89,7 @@ namespace _Scripts.Managers
 #endif
             StartNextWaveEvent?.Invoke(); // only start the first wave
         }
+        #endregion
 
         private void StartNextWave()
         {
@@ -95,6 +103,9 @@ namespace _Scripts.Managers
             StartCoroutine(StartWave());
         }
 
+        /// <summary>
+        /// Starts the current wave.
+        /// </summary>
         private IEnumerator StartWave()
         {
             WaveInfo currentWave = waves[currentWaveIndex];
@@ -102,7 +113,10 @@ namespace _Scripts.Managers
             while (true)
             {
                 if (enemies.Count >= currentWave.enemyCount)
+                {
+                    Debug.Log($"Spawning complete, spawned {enemies.Count} enemies");
                     yield break;
+                }
                 EnemyInfo enemyInfo = currentWave.GetRandomInfo();
                 Transform spawnPoint;
                 spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
@@ -122,6 +136,17 @@ namespace _Scripts.Managers
 #endif
                 enemies.Add(enemy.transform);
                 yield return new WaitForSeconds(currentWave.spawnInterval);
+            }
+        }
+
+        public void EnemyDeath(NetworkObject enemy)
+        {
+            enemies.Remove(enemy.transform);
+            if (enemies.Count == 0 && !_waitingForUpgrade)
+            {
+                _waitingForUpgrade = true;
+                Debug.Log("Wave complete, showing upgrade menu");
+                OnWaveCompleteEvent?.Invoke();
             }
         }
 
