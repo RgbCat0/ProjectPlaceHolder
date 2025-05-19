@@ -15,7 +15,8 @@ namespace _Scripts.Enemies
             _movement = GetComponent<EnemyMovement>();
             Health = enemyInfo.health;
             _movement.SetSpeed(enemyInfo.speed);
-            transform.position = spawnPoint;
+            // Debug.Log(spawnPoint);
+            // transform.position = spawnPoint;
             GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
             model.transform.localPosition = Vector3.zero;
             if (debug)

@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using _Scripts.Enemies;
 using Unity.Netcode;
 using UnityEngine;
+using _Scripts.Enemies;
 using Random = UnityEngine.Random;
 
 namespace _Scripts.Managers
@@ -62,7 +62,10 @@ namespace _Scripts.Managers
         public void Init()
         {
             _enemyParent = GameObject.Find("EnemyParent").transform;
-            spawnPoints = GameObject.Find("EnemySpawnPoints").transform.GetComponentsInChildren<Transform>().ToList();
+            spawnPoints = GameObject
+                .FindWithTag("EnemySpawnpoint")
+                .transform.GetComponentsInChildren<Transform>()
+                .ToList();
             if (waves.Count == 0)
             {
                 Debug.LogError("No waves set up");
@@ -98,14 +101,22 @@ namespace _Scripts.Managers
             yield return new WaitForSeconds(currentWave.startDelay);
             while (true)
             {
-                if (enemies.Count >= currentWave.enemyCount) yield break;
+                if (enemies.Count >= currentWave.enemyCount)
+                    yield break;
                 EnemyInfo enemyInfo = currentWave.GetRandomInfo();
-                Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-                NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(enemyBasePrefab,
-                    position: spawnPoint.position, rotation: Quaternion.identity);
+                Transform spawnPoint;
+                spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+                Debug.Log(spawnPoint.position);
+                NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(
+                    enemyBasePrefab,
+                    position: spawnPoint.position,
+                    rotation: Quaternion.identity
+                );
                 enemy.transform.SetParent(_enemyParent);
 #if UNITY_EDITOR
-                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, disableMovement);
+                enemy
+                    .GetComponent<Enemy>()
+                    .Initialize(enemyInfo, spawnPoint.position, disableMovement);
 #else
                 enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
 #endif
@@ -153,7 +164,8 @@ namespace _Scripts.Managers
             foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
             {
                 cumulative += enemy.spawnChance;
-                if (roll <= cumulative) return enemy.info;
+                if (roll <= cumulative)
+                    return enemy.info;
             }
 
             return enemyTypesToSpawn[0].info; // fallback
