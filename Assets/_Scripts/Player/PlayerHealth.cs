@@ -1,6 +1,7 @@
 using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
+using _Scripts.LobbyScripts;
 using _Scripts.Managers;
 
 namespace _Scripts.Player
@@ -24,6 +25,30 @@ namespace _Scripts.Player
             _playerStats = GetComponent<PlayerStats>();
             MaxHealth = _playerStats.baseMaxHealth;
             Health = MaxHealth; // Set initial health
+            SendData();
+        }
+
+        private void SendData() =>
+            SetPlayerDataSyncRpc(NetworkManager.LocalClientId, NetworkObject.NetworkObjectId);
+
+        [Rpc(SendTo.Server)]
+        private void SetPlayerDataSyncRpc(ulong networkManagerId, ulong playerObjectId)
+        {
+            var playerDataSync = PlayerDataSync.Instance;
+            var playerList = playerDataSync.syncedPlayerList;
+
+            for (int i = 0; i < playerList.Count; i++)
+            {
+                if (playerList[i].PlayerNetworkId == networkManagerId)
+                {
+                    playerDataSync.localPlayerObjectId = playerObjectId;
+                    var data = playerList[i];
+                    data.InGameObjectId = playerObjectId;
+                    playerList[i] = data;
+                    break;
+                }
+            }
+            playerDataSync.SendFullListRpc();
         }
 
         private void Update()

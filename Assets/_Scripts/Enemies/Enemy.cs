@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.AI;
 using _Scripts.Managers;
 using _Scripts.Player;
-using UnityEngine.AI;
 
 namespace _Scripts.Enemies
 {
@@ -14,7 +14,7 @@ namespace _Scripts.Enemies
         private EnemyMovement _movement;
         private NavMeshAgent _navMeshAgent;
         public float Health { get; private set; } = 100f;
-        
+
         #region init
         public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug = false)
         {
@@ -31,7 +31,7 @@ namespace _Scripts.Enemies
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
         #endregion
-        
+
         public void ApplyElementEffect(Spell spell, PlayerStats stats)
         {
             float duration = Time.time + spell.effectDuration;
@@ -42,11 +42,13 @@ namespace _Scripts.Enemies
                     Debug.Log("Fire");
                     if (currentEffect == Spell.SpellType.Water)
                     {
+                        Debug.unityLogger.Log("Water", "Fire");
                         TakeDamage(spell.damage * stats.damageMultiplier * 1.5f);
                         currentEffect = Spell.SpellType.None;
                     }
                     else
                     {
+                        Debug.unityLogger.Log("Fire", "Fire");
                         currentEffect = spell.spellType;
                         while (Time.time < duration)
                         {
@@ -56,8 +58,7 @@ namespace _Scripts.Enemies
                     }
 
                     break;
-                
-                
+
                 case Spell.SpellType.Lightning:
                     Debug.Log("Lightning");
                     if (currentEffect == Spell.SpellType.Water)
@@ -70,8 +71,7 @@ namespace _Scripts.Enemies
                         TakeDamage(spell.damage * stats.damageMultiplier);
                     }
                     break;
-                
-                
+
                 case Spell.SpellType.Ice:
                     Debug.Log("ice");
                     TakeDamage(spell.damage * stats.damageMultiplier);
@@ -95,27 +95,19 @@ namespace _Scripts.Enemies
                     }
 
                     break;
-                
-                
+
                 case Spell.SpellType.Water:
                     Debug.Log("Water");
                     currentEffect = Spell.SpellType.Water;
                     break;
-                
-                
+
                 case Spell.SpellType.Earth:
                     break;
-                
-                
+
                 case Spell.SpellType.None:
                     break;
-                
-                
             }
         }
-        
-        
-        
 
         #region Health
 

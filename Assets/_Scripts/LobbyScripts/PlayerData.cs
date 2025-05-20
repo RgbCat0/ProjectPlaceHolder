@@ -12,13 +12,15 @@ namespace _Scripts.LobbyScripts
         public ulong PlayerNetworkId;
         public bool IsHost;
         public bool IsReady;
+        public ulong InGameObjectId;
 
         public PlayerData(
             FixedString64Bytes name,
             FixedString64Bytes lobbyId,
             ulong networkId,
             bool isHost,
-            bool isReady
+            bool isReady,
+            ulong inGameObjectId
         )
         {
             PlayerName = name;
@@ -26,6 +28,7 @@ namespace _Scripts.LobbyScripts
             PlayerNetworkId = networkId;
             IsHost = isHost;
             IsReady = isReady;
+            InGameObjectId = 0;
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer)
@@ -36,6 +39,7 @@ namespace _Scripts.LobbyScripts
             serializer.SerializeValue(ref PlayerNetworkId);
             serializer.SerializeValue(ref IsHost);
             serializer.SerializeValue(ref IsReady);
+            serializer.SerializeValue(ref InGameObjectId);
         }
     }
 }

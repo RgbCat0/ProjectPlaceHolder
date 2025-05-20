@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using _Scripts.Enemies;
+using _Scripts.LobbyScripts;
 using _Scripts.Player;
 
 namespace _Scripts.Managers
@@ -136,7 +139,16 @@ namespace _Scripts.Managers
         private void ShowUpgradeMenu() // called at end of wave
         {
             upgradeMenu.SetActive(true);
-            var currUpgrades = GetComponent<PlayerStats>().GetRandomUpgrades(3); // TODO: errors on this line exception: NullReference
+            var localPlayerObjectId = PlayerDataSync.Instance.localPlayerObjectId;
+            var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[
+                localPlayerObjectId
+            ];
+            var currUpgrades = playerObject.GetComponent<PlayerStats>().GetRandomUpgrades(3);
+            if (currUpgrades.Count == 0)
+            {
+                Debug.Log("No upgrades available.");
+                return;
+            }
             foreach (var upgrade in currUpgrades)
             {
                 var upgradeObject = Instantiate(upgradePrefab, upgradeMenu.transform);
@@ -157,17 +169,20 @@ namespace _Scripts.Managers
             }
         }
 
-        private void UpgradeCall(Upgrade upgrade)
+        private void UpgradeCall(ScriptableUpgrades upgrade)
         {
             upgradeMenu.SetActive(false);
             foreach (Transform child in upgradeMenu.transform)
             {
                 Destroy(child.gameObject);
             }
-
+            var localPlayerObjectId = PlayerDataSync.Instance.localPlayerObjectId;
+            var playerStats = NetworkManager
+                .Singleton.SpawnManager.SpawnedObjects[localPlayerObjectId]
+                .GetComponent<PlayerStats>();
             foreach (var singleUpgrade in upgrade.upgrades)
             {
-                GetComponent<PlayerStats>().ApplyUpgrade(singleUpgrade);
+                playerStats.ApplyUpgrade(singleUpgrade);
             }
             WaveManager.Instance.ReportPlayerUpgradeDone();
         }
