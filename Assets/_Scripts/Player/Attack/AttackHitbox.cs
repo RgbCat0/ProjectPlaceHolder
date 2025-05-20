@@ -35,7 +35,7 @@ public class AttackHitbox : MonoBehaviour
         Enemy enemy = other.gameObject.GetComponent<Enemy>();
         if (enemy != null)
         {
-            enemy.TakeDamage(_attackManager.GetCastedSpell().damage * _playerStats.damageMultiplier);
+            enemy.ApplyElementEffect( _attackManager.GetCastedSpell(), _playerStats);
         }
         else
         {

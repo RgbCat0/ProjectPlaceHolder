@@ -8,10 +8,10 @@ public class Spell : ScriptableObject
     {
         None,
         Fire,
+        Water,
         Ice,
         Lightning,
         Earth,
-        Wind
     }
 
     public enum AreaOfEffect
@@ -25,6 +25,8 @@ public class Spell : ScriptableObject
     public NetworkObject hitboxPrefab;
     public NetworkObject spellPrefab;
     public SpellType spellType;
+    public float effectDuration;
+    public int effectDamage;
     public AreaOfEffect areaOfEffect;
     public float areaOfEffectRadius;
     public bool isPiercing;

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitboxPrefab: {fileID: 8852188195722696528, guid: ff8484064b5b8ae44849f61a7c996581, type: 3}
   spellPrefab: {fileID: 7554783805920216697, guid: c9f2ade7e7ff4394ab318452d33554b8, type: 3}
-  spellType: 5
+  spellType: 3
+  effectDuration: 0
+  effectDamage: 0
   areaOfEffect: 3
   areaOfEffectRadius: 5
   isPiercing: 0
