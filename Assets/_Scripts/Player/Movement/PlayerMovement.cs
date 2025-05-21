@@ -1,4 +1,5 @@
 using _Scripts.Player;
+using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     private AttackManager _attackManager;
     private Vector2 _moveInput;
     private Rigidbody _rb;
+    private CinemachineCamera _playerCam;
     public  bool canMove = true;
 
     [SerializeField] private float moveSpeed;
@@ -22,15 +24,21 @@ public class PlayerMovement : NetworkBehaviour
             enabled = false;
             return;
         }
+
+        _playerCam = FindFirstObjectByType<CinemachineCamera>();
         _playerStats = GetComponent<PlayerStats>();
         _playerAnimator = GetComponent<PlayerAnimator>();
         _attackManager = GetComponent<AttackManager>();
         _rb = GetComponent<Rigidbody>();
+        
+        _playerCam.Target.TrackingTarget = gameObject.transform;
+        _playerCam.Target.LookAtTarget = gameObject.transform;
+        _playerStats.OnSpeedChanged += f => moveSpeed *= f;
     }
 
+    
     private void Update()
     {
-        moveSpeed *= _playerStats.speedMultiplier;
         maxVel *= _playerStats.speedMultiplier;
         _moveInput = InputHandler.Instance.moveInput;
         if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)

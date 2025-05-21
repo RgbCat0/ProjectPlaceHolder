@@ -130,7 +130,7 @@ namespace _Scripts.LobbyScripts
         private IEnumerator StartGame()
         {
             _serviceManager.StopHeartbeat();
-            NetworkManager.SceneManager.LoadScene("CharacterRelated", LoadSceneMode.Single);
+            NetworkManager.SceneManager.LoadScene("Main", LoadSceneMode.Single);
             NetworkManager.SceneManager.OnLoadComplete += (id, _, _) =>
             {
                 if (id == NetworkManager.LocalClientId) GameManager.Instance.StartGame();
