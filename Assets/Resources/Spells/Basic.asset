@@ -15,10 +15,12 @@ MonoBehaviour:
   hitboxPrefab: {fileID: 0}
   spellPrefab: {fileID: -64658089636114989, guid: 4f5c082b95d7e0d40a4804ff4d3c62e6, type: 3}
   spellType: 0
+  effectDuration: 0
+  effectDamage: 0
   areaOfEffect: 0
   areaOfEffectRadius: 0
   isPiercing: 0
-  damage: 8
+  damage: 1
   manaCost: 0
   range: 15
   castTime: 0.5

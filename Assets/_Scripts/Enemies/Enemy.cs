@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using _Scripts.Managers;
 using _Scripts.Player;
+using Unity.VisualScripting;
 using UnityEngine.AI;
 
 namespace _Scripts.Enemies
@@ -13,6 +14,8 @@ namespace _Scripts.Enemies
         private EnemyAttack _attack;
         private EnemyMovement _movement;
         private NavMeshAgent _navMeshAgent;
+        private Spell _spell;
+        private PlayerStats _playerStats;
         public float Health { get; private set; } = 100f;
         
         #region init
@@ -31,69 +34,32 @@ namespace _Scripts.Enemies
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
         #endregion
-        
-        public void ApplyElementEffect(Spell spell, PlayerStats stats)
+
+        public void SetAttacker(Spell castedSpell, PlayerStats playerStats)
         {
-            float duration = Time.time + spell.effectDuration;
+            _spell = castedSpell;
+            _playerStats = playerStats;
+            ApplyElementEffectRpc();
+        }        
+        
+        [Rpc(SendTo.Server)]
+        public void ApplyElementEffectRpc()
+        {
             Debug.Log(currentEffect);
-            switch (spell.spellType)
+            switch (_spell.spellType)
             {
                 case Spell.SpellType.Fire:
-                    Debug.Log("Fire");
-                    if (currentEffect == Spell.SpellType.Water)
-                    {
-                        TakeDamage(spell.damage * stats.damageMultiplier * 1.5f);
-                        currentEffect = Spell.SpellType.None;
-                    }
-                    else
-                    {
-                        currentEffect = spell.spellType;
-                        while (Time.time < duration)
-                        {
-                            TakeDamage(spell.damage * stats.damageMultiplier);
-                            TakeDamage(spell.effectDamage);
-                        }
-                    }
-
+                    StartCoroutine(ApplyFire());
                     break;
                 
                 
                 case Spell.SpellType.Lightning:
-                    Debug.Log("Lightning");
-                    if (currentEffect == Spell.SpellType.Water)
-                    {
-                        TakeDamage(spell.damage * stats.damageMultiplier * 1.5f);
-                        currentEffect = Spell.SpellType.None;
-                    }
-                    else
-                    {
-                        TakeDamage(spell.damage * stats.damageMultiplier);
-                    }
+                    ApplyLightning();
                     break;
                 
                 
                 case Spell.SpellType.Ice:
-                    Debug.Log("ice");
-                    TakeDamage(spell.damage * stats.damageMultiplier);
-                    float speed = _navMeshAgent.speed;
-                    if (currentEffect == Spell.SpellType.Water)
-                    {
-                        while (Time.time < duration)
-                        {
-                            _movement.SetSpeed(0f);
-                        }
-                        _navMeshAgent.speed = speed;
-                    }
-                    else
-                    {
-                        while (Time.time < duration)
-                        {
-                            _movement.SetSpeed(_navMeshAgent.speed / 2);
-                        }
-
-                        _movement.SetSpeed(speed);
-                    }
-
+                    ApplyIce();
                     break;
                 
                 
@@ -113,7 +79,69 @@ namespace _Scripts.Enemies
                 
             }
         }
-        
+
+        private IEnumerator ApplyFire()
+        {
+            float duration = Time.time + _spell.effectDuration;
+            if (currentEffect == Spell.SpellType.Water)
+            {
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier * 1.5f);
+                currentEffect = Spell.SpellType.None;
+            }
+            else
+            {
+                bool DOT = true;
+                currentEffect = _spell.spellType;
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+                
+                while (Time.time < duration)
+                {
+                    TakeDamage(_spell.effectDamage);
+                    yield return new WaitForSeconds(0.5f);
+                }
+            }
+
+            yield return null;
+        }
+
+        private void ApplyIce()
+        {
+            Debug.Log("ice");
+            float duration = Time.time + _spell.effectDuration;
+            TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+            float speed = _navMeshAgent.speed;
+            if (currentEffect == Spell.SpellType.Water)
+            {
+                while (Time.time < duration)
+                {
+                    _movement.SetSpeed(0f);
+                }
+                _navMeshAgent.speed = speed;
+            }
+            else
+            {
+                while (Time.time < duration)
+                {
+                    _movement.SetSpeed(_navMeshAgent.speed / 2);
+                }
+
+                _movement.SetSpeed(speed);
+            }
+        }
+
+        private void ApplyLightning()
+        {
+            Debug.Log("Lightning");
+            if (currentEffect == Spell.SpellType.Water)
+            {
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier * 1.5f);
+                currentEffect = Spell.SpellType.None;
+            }
+            else
+            {
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+            }
+        }
         
         
 
