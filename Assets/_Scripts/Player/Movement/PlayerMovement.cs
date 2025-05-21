@@ -39,7 +39,7 @@ public class PlayerMovement : NetworkBehaviour
     
     private void Update()
     {
-        maxVel *= _playerStats.speedMultiplier;
+        maxVel = moveSpeed;
         _moveInput = InputHandler.Instance.moveInput;
         if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
         {
