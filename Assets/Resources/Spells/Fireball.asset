@@ -18,11 +18,11 @@ MonoBehaviour:
   effectDuration: 5
   effectDamage: 5
   areaOfEffect: 1
-  areaOfEffectRadius: 8
+  areaOfEffectRadius: 15
   isPiercing: 0
-  damage: 1
+  damage: 20
   manaCost: 10
-  range: 40
+  range: 50
   castTime: 0.5
   cooldown: 3
   duration: 0.5
