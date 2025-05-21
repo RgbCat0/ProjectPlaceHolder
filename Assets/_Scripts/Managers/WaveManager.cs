@@ -71,7 +71,7 @@ namespace _Scripts.Managers
             _enemyParent = GameObject.Find("EnemyParent").transform;
             spawnPoints = GameObject
                 .FindWithTag("EnemySpawnpoint")
-                .transform.GetComponentsInChildren<Transform>()
+                .transform.GetComponentsInChildren<Transform>() // TODO: enemies only spawn at the first child
                 .ToList();
             if (waves.Count == 0)
             {
@@ -93,6 +93,8 @@ namespace _Scripts.Managers
 
         private void StartNextWave()
         {
+            if (!IsHost)
+                return;
             currentWaveIndex++;
             if (currentWaveIndex >= waves.Count)
             {
@@ -146,8 +148,14 @@ namespace _Scripts.Managers
             {
                 _waitingForUpgrade = true;
                 Debug.Log("Wave complete, showing upgrade menu");
-                OnWaveCompleteEvent?.Invoke();
+                SendCompleteEventRpc();
             }
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void SendCompleteEventRpc()
+        {
+            OnWaveCompleteEvent?.Invoke();
         }
 
         public void ReportPlayerUpgradeDone()
@@ -157,8 +165,13 @@ namespace _Scripts.Managers
             {
                 _waitingForUpgrade = false;
                 _playersDoneUpgrading = 0;
-                StartNextWaveEvent?.Invoke();
+                SendNextWaveEventRpc();
             }
+        }
+
+        private void SendNextWaveEventRpc()
+        {
+            StartNextWaveEvent?.Invoke();
         }
 
 #if UNITY_EDITOR

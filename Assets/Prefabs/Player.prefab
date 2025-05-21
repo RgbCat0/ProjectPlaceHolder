@@ -984,40 +984,14 @@ MonoBehaviour:
   baseManaRegen: 1
   baseMaxHealth: 100
   baseHealthRegen: 1
+  baseLuck: 0
   currentMana: 0
   currentMaxMana: 100
   currentManaRegen: 1
   currentMaxHealth: 100
   currentHealthRegen: 1
-  upgrades:
-  - name: Health boi
-    shortText: 
-    upgrades:
-    - type: 0
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
-  - name: Damage boi
-    shortText: 
-    upgrades:
-    - type: 1
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
-  - name: Mana and damage boi
-    shortText: 
-    upgrades:
-    - type: 3
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    - type: 1
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
+  currentLuck: 0
+  upgrades: []
   healthMultiplier: 1
   damageMultiplier: 1
   speedMultiplier: 1

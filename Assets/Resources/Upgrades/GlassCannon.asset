@@ -10,12 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba40ab64b1cc490a87ae323e7d7a4e0e, type: 3}
-  m_Name: Damage10
+  m_Name: GlassCannon
   m_EditorClassIdentifier: 
-  upgradeName: Damage Dealer
-  shortText: DD
+  upgradeName: Glass Cannon
+  shortText: GC
   upgrades:
   - type: 1
-    value: 10
-    description: +10% Damage
-  rarity: 1
+    value: 25
+    description: +25% Damage
+  - type: 0
+    value: -15
+    description: -15% Health
+  rarity: 1.6
+  percentageChance: 0
+  percentageWithLuck: 0
