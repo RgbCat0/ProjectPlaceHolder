@@ -12,10 +12,22 @@ namespace _Scripts.LobbyScripts
         public NetworkVariable<bool> listIsSynced;
         public event Action OnPlayerJoin;
         private bool _isActuallySpawned;
+        public bool gameStarted; // disables all Lobby related functions
+        public ulong localPlayerObjectId;
+        public static PlayerDataSync Instance { get; private set; }
 
         private void Awake()
         {
             listIsSynced = new NetworkVariable<bool>();
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -60,7 +72,8 @@ namespace _Scripts.LobbyScripts
                 new FixedString64Bytes(lobbyId),
                 networkId,
                 isHost,
-                false
+                false,
+                0 // set once the game starts
             );
 
             // Avoid duplicates (e.g., reconnects)
@@ -88,6 +101,9 @@ namespace _Scripts.LobbyScripts
             StartCoroutine(GetComponent<LobbyUiManager>().AddNewPlayer());
         }
 
+        /// <summary>
+        /// This function should be called from the server itself. Any new data from clients have to be sent via RPC.
+        /// </summary>
         [Rpc(SendTo.Server)]
         public void SendFullListRpc()
         {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.AI;
 using _Scripts.Managers;
 using _Scripts.Player;
 using Unity.VisualScripting;
@@ -17,7 +18,7 @@ namespace _Scripts.Enemies
         private Spell _spell;
         private PlayerStats _playerStats;
         public float Health { get; private set; } = 100f;
-        
+
         #region init
         public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug = false)
         {
@@ -51,32 +52,25 @@ namespace _Scripts.Enemies
                 case Spell.SpellType.Fire:
                     StartCoroutine(ApplyFire());
                     break;
-                
-                
+
                 case Spell.SpellType.Lightning:
                     ApplyLightning();
                     break;
-                
-                
+
                 case Spell.SpellType.Ice:
                     ApplyIce();
                     break;
-                
-                
+
                 case Spell.SpellType.Water:
                     Debug.Log("Water");
                     currentEffect = Spell.SpellType.Water;
                     break;
-                
-                
+
                 case Spell.SpellType.Earth:
                     break;
-                
-                
+
                 case Spell.SpellType.None:
                     break;
-                
-                
             }
         }
 

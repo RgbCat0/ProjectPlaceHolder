@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Newtonsoft.Json;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +30,7 @@ namespace _Scripts.Player
         public float currentHealthRegen;
 
         private float manaRegenTimer;
-        public List<Upgrade> upgrades = new();
+        public List<ScriptableUpgrades> upgrades = new();
 
         [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
@@ -49,6 +50,8 @@ namespace _Scripts.Player
         private void Start()
         {
             currentMana = baseMaxMana;
+            Debug.Log(JsonConvert.SerializeObject(upgrades));
+            upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
         }
 
         private void Update()
@@ -105,9 +108,9 @@ namespace _Scripts.Player
             }
         }
 
-        public List<Upgrade> GetRandomUpgrades(int count) // dupes allowed
+        public List<ScriptableUpgrades> GetRandomUpgrades(int count) // dupes allowed
         {
-            List<Upgrade> selectedUpgrades = new();
+            List<ScriptableUpgrades> selectedUpgrades = new();
 
             for (int i = 0; i < count; i++)
             {
@@ -136,39 +139,5 @@ namespace _Scripts.Player
 
             return selectedUpgrades;
         }
-    }
-
-    [Serializable]
-    public class Upgrade
-    {
-        public string name;
-
-        [Tooltip("Used in place of icon in game jam (ex: Di == Damage Increase)")]
-        public string shortText; // used in place of icon in game jam (ex: Di == Damage Increase)
-        public List<SingleUpgrade> upgrades; // made for multiple upgrades so it can buff 1 and debuff 1 for example
-
-        [Tooltip("higher numbers are more rare")]
-        public float rarity; // same system as the wave system
-    }
-
-    [Serializable]
-    public class SingleUpgrade
-    {
-        public UpgradeTypes type;
-
-        [Tooltip("Percentage to Apply")]
-        public float value;
-        public string description;
-        public Image icon; // not used in game jam will be used for full game
-    }
-
-    public enum UpgradeTypes
-    {
-        Health,
-        Damage,
-        Speed,
-        Mana,
-        ManaRegen,
-        Cooldown,
     }
 }

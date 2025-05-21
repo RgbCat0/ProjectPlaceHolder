@@ -965,6 +965,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+  cd: 0
 --- !u!114 &3430485792608797232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,7 +989,35 @@ MonoBehaviour:
   currentManaRegen: 1
   currentMaxHealth: 100
   currentHealthRegen: 1
-  upgrades: []
+  upgrades:
+  - name: Health boi
+    shortText: 
+    upgrades:
+    - type: 0
+      value: 10
+      description: test desc
+      icon: {fileID: 0}
+    rarity: 0
+  - name: Damage boi
+    shortText: 
+    upgrades:
+    - type: 1
+      value: 10
+      description: test desc
+      icon: {fileID: 0}
+    rarity: 0
+  - name: Mana and damage boi
+    shortText: 
+    upgrades:
+    - type: 3
+      value: 10
+      description: test desc
+      icon: {fileID: 0}
+    - type: 1
+      value: 10
+      description: test desc
+      icon: {fileID: 0}
+    rarity: 0
   healthMultiplier: 1
   damageMultiplier: 1
   speedMultiplier: 1

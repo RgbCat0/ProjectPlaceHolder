@@ -260,7 +260,7 @@ namespace _Scripts.LobbyScripts
         {
             try
             {
-                var playerDataSync = GetComponent<PlayerDataSync>();
+                var playerDataSync = PlayerDataSync.Instance;
                 var playerList = playerDataSync.syncedPlayerList;
                 for (int i = 0; i < playerList.Count; i++)
                 {
