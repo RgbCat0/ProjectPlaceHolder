@@ -1,3 +1,4 @@
+using ArtificeToolkit.Attributes;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -21,10 +22,10 @@ public class Spell : ScriptableObject
         Line,
         Cone,
     }
-
+    public SpellType spellType;
+    [EnableIf(nameof(spellType), SpellType.Fire, SpellType.Water, SpellType.Ice, SpellType.Lightning, SpellType.Earth)]
     public NetworkObject hitboxPrefab;
     public NetworkObject spellPrefab;
-    public SpellType spellType;
     public float effectDuration;
     public int effectDamage;
     public AreaOfEffect areaOfEffect;
@@ -35,6 +36,7 @@ public class Spell : ScriptableObject
     public float range;
     public float castTime;
     public float cooldown;
+    [Tooltip("How long the hitbox will stay active")]
     public float duration;
     public float travelSpeed;
 }

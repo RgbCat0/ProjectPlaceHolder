@@ -184,7 +184,10 @@ public class AttackManager : NetworkBehaviour
             yield return null;
         }
     }
-
+    /// <summary>
+    /// Spawns the circle AOE attack. Fireball.
+    /// </summary>
+    /// <param name="pos"></param>
     [Rpc(SendTo.Server)]
     private void SpawnCircleAoeAttackRpc(Vector3 pos)
     {
@@ -202,17 +205,11 @@ public class AttackManager : NetworkBehaviour
             _castedSpell.areaOfEffectRadius / 2,
             _castedSpell.areaOfEffectRadius / 2,
             _castedSpell.areaOfEffectRadius / 2);
-        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
-            _castedSpell.hitboxPrefab,
-            _playerId,
-            position: pos,
-            rotation: Quaternion.identity);
-        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
 
-        StartCoroutine(CircleAoeAttack(hitbox, pos));
+        StartCoroutine(CircleAoeAttack(pos));
     }
 
-    private IEnumerator CircleAoeAttack(NetworkObject hitbox, Vector3 pos)
+    private IEnumerator CircleAoeAttack(Vector3 pos)
     {
         while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
         {
@@ -224,6 +221,12 @@ public class AttackManager : NetworkBehaviour
         }
 
         castedSpell.Despawn(true);
+        NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+            _castedSpell.hitboxPrefab,
+            _playerId,
+            position: pos,
+            rotation: Quaternion.identity);
+        hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
         yield return new WaitForSeconds(_castedSpell.duration);
         hitbox.Despawn(true);
     }
@@ -254,7 +257,7 @@ public class AttackManager : NetworkBehaviour
 
     private IEnumerator LineAoeAttack(NetworkObject hitbox, Vector3 pos)
     {
-        // Implement line spell visual effects
+        // TODO: Implement line spell visual effects
 
         //castedSpell.Despawn(true);
         yield return new WaitForSeconds(_castedSpell.duration);

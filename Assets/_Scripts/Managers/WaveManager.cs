@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ArtificeToolkit.Attributes;
 using Unity.Netcode;
 using UnityEngine;
 using _Scripts.Enemies;
@@ -186,6 +187,8 @@ namespace _Scripts.Managers
     public class WaveInfo
     {
         public List<EnemySpawnInfo> enemyTypesToSpawn;
+
+        [Title("Test")]
         public int enemyCount;
 
         [Tooltip("Time between enemy spawns in seconds")]

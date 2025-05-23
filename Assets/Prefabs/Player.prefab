@@ -979,12 +979,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  test: 0
   baseMana: 0
   baseMaxMana: 100
   baseManaRegen: 1
   baseMaxHealth: 100
   baseHealthRegen: 1
-  baseLuck: 0
   currentMana: 0
   currentMaxMana: 100
   currentManaRegen: 1

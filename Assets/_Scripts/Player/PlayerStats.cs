@@ -20,7 +20,6 @@ namespace _Scripts.Player
         public float baseManaRegen = 1f;
         public float baseMaxHealth = 100f;
         public float baseHealthRegen = 1f;
-        public float baseLuck = 0f; // lower then 0 is worse luck and higher then 0 is better luck
 
         // Current active stats modified by upgrades
         [Header("----------Current Stats----------")]

@@ -18,4 +18,6 @@ MonoBehaviour:
   - type: 0
     value: 40
     description: +40% Health
-  rarity: 2.5
+  rarity: 3
+  percentageChance: 2.7431667
+  percentageWithLuck: 2.7431667

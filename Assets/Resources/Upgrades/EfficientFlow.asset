@@ -19,3 +19,5 @@ MonoBehaviour:
     value: 20
     description: +20% Mana Regen
   rarity: 1.8
+  percentageChance: 0
+  percentageWithLuck: 0

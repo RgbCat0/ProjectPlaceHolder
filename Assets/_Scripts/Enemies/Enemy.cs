@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.AI;
 using _Scripts.Managers;
 using _Scripts.Player;
-using Unity.VisualScripting;
-using UnityEngine.AI;
 
 namespace _Scripts.Enemies
 {
@@ -41,8 +41,8 @@ namespace _Scripts.Enemies
             _spell = castedSpell;
             _playerStats = playerStats;
             ApplyElementEffectRpc();
-        }        
-        
+        }
+
         [Rpc(SendTo.Server)]
         public void ApplyElementEffectRpc()
         {
@@ -74,6 +74,7 @@ namespace _Scripts.Enemies
             }
         }
 
+        #region reactions
         private IEnumerator ApplyFire()
         {
             float duration = Time.time + _spell.effectDuration;
@@ -87,7 +88,7 @@ namespace _Scripts.Enemies
                 bool DOT = true;
                 currentEffect = _spell.spellType;
                 TakeDamage(_spell.damage * _playerStats.damageMultiplier);
-                
+
                 while (Time.time < duration)
                 {
                     TakeDamage(_spell.effectDamage);
@@ -136,8 +137,9 @@ namespace _Scripts.Enemies
                 TakeDamage(_spell.damage * _playerStats.damageMultiplier);
             }
         }
-        
-        
+        #endregion
+
+
 
         #region Health
 
