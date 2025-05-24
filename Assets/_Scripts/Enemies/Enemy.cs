@@ -62,8 +62,7 @@ namespace _Scripts.Enemies
                     break;
 
                 case Spell.SpellType.Water:
-                    Debug.Log("Water");
-                    currentEffect = Spell.SpellType.Water;
+                    ApplyWater();
                     break;
 
                 case Spell.SpellType.Earth:
@@ -84,7 +83,6 @@ namespace _Scripts.Enemies
             }
             else
             {
-                bool DOT = true;
                 currentEffect = _spell.spellType;
                 TakeDamage(_spell.damage * _playerStats.damageMultiplier);
                 
@@ -96,6 +94,11 @@ namespace _Scripts.Enemies
             }
 
             yield return null;
+        }
+
+        private void ApplyWater()
+        {
+            currentEffect = Spell.SpellType.Water;
         }
 
         private void ApplyIce()
