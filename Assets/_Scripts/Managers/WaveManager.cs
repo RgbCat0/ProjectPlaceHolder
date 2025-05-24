@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ArtificeToolkit.Attributes;
 using Unity.Netcode;
 using UnityEngine;
 using _Scripts.Enemies;
@@ -71,7 +72,7 @@ namespace _Scripts.Managers
             _enemyParent = GameObject.Find("EnemyParent").transform;
             spawnPoints = GameObject
                 .FindWithTag("EnemySpawnpoint")
-                .transform.GetComponentsInChildren<Transform>()
+                .transform.GetComponentsInChildren<Transform>() // TODO: enemies only spawn at the first child
                 .ToList();
             if (waves.Count == 0)
             {
@@ -93,6 +94,8 @@ namespace _Scripts.Managers
 
         private void StartNextWave()
         {
+            if (!IsHost)
+                return;
             currentWaveIndex++;
             if (currentWaveIndex >= waves.Count)
             {
@@ -146,8 +149,14 @@ namespace _Scripts.Managers
             {
                 _waitingForUpgrade = true;
                 Debug.Log("Wave complete, showing upgrade menu");
-                OnWaveCompleteEvent?.Invoke();
+                SendCompleteEventRpc();
             }
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void SendCompleteEventRpc()
+        {
+            OnWaveCompleteEvent?.Invoke();
         }
 
         public void ReportPlayerUpgradeDone()
@@ -157,8 +166,13 @@ namespace _Scripts.Managers
             {
                 _waitingForUpgrade = false;
                 _playersDoneUpgrading = 0;
-                StartNextWaveEvent?.Invoke();
+                SendNextWaveEventRpc();
             }
+        }
+
+        private void SendNextWaveEventRpc()
+        {
+            StartNextWaveEvent?.Invoke();
         }
 
 #if UNITY_EDITOR
@@ -173,6 +187,8 @@ namespace _Scripts.Managers
     public class WaveInfo
     {
         public List<EnemySpawnInfo> enemyTypesToSpawn;
+
+        [Title("Test")]
         public int enemyCount;
 
         [Tooltip("Time between enemy spawns in seconds")]

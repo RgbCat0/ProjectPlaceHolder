@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ArtificeToolkit.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,11 +18,20 @@ namespace _Scripts.Player
 
         [Tooltip("higher numbers are more rare\ncannot go below 1"), Min(1)]
         public float rarity = 1; // same system as the wave system
+
+        [Tooltip("Calculated each time the game is started. Only used for displaying.")]
+        [ReadOnly, ForceArtifice]
+        public float percentageChance; // Only used for displaying.
+
+        [Tooltip("Calculated each time the upgrade UI is called. Only used for displaying.")]
+        [ReadOnly, ForceArtifice]
+        public float percentageWithLuck; // Only used for displaying.
     }
 
     [Serializable]
     public class SingleUpgrade
     {
+        [EnumToggle]
         public UpgradeTypes type;
 
         [Tooltip("Percentage to Apply")]
@@ -41,5 +51,6 @@ namespace _Scripts.Player
         Mana,
         ManaRegen,
         Cooldown,
+        Luck
     }
 }

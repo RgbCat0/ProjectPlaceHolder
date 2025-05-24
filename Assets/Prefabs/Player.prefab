@@ -979,6 +979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  test: 0
   baseMana: 0
   baseMaxMana: 100
   baseManaRegen: 1
@@ -989,35 +990,8 @@ MonoBehaviour:
   currentManaRegen: 1
   currentMaxHealth: 100
   currentHealthRegen: 1
-  upgrades:
-  - name: Health boi
-    shortText: 
-    upgrades:
-    - type: 0
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
-  - name: Damage boi
-    shortText: 
-    upgrades:
-    - type: 1
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
-  - name: Mana and damage boi
-    shortText: 
-    upgrades:
-    - type: 3
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    - type: 1
-      value: 10
-      description: test desc
-      icon: {fileID: 0}
-    rarity: 0
+  currentLuck: 0
+  upgrades: []
   healthMultiplier: 1
   damageMultiplier: 1
   speedMultiplier: 1

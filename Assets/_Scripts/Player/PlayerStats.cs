@@ -28,6 +28,7 @@ namespace _Scripts.Player
         public float currentManaRegen;
         public float currentMaxHealth;
         public float currentHealthRegen;
+        public float currentLuck;
 
         private float manaRegenTimer;
         public List<ScriptableUpgrades> upgrades = new();
@@ -50,12 +51,15 @@ namespace _Scripts.Player
         private void Start()
         {
             currentMana = baseMaxMana;
-            Debug.Log(JsonConvert.SerializeObject(upgrades));
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
+            Debug.Log(JsonConvert.SerializeObject(upgrades));
+            CalculateUpgradeChance();
         }
 
         private void Update()
         {
+            if (!IsOwner)
+                return;
             currentMaxHealth = baseMaxHealth * healthMultiplier;
             currentMaxMana = baseMaxMana * manaMultiplier;
 
@@ -103,19 +107,28 @@ namespace _Scripts.Player
                     cooldownMultiplier -= upgrade.value / 100f;
                     OnCooldownChanged?.Invoke(cooldownMultiplier);
                     break;
+                case UpgradeTypes.Luck:
+
+                    currentLuck += upgrade.value;
+                    CalculateUpgradeChanceWithLuck(currentLuck);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        public List<ScriptableUpgrades> GetRandomUpgrades(int count) // dupes allowed
+        public List<ScriptableUpgrades> GetRandomUpgrades(int count)
         {
             List<ScriptableUpgrades> selectedUpgrades = new();
+            CalculateUpgradeChanceWithLuck(currentLuck);
+
+            // Adjust curve: lower curve = more likely to get rare upgrades
+            float curve = 1f / (1f + Mathf.Max(currentLuck, -0.99f)); // Prevent divide by 0 or negative root
 
             for (int i = 0; i < count; i++)
             {
-                // Calculate weights (inverted rarity: lower rarity = higher chance)
-                var weights = upgrades.Select(u => 1f / u.rarity).ToList();
+                var weights = upgrades.Select(u => 1f / Mathf.Pow(u.rarity, curve)).ToList();
                 float totalWeight = weights.Sum();
                 float roll = Random.Range(0f, totalWeight);
                 float cumulative = 0f;
@@ -131,13 +144,31 @@ namespace _Scripts.Player
                 }
             }
 
-            if (selectedUpgrades.Count == 0)
-            {
-                Debug.LogWarning("Err no upgrades found");
-                return null;
-            }
-
             return selectedUpgrades;
+        }
+
+        // misc
+        private void CalculateUpgradeChance()
+        {
+            float totalInverseRarity = upgrades.Sum(u => 1f / u.rarity);
+
+            foreach (var upgrade in upgrades)
+            {
+                upgrade.percentageChance = (1f / upgrade.rarity) / totalInverseRarity * 100f;
+            }
+        }
+
+        private void CalculateUpgradeChanceWithLuck(float luck)
+        {
+            float curve = 1f / (1f + Mathf.Max(luck, -0.99f)); // Prevent invalid math
+
+            var weights = upgrades.Select(u => 1f / Mathf.Pow(u.rarity, curve)).ToList();
+            float totalWeight = weights.Sum();
+
+            for (int i = 0; i < upgrades.Count; i++)
+            {
+                upgrades[i].percentageWithLuck = weights[i] / totalWeight * 100f;
+            }
         }
     }
 }

@@ -28,8 +28,11 @@ namespace _Scripts.Player
             SendData();
         }
 
-        private void SendData() =>
+        private void SendData()
+        {
+            PlayerDataSync.Instance.localPlayerObjectId = NetworkObject.NetworkObjectId;
             SetPlayerDataSyncRpc(NetworkManager.LocalClientId, NetworkObject.NetworkObjectId);
+        }
 
         [Rpc(SendTo.Server)]
         private void SetPlayerDataSyncRpc(ulong networkManagerId, ulong playerObjectId)
@@ -41,7 +44,6 @@ namespace _Scripts.Player
             {
                 if (playerList[i].PlayerNetworkId == networkManagerId)
                 {
-                    playerDataSync.localPlayerObjectId = playerObjectId;
                     var data = playerList[i];
                     data.InGameObjectId = playerObjectId;
                     playerList[i] = data;

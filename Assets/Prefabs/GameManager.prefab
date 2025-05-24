@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4176613130
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 2037331092
+  InScenePlacedSourceGlobalObjectIdHash: 4176613130
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -87,9 +87,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  waves: []
+  waves:
+  - enemyTypesToSpawn:
+    - info: {fileID: 11400000, guid: f2bd990e8a3239749b7b23f9143c0b41, type: 2}
+      spawnChance: 1
+    enemyCount: 5
+    spawnInterval: 1
+    startDelay: 0
   enemies: []
   currentWaveIndex: 0
-  enemyParent: {fileID: 0}
-  enemyBasePrefab: {fileID: 0}
+  enemyBasePrefab: {fileID: 2805619155688556586, guid: 9ec47d09978766e41a48d4157f21dc12, type: 3}
   spawnPoints: []
+  disableSpawning: 0
+  disableMovement: 0
