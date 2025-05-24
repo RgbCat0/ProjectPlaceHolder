@@ -50,26 +50,8 @@ public class AttackManager : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
-        HandleSpellSelection();
+        HandleSpellInput();
         HandleCasting();
-
-        RaycastHit hit;
-        if (InputHandler.Instance.attackTriggered)
-        {
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask)
-                && Time.time > _spellCooldowns[_currentSpell] && !cd)
-            {
-                Vector3 hitPos = hit.point;
-                _playerAnimator.ChangeAnimation(_currentSpell.ToString());
-                _castedSpell = _selectedSpell;
-                _spellCooldowns[_currentSpell] =
-                    Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
-
-                CastSpellRpc(hitPos, (int)_currentSpell);
-
-                // _selectedSpell = SetSpell(Spells.Basic);
-            }
-        }
     }
     
     #region Spell Casting
@@ -394,20 +376,63 @@ public class AttackManager : NetworkBehaviour
 
     #region Setting & Selecting
 
-    private void HandleSpellSelection()
+    private int _lastHeldSpell;
+    private bool _isHoldingSpell;
+
+    private void HandleSpellInput()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1) && _currentSpell != Spells.Fireball)
-            SetSpell(Spells.Fireball);
-        else if (Input.GetKeyDown(KeyCode.Alpha1))
-            SetSpell(Spells.Basic);
-        if (Input.GetKeyDown(KeyCode.Alpha2) && _currentSpell != Spells.Bolt)
-            SetSpell(Spells.Bolt);
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-            SetSpell(Spells.Basic);
-        if (Input.GetKeyDown(KeyCode.Alpha3) && _currentSpell != Spells.Arcane)
-            SetSpell(Spells.Arcane);
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-            SetSpell(Spells.Basic);
+        int currentHeldSpell = InputHandler.Instance.spellIndex;
+
+        // Spell selection when button is held
+        if (currentHeldSpell != 0 && currentHeldSpell != _lastHeldSpell)
+        {
+            switch (currentHeldSpell)
+            {
+                case 1:
+                    SetSpell(Spells.Fireball);
+                    break;
+                case 2:
+                    SetSpell(Spells.Bolt);
+                    break;
+                case 3:
+                    SetSpell(Spells.Arcane);
+                    break;
+            }
+            _isHoldingSpell = true;
+            _lastHeldSpell = currentHeldSpell;
+        }
+
+        // Spell release
+        if (_isHoldingSpell && currentHeldSpell == 0)
+        {
+            HandleSpellRelease();
+        }
+    }
+
+    private void HandleSpellRelease()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask)
+            && Time.time > _spellCooldowns[_currentSpell] && !cd)
+        {
+            Vector3 hitPos = hit.point;
+
+            if (_selectedSpell == null)
+            {
+                Debug.LogWarning("No spell selected at cast time.");
+                return;
+            }
+
+            _playerAnimator.ChangeAnimation(_currentSpell.ToString());
+            _castedSpell = _selectedSpell;
+            _spellCooldowns[_currentSpell] =
+                Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+
+            CastSpellRpc(hitPos, (int)_currentSpell);
+        }
+
+        _isHoldingSpell = false;
+        _lastHeldSpell = 0;
     }
 
     private void SetIndicator(Spells selectedSpell)

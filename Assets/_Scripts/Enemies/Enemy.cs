@@ -100,6 +100,7 @@ namespace _Scripts.Enemies
         private void ApplyWater()
         {
             currentEffect = Spell.SpellType.Water;
+            TakeDamage(_spell.damage * _playerStats.damageMultiplier);
         }
 
         private void ApplyIce()

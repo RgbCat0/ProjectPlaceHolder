@@ -18,7 +18,7 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private string attackActionName = "attack";
     //[SerializeField] private string aimActionName = "Aim";
     //[SerializeField] private string reloadActionName = "Reload";
-    //[SerializeField] private string switchWeaponActionName = "Swap";
+    [SerializeField] private string switchSpellActionName = "Spells";
     //[SerializeField] private string scoreboardActionName = "Scoreboard";
     //[SerializeField] private string settingsActionName = "Settings";
 
@@ -28,11 +28,11 @@ public class InputHandler : MonoBehaviour
     private InputAction attackAction;
     private InputAction aimAction;
     private InputAction reloadAction;
-    public InputAction switchWeaponAction;
+    public InputAction switchSpellAction;
     private InputAction scoreboardAction;
     private InputAction settingsAction;
 
-    //public int switchWeaponIndex { get; private set; }
+    public int spellIndex { get; private set; }
 
     public Vector2 moveInput { get; private set; }
 
@@ -46,7 +46,7 @@ public class InputHandler : MonoBehaviour
 
     //public bool reloadTriggered { get; private set; }
 
-    //public int switchWeaponValue { get; private set; }
+    public float spellValue { get; private set; }
 
     //public bool scoreboardTriggered { get; private set; }
 
@@ -74,7 +74,7 @@ public class InputHandler : MonoBehaviour
         attackAction = playerControls.FindActionMap(actionMapName).FindAction(attackActionName);
         //aimAction = playerControls.FindActionMap(actionMapName).FindAction(aimActionName);
         //reloadAction = playerControls.FindActionMap(actionMapName).FindAction(reloadActionName);
-        //switchWeaponAction = playerControls.FindActionMap(actionMapName).FindAction(switchWeaponActionName);
+        switchSpellAction = playerControls.FindActionMap(actionMapName).FindAction(switchSpellActionName);
         //scoreboardAction = playerControls.FindActionMap(actionMapName).FindAction(scoreboardActionName);
         //settingsAction = playerControls.FindActionMap(actionMapName).FindAction(settingsActionName);
         RegisterInputActions();
@@ -100,8 +100,8 @@ public class InputHandler : MonoBehaviour
         //reloadAction.performed += context => reloadTriggered = true;
         //reloadAction.canceled += context => reloadTriggered = false;
 
-        //switchWeaponAction.performed += OnSwitchWeapon;
-        //switchWeaponAction.canceled -= OnSwitchWeapon;
+        switchSpellAction.performed += OnSpellSwap;
+        switchSpellAction.canceled += context => spellIndex = 0;
 
         //scoreboardAction.performed += context => scoreboardTriggered = true;
         //scoreboardAction.canceled += context => scoreboardTriggered = false;
@@ -117,7 +117,7 @@ public class InputHandler : MonoBehaviour
         attackAction.Enable();
         //aimAction.Enable();
         //reloadAction.Enable();
-        //switchWeaponAction.Enable();
+        switchSpellAction.Enable();
         //scoreboardAction.Enable();
         //settingsAction.Enable();
 
@@ -131,13 +131,13 @@ public class InputHandler : MonoBehaviour
         attackAction.Disable();
         //aimAction.Disable();
         //reloadAction.Disable();
-        //switchWeaponAction.Disable();
+        switchSpellAction.Disable();
         //scoreboardAction.Disable();
         //settingsAction.Disable();
     }
 
-    //private void OnSwitchWeapon(InputAction.CallbackContext context)
-    //{
-    //    switchWeaponIndex = (int)context.ReadValue<float>();
-    //}
+    private void OnSpellSwap(InputAction.CallbackContext context)
+    {
+        spellIndex = (int)context.ReadValue<float>();
+    }
 }
