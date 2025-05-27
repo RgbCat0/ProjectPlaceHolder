@@ -58,7 +58,7 @@ namespace _Scripts.Enemies
                     break;
 
                 case Spell.SpellType.Ice:
-                    ApplyIce();
+                    StartCoroutine(ApplyIce());
                     break;
 
                 case Spell.SpellType.Water:
@@ -69,6 +69,7 @@ namespace _Scripts.Enemies
                     break;
 
                 case Spell.SpellType.None:
+                    TakeDamage(_spell.damage * _playerStats.damageMultiplier);
                     break;
             }
         }
@@ -103,27 +104,21 @@ namespace _Scripts.Enemies
             TakeDamage(_spell.damage * _playerStats.damageMultiplier);
         }
 
-        private void ApplyIce()
+        private IEnumerator ApplyIce()
         {
             Debug.Log("ice");
-            float duration = Time.time + _spell.effectDuration;
             TakeDamage(_spell.damage * _playerStats.damageMultiplier);
             float speed = _navMeshAgent.speed;
             if (currentEffect == Spell.SpellType.Water)
             {
-                while (Time.time < duration)
-                {
-                    _movement.SetSpeed(0f);
-                }
+                _movement.SetSpeed(0f);
+                yield return new WaitForSeconds(_spell.effectDuration);
                 _navMeshAgent.speed = speed;
             }
             else
             {
-                while (Time.time < duration)
-                {
-                    _movement.SetSpeed(_navMeshAgent.speed / 2);
-                }
-
+                _movement.SetSpeed(_navMeshAgent.speed / 2);
+                yield return new WaitForSeconds(_spell.effectDuration);
                 _movement.SetSpeed(speed);
             }
         }

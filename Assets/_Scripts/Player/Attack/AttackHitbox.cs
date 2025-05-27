@@ -2,12 +2,12 @@ using _Scripts.Enemies;
 using _Scripts.Player;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class AttackHitbox : MonoBehaviour
 {
     private PlayerStats _playerStats;
     private AttackManager _attackManager;
+    private Collider _collider;
 
     public void SetCaster(GameObject player)
     {
@@ -24,15 +24,16 @@ public class AttackHitbox : MonoBehaviour
 
         if (other.CompareTag("Enemy"))
         {
-            SendDamageRpc(other);
+            _collider = other;
+            SendDamageRpc();
         }
     }
 
     [Rpc(SendTo.Server)]
-    private void SendDamageRpc(Collider other)
+    private void SendDamageRpc()
     {
-        Debug.Log($"Hit {other.name}");
-        Enemy enemy = other.gameObject.GetComponent<Enemy>();
+        Debug.Log($"Hit {_collider.name}");
+        Enemy enemy = _collider.gameObject.GetComponent<Enemy>();
         if (enemy != null)
         {
             enemy.SetAttacker(_attackManager.GetCastedSpell(), _playerStats);
@@ -40,11 +41,6 @@ public class AttackHitbox : MonoBehaviour
         else
         {
             Debug.LogWarning("Enemy script not found.");
-        }
-        
-        if (_attackManager.CheckCastedSpell(AttackManager.Spells.Basic))
-        {
-            Destroy(this.gameObject);
         }
     }
 

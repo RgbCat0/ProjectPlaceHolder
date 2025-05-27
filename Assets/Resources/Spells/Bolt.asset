@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db20516fb8981d43a7d17320be53a65, type: 3}
   m_Name: Bolt
   m_EditorClassIdentifier: 
+  spellType: 2
   hitboxPrefab: {fileID: -7852783532370799962, guid: 9d8daccd0f7a2bd4096be3b6c83349e7, type: 3}
   spellPrefab: {fileID: 7554783805920216697, guid: c9f2ade7e7ff4394ab318452d33554b8, type: 3}
-  spellType: 2
   effectDuration: 0
   effectDamage: 0
   areaOfEffect: 2
   areaOfEffectRadius: 5
   isPiercing: 0
-  damage: 1
+  damage: 30
   manaCost: 20
-  range: 50
+  range: 20
   castTime: 0.5
   cooldown: 2
   duration: 0.5

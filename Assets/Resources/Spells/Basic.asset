@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db20516fb8981d43a7d17320be53a65, type: 3}
   m_Name: Basic
   m_EditorClassIdentifier: 
-  spellType: 1
+  spellType: 0
   hitboxPrefab: {fileID: 0}
   spellPrefab: {fileID: -64658089636114989, guid: 4f5c082b95d7e0d40a4804ff4d3c62e6, type: 3}
   effectDuration: 0
@@ -20,7 +20,7 @@ MonoBehaviour:
   areaOfEffect: 0
   areaOfEffectRadius: 0
   isPiercing: 0
-  damage: 1
+  damage: 8
   manaCost: 0
   range: 15
   castTime: 0.5

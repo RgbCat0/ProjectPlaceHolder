@@ -21,8 +21,8 @@ public class AttackManager : NetworkBehaviour
     private readonly Dictionary<Spells, GameObject> _indicators = new();
     private Spell _selectedSpell; // Stores the currently selected spell SO
     private Spells _currentSpell; // Stores the currently selected spell enum
-    private Spell _castedSpell; // Stores the spell which is currently being casted
-    private NetworkObject castedSpell; // Stores the casted spell object
+    private Spell _castedSpell; // Stores the spell which is currently being cast
+    private NetworkObject castedSpell; // Stores the cast spell object
 
     private PlayerStats _playerStats;
     private PlayerMovement _playerMovement;
@@ -52,6 +52,30 @@ public class AttackManager : NetworkBehaviour
         if (!IsOwner) return;
         HandleSpellInput();
         HandleCasting();
+        RaycastHit hit;
+        if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered)
+        {
+            _currentSpell = Spells.Basic;
+            
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask)
+                && Time.time > _spellCooldowns[_currentSpell] && !cd)
+            {
+                Vector3 hitPos = hit.point;
+
+                if (_selectedSpell == null)
+                {
+                    Debug.LogWarning("No spell selected at cast time.");
+                    return;
+                }
+
+                _playerAnimator.ChangeAnimation(_currentSpell.ToString());
+                _castedSpell = _selectedSpell;
+                _spellCooldowns[_currentSpell] =
+                    Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+
+                CastSpellRpc(hitPos, (int)_currentSpell);
+            }
+        }
     }
     
     #region Spell Casting
@@ -151,18 +175,19 @@ public class AttackManager : NetworkBehaviour
     private IEnumerator BasicAttack(Vector3 pos)
     {
         bool travel = true;
+        castedSpell.GetComponent<Basic>().SetCaster(gameObject);
         castedSpell.GetComponent<Rigidbody>().useGravity = false;
         castedSpell.GetComponent<Rigidbody>().linearVelocity =
             (pos - transform.position).normalized * _castedSpell.travelSpeed;
-        while (travel == true)
+        while (travel)
         {
             float distance = Vector3.Distance(spellObject[0].transform.position, castedSpell.transform.position);
             if (distance > _castedSpell.range)
             {
-                Destroy(castedSpell);
+               castedSpell.Despawn();
                 travel = false;
-                yield break;
-            }
+                yield return new WaitForEndOfFrame();
+;            }
             yield return null;
         }
     }
@@ -452,7 +477,7 @@ public class AttackManager : NetworkBehaviour
     {
         if (_spellDictionary.TryGetValue(spellName, out var spell) && spell != null)
         {
-            if (_playerStats.currentMana >= spell.manaCost)
+            if (_playerStats.currentMana >= spell.manaCost && !cd)
             {
                 _selectedSpell = spell;
                 _currentSpell = spellName;

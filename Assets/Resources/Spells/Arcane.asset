@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db20516fb8981d43a7d17320be53a65, type: 3}
   m_Name: Arcane
   m_EditorClassIdentifier: 
+  spellType: 3
   hitboxPrefab: {fileID: 8852188195722696528, guid: ff8484064b5b8ae44849f61a7c996581, type: 3}
   spellPrefab: {fileID: 7554783805920216697, guid: c9f2ade7e7ff4394ab318452d33554b8, type: 3}
-  spellType: 3
-  effectDuration: 0
+  effectDuration: 3
   effectDamage: 0
   areaOfEffect: 3
   areaOfEffectRadius: 5
   isPiercing: 0
-  damage: 1
+  damage: 20
   manaCost: 20
   range: 15
   castTime: 0.7
