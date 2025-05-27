@@ -87,13 +87,31 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Spells",
-                    "type": "Value",
-                    "id": "d25da774-6974-42dd-924e-980198250ba9",
+                    "name": "Spell 1",
+                    "type": "Button",
+                    "id": "ce80ec28-e6c3-4a40-ab91-36b1e4d0d4ed",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Spell 2",
+                    "type": "Button",
+                    "id": "c4c83624-57f6-4170-bbf3-e197161158b3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Spell 3",
+                    "type": "Button",
+                    "id": "2d773db5-b6af-4fa8-8f21-5a23937b6c7e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -484,34 +502,34 @@
                 },
                 {
                     "name": "",
-                    "id": "989b529b-c283-4c4b-b07c-42fc77f3fd4c",
+                    "id": "2e18d43f-7163-467d-8451-2ea01bd8267b",
                     "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "Scale",
-                    "groups": "",
-                    "action": "Spells",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Spell 1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "b391b75b-5e0d-48ad-ab72-0290d4392255",
+                    "id": "47b23ea2-4ca7-4cc7-bf60-4611209102c3",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "Scale(factor=2)",
-                    "groups": "",
-                    "action": "Spells",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Spell 2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "bfaf7908-ecdf-4fb1-9867-3d270fecfd3c",
+                    "id": "21b56a30-7853-40e7-b563-24fd553ac7fb",
                     "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "Scale(factor=3)",
-                    "groups": "",
-                    "action": "Spells",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Spell 3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

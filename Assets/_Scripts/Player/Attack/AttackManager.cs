@@ -134,7 +134,7 @@ public class AttackManager : NetworkBehaviour
             cd = true;
             _playerMovement.canMove = false;
             Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 10f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 50f);
             yield return new WaitForFixedUpdate();
         }
 
@@ -224,6 +224,7 @@ public class AttackManager : NetworkBehaviour
                 castedSpell.transform.position,
                 pos,
                 _castedSpell.travelSpeed * Time.deltaTime);
+            castedSpell.transform.rotation = Quaternion.LookRotation(castedSpell.transform.position - pos);
             yield return null;
         }
 
@@ -411,6 +412,7 @@ public class AttackManager : NetworkBehaviour
         // Spell selection when button is held
         if (currentHeldSpell != 0 && currentHeldSpell != _lastHeldSpell)
         {
+            Debug.Log(currentHeldSpell);
             switch (currentHeldSpell)
             {
                 case 1:

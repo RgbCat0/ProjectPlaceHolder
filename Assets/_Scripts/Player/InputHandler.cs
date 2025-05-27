@@ -6,7 +6,7 @@ public class InputHandler : MonoBehaviour
 {
 
     [Header("InputSystem")]
-    [SerializeField] private InputActionAsset playerControls;
+    [SerializeField] public InputActionAsset playerControls;
 
     [Header("Action map name reference")]
     [SerializeField] private string actionMapName = "Player";
@@ -18,7 +18,9 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private string attackActionName = "attack";
     //[SerializeField] private string aimActionName = "Aim";
     //[SerializeField] private string reloadActionName = "Reload";
-    [SerializeField] private string switchSpellActionName = "Spells";
+    [SerializeField] private string spell1ActionName = "Spell 1";
+    [SerializeField] private string spell2ActionName = "Spell 2";
+    [SerializeField] private string spell3ActionName = "Spell 3";
     //[SerializeField] private string scoreboardActionName = "Scoreboard";
     //[SerializeField] private string settingsActionName = "Settings";
 
@@ -28,7 +30,9 @@ public class InputHandler : MonoBehaviour
     private InputAction attackAction;
     private InputAction aimAction;
     private InputAction reloadAction;
-    public InputAction switchSpellAction;
+    public InputAction spell1Action;
+    public InputAction spell2Action;
+    public InputAction spell3Action;
     private InputAction scoreboardAction;
     private InputAction settingsAction;
 
@@ -46,7 +50,9 @@ public class InputHandler : MonoBehaviour
 
     //public bool reloadTriggered { get; private set; }
 
-    public float spellValue { get; private set; }
+    public bool spell1Triggered { get; private set; }
+    public bool spell2Triggered { get; private set; }
+    public bool spell3Triggered { get; private set; }
 
     //public bool scoreboardTriggered { get; private set; }
 
@@ -74,7 +80,9 @@ public class InputHandler : MonoBehaviour
         attackAction = playerControls.FindActionMap(actionMapName).FindAction(attackActionName);
         //aimAction = playerControls.FindActionMap(actionMapName).FindAction(aimActionName);
         //reloadAction = playerControls.FindActionMap(actionMapName).FindAction(reloadActionName);
-        switchSpellAction = playerControls.FindActionMap(actionMapName).FindAction(switchSpellActionName);
+        spell1Action = playerControls.FindActionMap(actionMapName).FindAction(spell1ActionName);
+        spell2Action = playerControls.FindActionMap(actionMapName).FindAction(spell2ActionName);
+        spell3Action = playerControls.FindActionMap(actionMapName).FindAction(spell3ActionName);
         //scoreboardAction = playerControls.FindActionMap(actionMapName).FindAction(scoreboardActionName);
         //settingsAction = playerControls.FindActionMap(actionMapName).FindAction(settingsActionName);
         RegisterInputActions();
@@ -99,9 +107,15 @@ public class InputHandler : MonoBehaviour
 
         //reloadAction.performed += context => reloadTriggered = true;
         //reloadAction.canceled += context => reloadTriggered = false;
-
-        switchSpellAction.performed += OnSpellSwap;
-        switchSpellAction.canceled += context => spellIndex = 0;
+        
+        spell1Action.performed += OnSpellSwap;
+        spell1Action.canceled += context => spellIndex = 0;
+        
+        spell2Action.performed += OnSpellSwap;
+        spell2Action.canceled += context => spellIndex = 0;
+        
+        spell3Action.performed += OnSpellSwap;
+        spell3Action.canceled += context => spellIndex = 0;
 
         //scoreboardAction.performed += context => scoreboardTriggered = true;
         //scoreboardAction.canceled += context => scoreboardTriggered = false;
@@ -117,7 +131,9 @@ public class InputHandler : MonoBehaviour
         attackAction.Enable();
         //aimAction.Enable();
         //reloadAction.Enable();
-        switchSpellAction.Enable();
+        spell1Action.Enable();
+        spell2Action.Enable();
+        spell3Action.Enable();
         //scoreboardAction.Enable();
         //settingsAction.Enable();
 
@@ -131,7 +147,9 @@ public class InputHandler : MonoBehaviour
         attackAction.Disable();
         //aimAction.Disable();
         //reloadAction.Disable();
-        switchSpellAction.Disable();
+        spell1Action.Disable();
+        spell2Action.Disable();
+        spell3Action.Disable();
         //scoreboardAction.Disable();
         //settingsAction.Disable();
     }

@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db20516fb8981d43a7d17320be53a65, type: 3}
   m_Name: Fireball
   m_EditorClassIdentifier: 
+  spellType: 1
   hitboxPrefab: {fileID: 7418273849471001625, guid: 14b081244615d844dbc60fa82cedcbfc, type: 3}
   spellPrefab: {fileID: 7554783805920216697, guid: c9f2ade7e7ff4394ab318452d33554b8, type: 3}
-  spellType: 1
   effectDuration: 5
   effectDamage: 5
   areaOfEffect: 1
   areaOfEffectRadius: 15
   isPiercing: 0
   damage: 20
-  manaCost: 10
+  manaCost: 20
   range: 50
   castTime: 0.5
   cooldown: 3

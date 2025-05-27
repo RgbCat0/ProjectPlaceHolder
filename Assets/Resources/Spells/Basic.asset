@@ -23,7 +23,7 @@ MonoBehaviour:
   damage: 8
   manaCost: 0
   range: 15
-  castTime: 0.5
+  castTime: 0.2
   cooldown: 0.5
   duration: 0
   travelSpeed: 20

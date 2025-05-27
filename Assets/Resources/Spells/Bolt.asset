@@ -21,7 +21,7 @@ MonoBehaviour:
   areaOfEffectRadius: 5
   isPiercing: 0
   damage: 30
-  manaCost: 20
+  manaCost: 10
   range: 20
   castTime: 0.5
   cooldown: 2

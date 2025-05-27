@@ -20,6 +20,10 @@ MonoBehaviour:
     list:
     - Key: Lobby
       Value: 1
+    - Key: MainMenu
+      Value: 1
+    - Key: RebindingUISampleScene
+      Value: 1
   validatorTypesMap:
     list:
     - Key: Artifice_ValidatorModule_IsArtificeEnabled
