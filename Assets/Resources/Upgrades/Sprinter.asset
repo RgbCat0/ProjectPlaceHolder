@@ -17,5 +17,8 @@ MonoBehaviour:
   upgrades:
   - type: 2
     value: 30
+    customDescription: 1
     description: +30% Speed
-  rarity: 2.2
+  rarity: 3
+  percentageChance: 0
+  percentageWithLuck: 0

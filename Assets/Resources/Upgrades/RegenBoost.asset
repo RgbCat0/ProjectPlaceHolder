@@ -17,5 +17,8 @@ MonoBehaviour:
   upgrades:
   - type: 4
     value: 15
+    customDescription: 1
     description: +15% Mana Regen
-  rarity: 1.3
+  rarity: 1.5
+  percentageChance: 0
+  percentageWithLuck: 0

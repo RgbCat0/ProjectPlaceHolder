@@ -17,5 +17,8 @@ MonoBehaviour:
   upgrades:
   - type: 3
     value: 20
+    customDescription: 1
     description: +20% Mana
-  rarity: 1.2
+  rarity: 2
+  percentageChance: 0
+  percentageWithLuck: 0

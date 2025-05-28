@@ -10,15 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba40ab64b1cc490a87ae323e7d7a4e0e, type: 3}
-  m_Name: HealthyMind
+  m_Name: Bulker
   m_EditorClassIdentifier: 
-  upgradeName: Healthy Mind
-  shortText: H++
+  upgradeName: Mana Blade
+  shortText: Bu
   upgrades:
-  - type: 0
-    value: 20
-    customDescription: 1
-    description: +20% Health
-  rarity: 2
+  - type: 1
+    value: 30
+    customDescription: 0
+    description: 
+  - type: 3
+    value: -15
+    customDescription: 0
+    description: 
+  rarity: 3.0003333
   percentageChance: 0
   percentageWithLuck: 0

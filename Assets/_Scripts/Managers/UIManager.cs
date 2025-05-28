@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using _Scripts.Enemies;
 using _Scripts.LobbyScripts;
 using _Scripts.Player;
+
 
 namespace _Scripts.Managers
 {
@@ -41,6 +40,9 @@ namespace _Scripts.Managers
         [Header("Upgrade Menu")]
         [SerializeField]
         private GameObject upgradeMenu;
+
+        [SerializeField]
+        private GameObject smallUpgrades; // shows all the upgrades in the bottom right corner
 
         [SerializeField]
         private GameObject upgradePrefab;
@@ -155,16 +157,25 @@ namespace _Scripts.Managers
                 var upgradeObject = Instantiate(upgradePrefab, upgradeMenu.transform);
                 upgradeObject
                     .transform.GetChild(0)
+                    .GetComponent<TextMeshProUGUI>()
+                    .text = upgrade.name;
+                upgradeObject
+                    .transform.GetChild(1)
                     .GetChild(0)
                     .GetComponent<TextMeshProUGUI>()
                     .text = upgrade.shortText; // icon replacement
+                
                 foreach (var singleUpgrade in upgrade.upgrades)
                 {
-                    upgradeObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text +=
+                    if(!singleUpgrade.customDescription)
+                    {
+                        singleUpgrade.description = singleUpgrade.GenerateDescription();
+                    }
+                    upgradeObject.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text +=
                         singleUpgrade.description + "\n";
                 }
                 upgradeObject
-                    .transform.GetChild(2)
+                    .transform.GetChild(3)
                     .GetComponent<Button>()
                     .onClick.AddListener(() => UpgradeCall(upgrade));
             }
@@ -184,6 +195,11 @@ namespace _Scripts.Managers
             {
                 playerStats.ApplyUpgrade(singleUpgrade);
             }
+
+            var newSmall = Instantiate(smallUpgradePrefab, smallUpgrades.transform).GetComponent<HoverDesc>();
+            string desc = string.Join("\n", upgrade.upgrades.ConvertAll(x => x.description));
+            newSmall.SetText(desc);
+            newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
             WaveManager.Instance.ReportPlayerUpgradeDone();
         }
 

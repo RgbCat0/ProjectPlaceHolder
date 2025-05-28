@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
 using _Scripts.Managers;
 using Random = UnityEngine.Random;
 
