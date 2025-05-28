@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ArtificeToolkit.Attributes;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Player
 {
@@ -31,16 +31,47 @@ namespace _Scripts.Player
     [Serializable]
     public class SingleUpgrade
     {
-        [EnumToggle]
+        [EnumToggle, HideLabel]
         public UpgradeTypes type;
 
-        [Tooltip("Percentage to Apply")]
+        [Tooltip("Percentage to Apply"), 
+         ValidateInput(nameof(ValidateValue), "Value cannot be 0.")]
         public float value;
+        [Tooltip("Auto-generated description based on type and value")]
+        public bool customDescription = true; // if true, description will be generated automatically based on type and value
 
-        [Tooltip("Short description of the upgrade\n(ex: +10% Health)")]
+        [EnableIf(nameof(customDescription), true), Tooltip("Short description of the upgrade\n(ex: +10% Health)")]
         public string description;
         // [Tooltip("Displays on top of the ")]
         // public Image icon; // not used in game jam will be used for full game
+
+        private bool ValidateValue()
+        {
+            if (value == 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateValue2()
+        {
+            if (value < -100 || value > 100)
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public string GenerateDescription()
+        {
+            if (value < 0)
+            {
+                return $"{type} -{Mathf.Abs(value)}%";
+            }
+            return $"{type} +{value}%";
+        }
+        
     }
 
     public enum UpgradeTypes

@@ -17,7 +17,8 @@ MonoBehaviour:
   upgrades:
   - type: 0
     value: 40
+    customDescription: 1
     description: +40% Health
-  rarity: 3
+  rarity: 4
   percentageChance: 2.7431667
   percentageWithLuck: 2.7431667
