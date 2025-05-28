@@ -909,7 +909,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  quickTest: 1
+  quickTest: 0
 --- !u!4 &1644267330
 Transform:
   m_ObjectHideFlags: 0
