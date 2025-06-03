@@ -33,7 +33,7 @@ namespace _Scripts.Player
 
         [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
-        public float damageMultiplier = 1f;
+        public NetworkVariable<float> damageMultiplier; // needs to be a NetworkVariable for syncing to host as it handles damage calculations
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
@@ -48,6 +48,7 @@ namespace _Scripts.Player
 
         private void Start()
         {
+            damageMultiplier = new NetworkVariable<float>(1f);
             currentMana = baseMaxMana;
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
             Debug.Log(JsonConvert.SerializeObject(upgrades));
@@ -86,8 +87,8 @@ namespace _Scripts.Player
                     OnHealthChanged?.Invoke(healthMultiplier);
                     break;
                 case UpgradeTypes.Damage:
-                    damageMultiplier += upgrade.value / 100f;
-                    OnDamageChanged?.Invoke(damageMultiplier);
+                    damageMultiplier.Value += upgrade.value / 100f;
+                    OnDamageChanged?.Invoke(damageMultiplier.Value);
                     break;
                 case UpgradeTypes.Speed:
                     speedMultiplier += upgrade.value / 100f;

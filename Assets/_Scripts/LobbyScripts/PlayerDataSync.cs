@@ -109,7 +109,7 @@ namespace _Scripts.LobbyScripts
         {
             if (NetworkManager.ConnectedClientsList.Count == 1)
                 return; // No need to sync if only one player is connected
-            listIsSynced.Value = false; // Set to false to indicate that the list is not synced yet
+            listIsSynced.Value = false; // when set to false indicate that the list is not synced yet
 
             UpdateListRpc(syncedPlayerList.ToArray());
         }

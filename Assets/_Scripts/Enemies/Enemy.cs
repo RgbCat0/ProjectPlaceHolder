@@ -1,28 +1,34 @@
 ﻿using System.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.AI;
 using _Scripts.Managers;
 using _Scripts.Player;
+using static Spell;
 
 namespace _Scripts.Enemies
 {
     public class Enemy : NetworkBehaviour, IDamageable
     {
-        private Spell.SpellType currentEffect = Spell.SpellType.None;
-        private EnemyAttack _attack;
+        private SpellType _currentEffect = SpellType.None;
+        // private EnemyAttack _attack;
         private EnemyMovement _movement;
         private NavMeshAgent _navMeshAgent;
         private Spell _spell;
         private PlayerStats _playerStats;
         public float Health { get; private set; } = 100f;
 
+#if UNITY_EDITOR
+        [SerializeField]
+        private bool debug; // for logging purposes, can be set in the inspector
+#endif
+
+
         #region init
-        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug = false)
+
+        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug1 = false)
         {
-            _attack = GetComponent<EnemyAttack>();
+            // _attack = GetComponent<EnemyAttack>(); unused kept for future reference
             _movement = GetComponent<EnemyMovement>();
             _navMeshAgent = GetComponent<NavMeshAgent>();
             Health = enemyInfo.health;
@@ -31,9 +37,10 @@ namespace _Scripts.Enemies
             // transform.position = spawnPoint;
             GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
             model.transform.localPosition = Vector3.zero;
-            if (debug)
+            if (debug1)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
+
         #endregion
 
         public void SetAttacker(Spell castedSpell, PlayerStats playerStats)
@@ -46,47 +53,48 @@ namespace _Scripts.Enemies
         [Rpc(SendTo.Server)]
         public void ApplyElementEffectRpc()
         {
-            Debug.Log(currentEffect);
+            Debug.Log(_currentEffect);
             switch (_spell.spellType)
             {
-                case Spell.SpellType.Fire:
+                case SpellType.Fire:
                     StartCoroutine(ApplyFire());
                     break;
 
-                case Spell.SpellType.Lightning:
+                case SpellType.Lightning:
                     ApplyLightning();
                     break;
 
-                case Spell.SpellType.Ice:
+                case SpellType.Ice:
                     StartCoroutine(ApplyIce());
                     break;
 
-                case Spell.SpellType.Water:
+                case SpellType.Water:
                     ApplyWater();
                     break;
 
-                case Spell.SpellType.Earth:
+                case SpellType.Earth:
                     break;
 
-                case Spell.SpellType.None:
-                    TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+                case SpellType.None:
+                    TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
                     break;
             }
         }
 
         #region reactions
+
         private IEnumerator ApplyFire()
         {
             float duration = Time.time + _spell.effectDuration;
-            if (currentEffect == Spell.SpellType.Water)
+            if (_currentEffect == SpellType.Water)
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier * 1.5f);
-                currentEffect = Spell.SpellType.None;
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                _currentEffect = SpellType.None;
             }
             else
             {
-                currentEffect = _spell.spellType;
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+                _currentEffect = _spell.spellType;
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
 
                 while (Time.time < duration)
                 {
@@ -100,16 +108,16 @@ namespace _Scripts.Enemies
 
         private void ApplyWater()
         {
-            currentEffect = Spell.SpellType.Water;
-            TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+            _currentEffect = SpellType.Water;
+            TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
         }
 
         private IEnumerator ApplyIce()
         {
             Debug.Log("ice");
-            TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+            TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
             float speed = _navMeshAgent.speed;
-            if (currentEffect == Spell.SpellType.Water)
+            if (_currentEffect == SpellType.Water)
             {
                 _movement.SetSpeed(0f);
                 yield return new WaitForSeconds(_spell.effectDuration);
@@ -126,28 +134,32 @@ namespace _Scripts.Enemies
         private void ApplyLightning()
         {
             Debug.Log("Lightning");
-            if (currentEffect == Spell.SpellType.Water)
+            if (_currentEffect == SpellType.Water)
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier * 1.5f);
-                currentEffect = Spell.SpellType.None;
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                _currentEffect = SpellType.None;
             }
             else
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier);
+                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
             }
         }
-        #endregion
 
+        #endregion
 
 
         #region Health
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void TakeDamage(float damage)
         {
             Health -= damage;
             if (Health <= 0f)
                 DieRpc();
-            Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
+#if UNITY_EDITOR
+            if (debug)
+                Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
+#endif
         }
 
         //ensure running on server
@@ -156,8 +168,11 @@ namespace _Scripts.Enemies
         {
             // Handle enemy death (e.g., play animation, destroy object, etc.)
             WaveManager.Instance.EnemyDeath(NetworkObject);
-            Debug.Log($"{gameObject.name} has died.");
-            Destroy(gameObject); // Destroy the enemy object
+#if UNITY_EDITOR
+            if(debug)
+                Debug.Log($"{gameObject.name} has died.");
+#endif
+            NetworkObject.Despawn();
         }
 
         #endregion
