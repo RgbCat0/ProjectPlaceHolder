@@ -7,8 +7,10 @@ namespace _Scripts.Enemies
         [SerializeField]
         private float damage;
 
+        
+        private float _attackCooldown; // ex: 1f
         [SerializeField]
-        private float attackCooldown; // ex: 1f
+        private float attackCooldownBase = 1f; // base cooldown time
 
         private void OnTriggerEnter(Collider other)
         {
@@ -18,7 +20,7 @@ namespace _Scripts.Enemies
                 if (damageable != null)
                 {
                     Attack(other);
-                    Debug.Log($"{other.name} took {damage} damage from {gameObject.name}.");
+                    // Debug.Log($"{other.name} took {damage} damage from {gameObject.name}.");
                 }
                 else
                 {
@@ -35,11 +37,11 @@ namespace _Scripts.Enemies
                 if (damageable != null)
                 {
                     // Check if the attack is on cooldown
-                    if (Time.time >= attackCooldown)
+                    if (Time.time >= _attackCooldown)
                     {
                         Attack(other);
                         Debug.Log($"{other.name} took {damage} damage from {gameObject.name}.");
-                        attackCooldown = Time.time + attackCooldown; // Reset cooldown
+                        _attackCooldown = Time.time + attackCooldownBase; // Reset cooldown
                     }
                 }
                 else
