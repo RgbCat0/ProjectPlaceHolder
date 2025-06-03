@@ -14,6 +14,7 @@ namespace _Scripts.Player
         // Base stats
         [Header("----------Base Stats----------")]
         public float baseMana;
+
         public float baseMaxMana = 100f;
         public float baseManaRegen = 1f;
         public float baseMaxHealth = 100f;
@@ -22,6 +23,7 @@ namespace _Scripts.Player
         // Current active stats modified by upgrades
         [Header("----------Current Stats----------")]
         public float currentMana;
+
         public float currentMaxMana;
         public float currentManaRegen;
         public float currentMaxHealth;
@@ -33,7 +35,11 @@ namespace _Scripts.Player
 
         [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
-        public NetworkVariable<float> damageMultiplier; // needs to be a NetworkVariable for syncing to host as it handles damage calculations
+
+        public NetworkVariable<float>
+            damageMultiplier =
+                new(); // needs to be a NetworkVariable for syncing to host as it handles damage calculations
+
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
@@ -48,7 +54,8 @@ namespace _Scripts.Player
 
         private void Start()
         {
-            damageMultiplier = new NetworkVariable<float>(1f);
+            damageMultiplier.Initialize(this);
+            damageMultiplier.Value = 1f;
             currentMana = baseMaxMana;
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
             CalculateUpgradeChance();
@@ -72,6 +79,7 @@ namespace _Scripts.Player
                     manaRegenTimer = 0f;
                 }
             }
+
             if (currentMana > currentMaxMana)
                 currentMana = currentMaxMana;
             UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
@@ -106,7 +114,6 @@ namespace _Scripts.Player
                     OnCooldownChanged?.Invoke(cooldownMultiplier);
                     break;
                 case UpgradeTypes.Luck:
-
                     currentLuck += upgrade.value;
                     CalculateUpgradeChanceWithLuck(currentLuck);
                     break;
