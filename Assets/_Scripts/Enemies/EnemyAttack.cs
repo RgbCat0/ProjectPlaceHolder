@@ -7,50 +7,38 @@ namespace _Scripts.Enemies
         [SerializeField]
         private float damage;
 
-        
-        private float _attackCooldown; // ex: 1f
         [SerializeField]
-        private float attackCooldownBase = 1f; // base cooldown time
+        private float attackCooldown = 1f; // ex: 1f
+
+        private float _attackCooldownTimer;
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
-            {
-                var damageable = other.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    Attack(other);
-                    // Debug.Log($"{other.name} took {damage} damage from {gameObject.name}.");
-                }
-                else
-                {
-                    Debug.LogWarning($"{other.name} does not implement IDamageable.");
-                }
-            }
+            if (!other.CompareTag("Player"))
+                return;
+            _attackCooldownTimer = 0f;
+            Attack(other);
         }
 
         private void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (!other.CompareTag("Player")) 
+                return;
+            _attackCooldownTimer += Time.deltaTime;
+            if(_attackCooldownTimer >= attackCooldown)
             {
-                var damageable = other.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    // Check if the attack is on cooldown
-                    if (Time.time >= _attackCooldown)
-                    {
-                        Attack(other);
-                        Debug.Log($"{other.name} took {damage} damage from {gameObject.name}.");
-                        _attackCooldown = Time.time + attackCooldownBase; // Reset cooldown
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"{other.name} does not implement IDamageable.");
-                }
+                _attackCooldownTimer = 0f;
+                Attack(other);
             }
         }
 
-        private void Attack(Collider other) => other.GetComponent<IDamageable>().TakeDamage(damage);
+        private void OnTriggerExit(Collider other)
+        {
+            if (!other.CompareTag("Player"))
+                return;
+            _attackCooldownTimer = 0f;
+        }
+
+        private void Attack(Collider other) => other.GetComponent<IDamageable>()?.TakeDamage(damage);
     }
 }

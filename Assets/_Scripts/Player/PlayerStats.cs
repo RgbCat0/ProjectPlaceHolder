@@ -51,7 +51,6 @@ namespace _Scripts.Player
             damageMultiplier = new NetworkVariable<float>(1f);
             currentMana = baseMaxMana;
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
-            Debug.Log(JsonConvert.SerializeObject(upgrades));
             CalculateUpgradeChance();
         }
 

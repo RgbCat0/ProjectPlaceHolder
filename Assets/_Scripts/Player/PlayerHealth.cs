@@ -86,7 +86,8 @@ namespace _Scripts.Player
         {
             // Handle player death (e.g., play animation, destroy object, etc.)
             Debug.Log($"{gameObject.name} has died.");
-            NetworkObject.Despawn();
+            gameObject.SetActive(false);
+            // NetworkObject.Despawn();
         }
     }
 }

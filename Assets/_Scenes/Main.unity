@@ -1835,7 +1835,7 @@ GameObject:
   - component: {fileID: 165965655}
   m_Layer: 0
   m_Name: GameObject (3)
-  m_TagString: EnemySpawnpoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6745,7 +6745,7 @@ GameObject:
   - component: {fileID: 726913803}
   m_Layer: 0
   m_Name: GameObject (1)
-  m_TagString: EnemySpawnpoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8297,12 +8297,32 @@ MonoBehaviour:
   actionMapName: Player
   movementActionName: Move
   attackActionName: attack
-  switchSpellActionName: Spells
-  switchSpellAction:
+  spell1ActionName: Spell 1
+  spell2ActionName: Spell 2
+  spell3ActionName: Spell 3
+  spell1Action:
     m_Name: 
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 9a7355ba-0e5c-40b1-8e91-e4eb239bdd7b
+    m_Id: 137822c6-6be1-4597-988f-d80bb9309683
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spell2Action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 07bb03b0-ded8-40f8-b02c-33fec172eebd
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spell3Action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: d0324bb2-9cdb-4258-9fdc-135023ceaa73
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
@@ -8877,7 +8897,7 @@ GameObject:
   - component: {fileID: 976191646}
   m_Layer: 0
   m_Name: GameObject
-  m_TagString: EnemySpawnpoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13513,7 +13533,7 @@ GameObject:
   - component: {fileID: 1654585228}
   m_Layer: 0
   m_Name: GameObject (2)
-  m_TagString: EnemySpawnpoint
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13861,7 +13881,7 @@ GameObject:
   - component: {fileID: 1744613356}
   m_Layer: 0
   m_Name: EnemySpawnPoints
-  m_TagString: Untagged
+  m_TagString: EnemySpawnpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

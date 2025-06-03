@@ -60,9 +60,8 @@ namespace _Scripts.Managers
         // events
         public event Action OnWaveCompleteEvent; // send from this script to notify other scripts
         public event Action StartNextWaveEvent; // used in another script to notify starting the next wave
+
         #region init
-
-
 
         /// <summary>
         /// Tells the WaveManager to initialize and start the first wave.
@@ -72,7 +71,7 @@ namespace _Scripts.Managers
             _enemyParent = GameObject.Find("EnemyParent").transform;
             spawnPoints = GameObject
                 .FindWithTag("EnemySpawnpoint")
-                .transform.GetComponentsInChildren<Transform>() // TODO: enemies only spawn at the first child
+                .transform.GetComponentsInChildren<Transform>()
                 .ToList();
             if (waves.Count == 0)
             {
@@ -90,6 +89,7 @@ namespace _Scripts.Managers
 #endif
             StartNextWaveEvent?.Invoke(); // only start the first wave
         }
+
         #endregion
 
         private void StartNextWave()
@@ -120,6 +120,7 @@ namespace _Scripts.Managers
                     Debug.Log($"Spawning complete, spawned {enemies.Count} enemies");
                     yield break;
                 }
+
                 EnemyInfo enemyInfo = currentWave.GetRandomInfo();
                 Transform spawnPoint;
                 spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];

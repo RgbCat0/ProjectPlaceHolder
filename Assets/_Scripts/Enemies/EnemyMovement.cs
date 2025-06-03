@@ -16,9 +16,11 @@ namespace _Scripts.Enemies
             _navMeshAgent = GetComponent<NavMeshAgent>();
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void SetSpeed(float speed)
         {
-            _navMeshAgent = GetComponent<NavMeshAgent>();
+            if (_navMeshAgent == null)
+                _navMeshAgent = GetComponent<NavMeshAgent>();
             _navMeshAgent.stoppingDistance = 2f;
             _navMeshAgent.speed = speed;
         }
@@ -34,6 +36,8 @@ namespace _Scripts.Enemies
 
             foreach (NetworkObject player in GameManager.Instance.players)
             {
+                if (player == null || !player.IsSpawned || player.transform == null || !player.isActiveAndEnabled)
+                    continue;
                 float distanceSqr = (player.transform.position - currentPosition).sqrMagnitude;
                 if (distanceSqr > closestDistanceSqr)
                     continue;
