@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace _Scripts.LobbyScripts
 {
-    public class LobbyUiManager : NetworkBehaviour
+    public class LobbyUiManager : MonoBehaviour
     {
         [Header("Menu Parents")]
         [SerializeField]
@@ -197,14 +197,11 @@ namespace _Scripts.LobbyScripts
             startGameButton.interactable = false;
         }
 
-        public void EnableStartGameButton()
-        {
-            startGameButton.interactable = true;
-        }
 
-        public void DisableStartGameButton()
+
+        public void EnableDisableStartGameButton(bool enable)
         {
-            startGameButton.interactable = false;
+            startGameButton.interactable = enable;
         }
 
         public void ShowMainMenu()
@@ -226,7 +223,7 @@ namespace _Scripts.LobbyScripts
 
         public IEnumerator AddNewPlayer()
         {
-            var playerDataSync = GetComponent<PlayerDataSync>();
+            var playerDataSync = LobbyController.Instance.playerDataSync;
             while (!playerDataSync.listIsSynced.Value)
                 yield return null;
 
@@ -241,10 +238,10 @@ namespace _Scripts.LobbyScripts
                 newPanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text =
                     playerData.PlayerName.ToString();
                 var toggle = newPanel.transform.GetChild(0).GetChild(1).GetComponent<Toggle>();
-                if (playerData.PlayerNetworkId == NetworkManager.LocalClientId)
+                if (playerData.PlayerNetworkId == NetworkManager.Singleton.LocalClientId)
                 {
-                    toggle.onValueChanged.AddListener(arg0 =>
-                        UpdateReadyButtonRpc(arg0, NetworkManager.LocalClientId)
+                    toggle.onValueChanged.AddListener(readyStatus =>
+                        LobbyController.Instance.UpdateReadyButtonRpc(readyStatus, NetworkManager.Singleton.LocalClientId)
                     );
                 }
                 else
@@ -255,54 +252,11 @@ namespace _Scripts.LobbyScripts
             }
         }
 
-        [Rpc(SendTo.Server)]
-        public void UpdateReadyButtonRpc(bool arg0, ulong arg1)
-        {
-            try
-            {
-                var playerDataSync = PlayerDataSync.Instance;
-                var playerList = playerDataSync.syncedPlayerList;
-                for (int i = 0; i < playerList.Count; i++)
-                {
-                    if (playerList[i].PlayerNetworkId == arg1)
-                    {
-                        var data = playerList[i];
-                        data.IsReady = arg0;
-                        playerList[i] = data;
-                        // break;
-                    }
-                }
-                playerDataSync.SendFullListRpc();
-                UpdateReadyStatusRpc();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error in UpdateReadyButtonRpc: {e.Message}");
-            }
-        }
 
-        [Rpc(SendTo.Server)]
-        public void ResetReadyStatusRpc()
-        {
-            var playerDataSync = GetComponent<PlayerDataSync>();
-            var playerList = playerDataSync.syncedPlayerList;
-            for (int i = 0; i < playerList.Count; i++)
-            {
-                var data = playerList[i];
-                data.IsReady = false;
-                playerList[i] = data;
-            }
-        }
 
-        [Rpc(SendTo.Everyone)]
-        private void UpdateReadyStatusRpc()
+        public IEnumerator UpdateReadyStatus()
         {
-            StartCoroutine(UpdateReadyStatus());
-        }
-
-        private IEnumerator UpdateReadyStatus()
-        {
-            var playerDataSync = GetComponent<PlayerDataSync>();
+            var playerDataSync = LobbyController.Instance.playerDataSync;
             while (!playerDataSync.listIsSynced.Value)
                 yield return null;
             for (int i = 0; i < _playerLobbyPanels.Count; i++)
@@ -323,7 +277,7 @@ namespace _Scripts.LobbyScripts
 
         public void StartGame()
         {
-            if (NetworkManager.IsHost)
+            if (NetworkManager.Singleton.IsHost)
             {
                 OnStartGame?.Invoke();
             }

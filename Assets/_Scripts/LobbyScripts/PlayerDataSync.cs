@@ -98,7 +98,7 @@ namespace _Scripts.LobbyScripts
         {
             OnPlayerJoin?.Invoke();
 
-            StartCoroutine(GetComponent<LobbyUiManager>().AddNewPlayer());
+            StartCoroutine(LobbyController.Instance.uiManager.AddNewPlayer());
         }
 
         /// <summary>
