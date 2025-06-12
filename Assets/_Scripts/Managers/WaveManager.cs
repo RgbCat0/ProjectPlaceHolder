@@ -31,6 +31,12 @@ namespace _Scripts.Managers
         private int _playersDoneUpgrading;
         private bool _waitingForUpgrade;
         public static WaveManager Instance { get; private set; }
+#if UNITY_EDITOR
+        [Header("Debug")]
+        public bool disableSpawning; // for testing without spawning enemies
+
+        public bool disableMovement; // for testing spawns but not movement
+#endif
 
         private void Awake()
         {
@@ -46,16 +52,6 @@ namespace _Scripts.Managers
 
             StartNextWaveEvent += StartNextWave;
         }
-
-        // private void FixedUpdate()
-        // {
-        //     if (enemies.Count == 0 && !_waitingForUpgrade)
-        //     {
-        //         _waitingForUpgrade = true;
-        //         Debug.Log("Wave complete, showing upgrade menu");
-        //         OnWaveCompleteEvent?.Invoke();
-        //     }
-        // }
 
         // events
         public event Action OnWaveCompleteEvent; // send from this script to notify other scripts
@@ -176,12 +172,7 @@ namespace _Scripts.Managers
             StartNextWaveEvent?.Invoke();
         }
 
-#if UNITY_EDITOR
-        [Header("Debug")]
-        public bool disableSpawning; // for testing without spawning enemies
 
-        public bool disableMovement; // for testing spawns but not movement
-#endif
     }
 
     [Serializable]
