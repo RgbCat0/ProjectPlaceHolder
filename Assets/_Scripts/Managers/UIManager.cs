@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -49,6 +50,19 @@ namespace _Scripts.Managers
 
         [SerializeField]
         private GameObject smallUpgradePrefab;
+
+        [Header("Hurt flash")]
+        [SerializeField]
+        private RawImage hurtFlashImage; // to change opacity when hurt
+
+        [SerializeField]
+        private AnimationCurve hurtFlashCurve;
+
+        [SerializeField]
+        private float hurtFlashDuration = 0.5f; // duration of the flash effect
+
+        private float _hurtFlashTimer = 0f;
+        private bool _isHurtFlashing = false;
 
         private void Awake()
         {
@@ -134,6 +148,7 @@ namespace _Scripts.Managers
             {
                 image.texture = deselectedSpellImage;
             }
+
             if (spellIndex == 0)
                 return; // basic attack has no image
             spells[spellIndex - 1].texture = selectedSpellImage;
@@ -152,6 +167,7 @@ namespace _Scripts.Managers
                 Debug.Log("No upgrades available.");
                 return;
             }
+
             foreach (var upgrade in currUpgrades)
             {
                 var upgradeObject = Instantiate(upgradePrefab, upgradeMenu.transform);
@@ -164,16 +180,18 @@ namespace _Scripts.Managers
                     .GetChild(0)
                     .GetComponent<TextMeshProUGUI>()
                     .text = upgrade.shortText; // icon replacement
-                
+
                 foreach (var singleUpgrade in upgrade.upgrades)
                 {
-                    if(!singleUpgrade.customDescription)
+                    if (!singleUpgrade.customDescription)
                     {
                         singleUpgrade.description = singleUpgrade.GenerateDescription();
                     }
+
                     upgradeObject.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text +=
                         singleUpgrade.description + "\n";
                 }
+
                 upgradeObject
                     .transform.GetChild(3)
                     .GetComponent<Button>()
@@ -184,9 +202,9 @@ namespace _Scripts.Managers
         private void UpgradeCall(ScriptableUpgrades upgrade)
         {
             foreach (Transform child in upgradeMenu.transform)
-            {
                 Destroy(child.gameObject);
-            }
+
+
             var localPlayerObjectId = PlayerDataSync.Instance.localPlayerObjectId;
             var playerStats = NetworkManager
                 .Singleton.SpawnManager.SpawnedObjects[localPlayerObjectId]
@@ -196,10 +214,14 @@ namespace _Scripts.Managers
                 playerStats.ApplyUpgrade(singleUpgrade);
             }
 
-            var newSmall = Instantiate(smallUpgradePrefab, smallUpgrades.transform).GetComponent<HoverDesc>();
-            string desc = string.Join("\n", upgrade.upgrades.ConvertAll(x => x.description));
-            newSmall.SetText(desc);
-            newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
+            if (PlayerPrefs.GetInt("ShowUpgradeStats") == 0)
+            {
+                var newSmall = Instantiate(smallUpgradePrefab, smallUpgrades.transform).GetComponent<HoverDesc>();
+                string desc = string.Join("\n", upgrade.upgrades.ConvertAll(x => x.description));
+                newSmall.SetText(desc);
+                newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
+            }
+
             WaveManager.Instance.ReportPlayerUpgradeDone();
         }
 
@@ -207,6 +229,30 @@ namespace _Scripts.Managers
         {
             // aka all players are done
             upgradeMenu.SetActive(false);
+        }
+
+        public IEnumerator HurtFlashCoroutine()
+        {
+            if (_isHurtFlashing)
+            {
+                // just reset the timer if already flashing and break this instance of the coroutine
+                _hurtFlashTimer = 0f;
+                yield break;
+            }
+            _isHurtFlashing = true;
+            _hurtFlashTimer = 0f;
+            hurtFlashImage.color = new Color(1, 1, 1, 0);
+            
+            while (_hurtFlashTimer < hurtFlashDuration)
+            {
+                _hurtFlashTimer += Time.deltaTime;
+                float alpha = hurtFlashCurve.Evaluate(_hurtFlashTimer / hurtFlashDuration);
+                hurtFlashImage.color = new Color(1, 1, 1, alpha);
+                yield return null;
+            }
+
+            hurtFlashImage.color = new Color(1, 1, 1, 0);
+            _isHurtFlashing = false;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Unity.Netcode;
 using UnityEngine;
 using _Scripts.Managers;
@@ -16,7 +15,6 @@ namespace _Scripts.Player
         public float baseMana;
 
         public float baseMaxMana = 100f;
-        public float baseManaRegen = 1f;
         public float baseMaxHealth = 100f;
         public float baseHealthRegen = 1f;
 
@@ -25,7 +23,6 @@ namespace _Scripts.Player
         public float currentMana;
 
         public float currentMaxMana;
-        public float currentManaRegen;
         public float currentMaxHealth;
         public float currentHealthRegen;
         public float currentLuck;
@@ -35,15 +32,14 @@ namespace _Scripts.Player
 
         [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
-
-        public NetworkVariable<float>
-            damageMultiplier =
-                new(); // needs to be a NetworkVariable for syncing to host as it handles damage calculations
-
+        // needs to be a NetworkVariable for syncing to host as it handles damage calculations
+        public NetworkVariable<float> damageMultiplier = new();
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
         public float cooldownMultiplier = 1f;
+        [Header("----------Misc----------")]
+        public float manaRegenAmount = 1f;
 
         public event Action<float> OnHealthChanged;
         public event Action<float> OnDamageChanged;
@@ -70,10 +66,10 @@ namespace _Scripts.Player
 
             if (currentMana < currentMaxMana)
             {
-                manaRegenTimer += Time.deltaTime;
+                manaRegenTimer += Time.deltaTime * manaRegenMultiplier;
                 if (manaRegenTimer >= 1f)
                 {
-                    currentMana += currentManaRegen;
+                    currentMana += manaRegenAmount;
                     if (currentMana > currentMaxMana)
                         currentMana = currentMaxMana;
                     manaRegenTimer = 0f;

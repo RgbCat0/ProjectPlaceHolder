@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace _Scripts.Managers
 {
@@ -8,6 +9,7 @@ namespace _Scripts.Managers
         public NetworkObject playerPrefab;
         public List<NetworkObject> players = new();
         public static GameManager Instance { get; private set; }
+        private Transform _playerSpawnPoint; // Set this to the desired spawn point in the scene
 
         private void Awake()
         {
@@ -28,15 +30,17 @@ namespace _Scripts.Managers
 
         public void StartGame()
         {
+            _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
             if (NetworkManager.IsHost)
-                for (var i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
+                for (var client = 0; client < NetworkManager.Singleton.ConnectedClients.Count; client++)
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
                     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
                         playerPrefab,
-                        (ulong)i,
-                        isPlayerObject: true
+                        (ulong)client,
+                        isPlayerObject: true,
+                        position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
                     );
                     players.Add(newPlayer);
                 }

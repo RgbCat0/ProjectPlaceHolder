@@ -79,6 +79,7 @@ namespace _Scripts.Player
                 DieRpc();
             }
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
+            StartCoroutine(UIManager.Instance.HurtFlashCoroutine());
         }
 
         [Rpc(SendTo.Server)]

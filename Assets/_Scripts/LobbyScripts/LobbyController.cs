@@ -174,7 +174,6 @@ namespace _Scripts.LobbyScripts
         {
             try
             {
-                var playerDataSync = PlayerDataSync.Instance;
                 var playerList = playerDataSync.syncedPlayerList;
                 for (int i = 0; i < playerList.Count; i++)
                 {
@@ -196,7 +195,7 @@ namespace _Scripts.LobbyScripts
         }
 
         [Rpc(SendTo.Server)]
-        public void ResetReadyStatusRpc()
+        private void ResetReadyStatusRpc()
         {
             var playerList = playerDataSync.syncedPlayerList;
             for (int i = 0; i < playerList.Count; i++)
