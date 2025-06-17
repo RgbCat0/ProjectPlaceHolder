@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using Unity.Netcode;
 using System.Reflection;
+// ReSharper disable All
 
 public class NetworkHashFinder : EditorWindow
 {

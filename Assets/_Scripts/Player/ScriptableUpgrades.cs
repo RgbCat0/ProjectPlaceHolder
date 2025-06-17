@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using ArtificeToolkit.Attributes;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace _Scripts.Player
+namespace Player
 {
     [CreateAssetMenu(fileName = "Upgrade", menuName = "Scriptable Objects/Upgrade", order = 1)]
     public class ScriptableUpgrades : ScriptableObject

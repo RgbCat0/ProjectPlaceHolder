@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using LobbyScripts;
+using Player;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using _Scripts.LobbyScripts;
-using _Scripts.Player;
 
-
-namespace _Scripts.Managers
+namespace Managers
 {
     public class UIManager : MonoBehaviour
     {

@@ -1,10 +1,9 @@
-using System.Globalization;
+using LobbyScripts;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
-using _Scripts.LobbyScripts;
-using _Scripts.Managers;
 
-namespace _Scripts.Player
+namespace Player
 {
     public class PlayerHealth : NetworkBehaviour, IDamageable
     {

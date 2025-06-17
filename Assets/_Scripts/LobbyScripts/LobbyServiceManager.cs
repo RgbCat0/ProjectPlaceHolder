@@ -6,7 +6,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public class LobbyServiceManager : MonoBehaviour
     {

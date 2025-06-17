@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public class PlayerDataSync : NetworkBehaviour
     {

@@ -1,8 +1,5 @@
-﻿namespace _Scripts
+﻿public interface IDamageable
 {
-    public interface IDamageable
-    {
-        float Health { get; }
-        void TakeDamage(float damage);
-    }
+    float Health { get; }
+    void TakeDamage(float damage);
 }

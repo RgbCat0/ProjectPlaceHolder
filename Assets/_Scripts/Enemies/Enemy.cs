@@ -1,22 +1,28 @@
 ﻿using System.Collections;
+using System.Globalization;
+using Managers;
+using Player;
+using Player.Attack;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
-using _Scripts.Managers;
-using _Scripts.Player;
-using static Spell;
+using static Player.Attack.Spell;
 
-namespace _Scripts.Enemies
+namespace Enemies
 {
     public class Enemy : NetworkBehaviour, IDamageable
     {
         private SpellType _currentEffect = SpellType.None;
+
         // private EnemyAttack _attack;
         private EnemyMovement _movement;
         private NavMeshAgent _navMeshAgent;
         private Spell _spell;
         private PlayerStats _playerStats;
         public float Health { get; private set; } = 100f;
+
+        [SerializeField]
+        private GameObject damageNumberPrefab; // prefab for damage numbers
 
 #if UNITY_EDITOR
         [SerializeField]
@@ -154,8 +160,10 @@ namespace _Scripts.Enemies
         public void TakeDamage(float damage)
         {
             Health -= damage;
+            DamageNumbersRpc(damage);
             if (Health <= 0f)
                 DieRpc();
+
 #if UNITY_EDITOR
             if (debug)
                 Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
@@ -169,10 +177,19 @@ namespace _Scripts.Enemies
             // Handle enemy death (e.g., play animation, destroy object, etc.)
             WaveManager.Instance.EnemyDeath(NetworkObject);
 #if UNITY_EDITOR
-            if(debug)
+            if (debug)
                 Debug.Log($"{gameObject.name} has died.");
 #endif
             NetworkObject.Despawn();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void DamageNumbersRpc(float damage)
+        {
+            if (PlayerPrefs.GetInt("DamageNumbersEnabled") == 0)
+                return;
+            GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position, Quaternion.identity);
+            damageNumber.GetComponent<HitAnimation>().ShowHitText(damage.ToString(CultureInfo.CurrentCulture));
         }
 
         #endregion

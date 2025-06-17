@@ -9,7 +9,7 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public class LobbyNetManager : NetworkBehaviour
     {

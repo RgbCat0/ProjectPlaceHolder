@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
-using _Scripts.Managers;
 using Random = UnityEngine.Random;
 
-namespace _Scripts.Player
+namespace Player
 {
     public class PlayerStats : NetworkBehaviour
     {

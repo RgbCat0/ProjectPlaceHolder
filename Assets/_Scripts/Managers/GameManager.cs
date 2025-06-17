@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace _Scripts.Managers
+namespace Managers
 {
     public class GameManager : NetworkBehaviour
     {

@@ -2,9 +2,8 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
-using _Scripts.Player;
-using System.IO;
 using System.Linq;
+using Player;
 
 public class UpgradeAutoBalancer : EditorWindow
 {

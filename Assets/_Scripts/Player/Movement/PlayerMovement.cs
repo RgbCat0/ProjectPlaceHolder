@@ -1,79 +1,82 @@
-using _Scripts.Player;
+using Player.Attack;
 using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : NetworkBehaviour
+namespace Player.Movement
 {
-    private PlayerStats _playerStats;
-    private PlayerAnimator _playerAnimator;
-    private AttackManager _attackManager;
-    private Vector2 _moveInput;
-    private Rigidbody _rb;
-    private CinemachineCamera _playerCam;
-    public  bool canMove = true;
-
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float rotationSpeed;
-    [SerializeField] private float maxVel;
-
-    private void Start()
+    public class PlayerMovement : NetworkBehaviour
     {
-        if (!IsOwner)
+        private PlayerStats _playerStats;
+        private PlayerAnimator _playerAnimator;
+        private AttackManager _attackManager;
+        private Vector2 _moveInput;
+        private Rigidbody _rb;
+        private CinemachineCamera _playerCam;
+        public  bool canMove = true;
+
+        [SerializeField] private float moveSpeed;
+        [SerializeField] private float rotationSpeed;
+        [SerializeField] private float maxVel;
+
+        private void Start()
         {
-            enabled = false;
-            return;
-        }
-
-        _playerCam = FindFirstObjectByType<CinemachineCamera>();
-        _playerStats = GetComponent<PlayerStats>();
-        _playerAnimator = GetComponent<PlayerAnimator>();
-        _attackManager = GetComponent<AttackManager>();
-        _rb = GetComponent<Rigidbody>();
-        
-        _playerCam.Target.TrackingTarget = gameObject.transform;
-        _playerCam.Target.LookAtTarget = gameObject.transform;
-        _playerStats.OnSpeedChanged += f => moveSpeed *= f;
-    }
-
-    
-    private void Update()
-    {
-        maxVel = moveSpeed;
-        _moveInput = InputHandler.Instance.moveInput;
-        if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
-        {
-            _playerAnimator.ChangeAnimation("Idle", 0.2f);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!canMove) return;
-        Move();
-    }
-
-
-    private void Move()
-    {
-        Vector3 moveDir = new Vector3(_moveInput.x, 0, _moveInput.y);
-        moveDir.Normalize();
-        if (moveDir != Vector3.zero)
-        {
-            _playerAnimator.ChangeAnimation("Walking");
-            Rotation(moveDir);
-            _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
-            if (_rb.linearVelocity.magnitude > maxVel)
+            if (!IsOwner)
             {
-                _rb.linearVelocity = _rb.linearVelocity.normalized * maxVel;
+                enabled = false;
+                return;
             }
 
+            _playerCam = FindFirstObjectByType<CinemachineCamera>();
+            _playerStats = GetComponent<PlayerStats>();
+            _playerAnimator = GetComponent<PlayerAnimator>();
+            _attackManager = GetComponent<AttackManager>();
+            _rb = GetComponent<Rigidbody>();
+        
+            _playerCam.Target.TrackingTarget = gameObject.transform;
+            _playerCam.Target.LookAtTarget = gameObject.transform;
+            _playerStats.OnSpeedChanged += f => moveSpeed *= f;
         }
-    }
 
-    private void Rotation(Vector3 moveDir)
-    {
-        Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+    
+        private void Update()
+        {
+            maxVel = moveSpeed;
+            _moveInput = InputHandler.Instance.moveInput;
+            if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
+            {
+                _playerAnimator.ChangeAnimation("Idle", 0.2f);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (!canMove) return;
+            Move();
+        }
+
+
+        private void Move()
+        {
+            Vector3 moveDir = new Vector3(_moveInput.x, 0, _moveInput.y);
+            moveDir.Normalize();
+            if (moveDir != Vector3.zero)
+            {
+                _playerAnimator.ChangeAnimation("Walking");
+                Rotation(moveDir);
+                _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
+                if (_rb.linearVelocity.magnitude > maxVel)
+                {
+                    _rb.linearVelocity = _rb.linearVelocity.normalized * maxVel;
+                }
+
+            }
+        }
+
+        private void Rotation(Vector3 moveDir)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+        }
     }
 }

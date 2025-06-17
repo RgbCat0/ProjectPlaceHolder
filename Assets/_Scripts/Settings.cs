@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
 using TMPro;
 using UnityEngine.UI;
 
@@ -86,7 +85,7 @@ public class Settings : MonoBehaviour
         => PlayerPrefs.SetInt("DamageNumbersEnabled", isOn ? 1 : 0);
 
     public void ShowFPSCounterToggle(bool isOn)
-        => GameObject.Find("FpsCanvas")?.SetActive(isOn);
+        => GameObject.Find("FpsCanvas").GetComponent<Fps>().showFps = isOn;
 
     public void ShowUpgradeStatsToggle(bool isOn)
         => PlayerPrefs.SetInt("ShowUpgradeStats", isOn ? 1 : 0);

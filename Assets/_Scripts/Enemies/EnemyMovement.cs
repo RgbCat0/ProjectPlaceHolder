@@ -1,9 +1,9 @@
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
-using _Scripts.Managers;
 
-namespace _Scripts.Enemies
+namespace Enemies
 {
     [RequireComponent(typeof(NavMeshAgent))]
     public class EnemyMovement : NetworkBehaviour

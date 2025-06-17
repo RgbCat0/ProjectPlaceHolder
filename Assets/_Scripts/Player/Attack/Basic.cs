@@ -1,62 +1,64 @@
 using System.Collections;
+using Enemies;
 using Unity.Netcode;
 using UnityEngine;
-using _Scripts.Enemies;
-using _Scripts.Player;
 
-public class Basic : NetworkBehaviour
+namespace Player.Attack
 {
+    public class Basic : NetworkBehaviour
+    {
 
-    private PlayerStats _playerStats;
-    private AttackManager _attackManager;
+        private PlayerStats _playerStats;
+        private AttackManager _attackManager;
     
-    private Collider _collider;
-    void Start()
-    {
-        StartCoroutine(DestroyAfterTime(2f));
-    }
+        private Collider _collider;
+        void Start()
+        {
+            StartCoroutine(DestroyAfterTime(2f));
+        }
     
-    public void SetCaster(GameObject player)
-    {
-        _playerStats = player.GetComponent<PlayerStats>();
-        _attackManager = player.GetComponent<AttackManager>();
-    }
-
-    private IEnumerator DestroyAfterTime(float time)
-    {
-        yield return new WaitForSeconds(time);
-        Debug.Log(gameObject.name + " was destroyed");
-        NetworkObject.Despawn(this.gameObject);
-    }
-
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (_playerStats == null || _attackManager == null)
+        public void SetCaster(GameObject player)
         {
-            return;
+            _playerStats = player.GetComponent<PlayerStats>();
+            _attackManager = player.GetComponent<AttackManager>();
         }
 
-        if (other.CompareTag("Enemy"))
+        private IEnumerator DestroyAfterTime(float time)
         {
-            _collider = other;
-            SendDamageRpc();
+            yield return new WaitForSeconds(time);
+            Debug.Log(gameObject.name + " was destroyed");
+            NetworkObject.Despawn(this.gameObject);
         }
-    }
 
-    [Rpc(SendTo.Server)]
-    private void SendDamageRpc()
-    {
-        Debug.Log($"Hit {_collider.gameObject.name} ");
-        Enemy enemy = _collider.gameObject.GetComponent<Enemy>();
-        if (enemy != null)
+
+        private void OnTriggerEnter(Collider other)
         {
-            enemy.SetAttacker(_attackManager.GetCastedSpell(), _playerStats);
+            if (_playerStats == null || _attackManager == null)
+            {
+                return;
+            }
+
+            if (other.CompareTag("Enemy"))
+            {
+                _collider = other;
+                SendDamageRpc();
+            }
         }
-        else
+
+        [Rpc(SendTo.Server)]
+        private void SendDamageRpc()
         {
-            Debug.LogWarning("Enemy script not found.");
+            Debug.Log($"Hit {_collider.gameObject.name} ");
+            Enemy enemy = _collider.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.SetAttacker(_attackManager.GetCastedSpell(), _playerStats);
+            }
+            else
+            {
+                Debug.LogWarning("Enemy script not found.");
+            }
+            NetworkObject.Despawn(this.gameObject);
         }
-        NetworkObject.Despawn(this.gameObject);
     }
 }

@@ -143,6 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  damageNumberPrefab: {fileID: 5716689198939074010, guid: f6e4f2ec518b7b045bae4abb9f5f3fc1, type: 3}
+  debug: 0
 --- !u!114 &8680456736130079534
 MonoBehaviour:
   m_ObjectHideFlags: 0

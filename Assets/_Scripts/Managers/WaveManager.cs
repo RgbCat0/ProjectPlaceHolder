@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ArtificeToolkit.Attributes;
+using Enemies;
 using Unity.Netcode;
 using UnityEngine;
-using _Scripts.Enemies;
 using Random = UnityEngine.Random;
 
-namespace _Scripts.Managers
+namespace Managers
 {
     public class WaveManager : NetworkBehaviour
     {
@@ -171,46 +170,6 @@ namespace _Scripts.Managers
         {
             StartNextWaveEvent?.Invoke();
         }
-
-
     }
 
-    [Serializable]
-    public class WaveInfo
-    {
-        public List<EnemySpawnInfo> enemyTypesToSpawn;
-
-        [Title("Test")]
-        public int enemyCount;
-
-        [Tooltip("Time between enemy spawns in seconds")]
-        public float spawnInterval;
-
-        [Tooltip("Delay before the first enemy spawns in seconds")]
-        public float startDelay;
-
-        public EnemyInfo GetRandomInfo()
-        {
-            float totalChance = enemyTypesToSpawn.Sum(e => e.spawnChance);
-            float roll = Random.Range(0f, totalChance);
-            var cumulative = 0f;
-            foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
-            {
-                cumulative += enemy.spawnChance;
-                if (roll <= cumulative)
-                    return enemy.info;
-            }
-
-            return enemyTypesToSpawn[0].info; // fallback
-        }
-    }
-
-    [Serializable]
-    public class EnemySpawnInfo
-    {
-        public EnemyInfo info;
-
-        [Tooltip("Higher value = higher chance to spawn")]
-        public float spawnChance;
-    }
 }

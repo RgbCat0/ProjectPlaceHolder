@@ -1,6 +1,6 @@
 using Unity.Netcode;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public class LobbyPlayer : NetworkBehaviour
     {

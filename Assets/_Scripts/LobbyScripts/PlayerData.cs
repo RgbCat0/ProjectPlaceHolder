@@ -2,7 +2,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     [Serializable]
     public struct PlayerData : INetworkSerializable

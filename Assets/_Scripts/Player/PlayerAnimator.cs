@@ -1,23 +1,26 @@
 using System;
 using UnityEngine;
 
-public class PlayerAnimator : MonoBehaviour
+namespace Player
 {
-    private Animator _animator;
-    private String _currentState = "Idle";
-
-    private void Start()
+    public class PlayerAnimator : MonoBehaviour
     {
-        _animator = GetComponent<Animator>();
-    }
+        private Animator _animator;
+        private String _currentState = "Idle";
+
+        private void Start()
+        {
+            _animator = GetComponent<Animator>();
+        }
     
 
-    public void ChangeAnimation(string newState, float crossFade = 0.7f)
-    {
-        if (_currentState != newState)
+        public void ChangeAnimation(string newState, float crossFade = 0.7f)
         {
-            _currentState = newState;
-            _animator.CrossFade(_currentState, crossFade);
+            if (_currentState != newState)
+            {
+                _currentState = newState;
+                _animator.CrossFade(_currentState, crossFade);
+            }
         }
     }
 }

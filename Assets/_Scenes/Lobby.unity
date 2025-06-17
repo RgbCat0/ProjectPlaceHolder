@@ -374,12 +374,16 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: waves.Array.data[0].enemyCount
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.data[0].startDelay
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.data[1].enemyCount
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.data[1].startDelay
@@ -562,6 +566,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   quickTest: 0
+  lobbyNetManager: {fileID: 0}
+  playerDataSync: {fileID: 0}
+  serviceManager: {fileID: 0}
+  uiManager: {fileID: 0}
   lobbyUIPrefab: {fileID: 7495196953033148744, guid: 7bac578644244ea4cab5f000cf100824, type: 3}
 --- !u!4 &1644267330
 Transform:

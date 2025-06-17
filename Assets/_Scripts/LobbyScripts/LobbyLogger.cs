@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public static class LobbyLogger
     {

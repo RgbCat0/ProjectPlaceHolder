@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &38521089
 RectTransform:
   m_ObjectHideFlags: 0
@@ -214,10 +214,10 @@ MonoBehaviour:
   mainPanel: {fileID: 231334571}
   keybindsPanel: {fileID: 1561853745}
   videoPanel: {fileID: 1584487835}
-  fullScreenDropdown: {fileID: 0}
-  damageNumbersToggle: {fileID: 0}
-  showFPSCounterToggle: {fileID: 0}
-  showUpgradeStatsToggle: {fileID: 0}
+  fullScreenDropdown: {fileID: 733303958}
+  damageNumbersToggle: {fileID: 1681986667}
+  showFPSCounterToggle: {fileID: 642284577}
+  showUpgradeStatsToggle: {fileID: 1291644652}
 --- !u!1 &44422397
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,7 +393,7 @@ GameObject:
   - component: {fileID: 175430985}
   - component: {fileID: 175430984}
   m_Layer: 5
-  m_Name: SettingsButton
+  m_Name: OpenSettingsButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3156,7 +3156,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Spell 1
+  m_text: Spell 2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

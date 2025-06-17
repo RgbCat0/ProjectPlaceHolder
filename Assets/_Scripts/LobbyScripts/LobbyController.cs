@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using _Scripts.Managers;
+using Managers;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace _Scripts.LobbyScripts
+namespace LobbyScripts
 {
     public class LobbyController : NetworkBehaviour
     {
