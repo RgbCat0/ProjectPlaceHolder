@@ -94,6 +94,7 @@ namespace LobbyScripts
             refreshButton?.onClick.AddListener(PopulateLobbies);
             goBackButton?.onClick.AddListener(ShowMainMenu);
             joinGoBackButton?.onClick.AddListener(ShowMainMenu);
+            // GameObject.Find("RestartButton").GetComponent<Button>().onClick.AddListener();
 
             // GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
             //     UpdateLobbyPlayers();

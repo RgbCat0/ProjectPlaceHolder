@@ -73,6 +73,8 @@ namespace Managers
                 Debug.LogError("No waves set up");
                 return;
             }
+            // load all wave info from resources folder
+            waves = Resources.LoadAll<WaveInfo>("Waves").ToList();
 
             currentWaveIndex--; // start at -1 to trigger the first wave
 #if UNITY_EDITOR

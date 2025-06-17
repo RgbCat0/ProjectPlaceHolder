@@ -6,7 +6,7 @@ using Enemies;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-[CreateAssetMenu(fileName = "WaveInfo", menuName = "ScriptableObjects/WaveInfo", order = 2)]
+[CreateAssetMenu(fileName = "WaveInfo", menuName = "Scriptable Objects/WaveInfo", order = 2)]
 public class WaveInfo : ScriptableObject
 {
     public List<EnemySpawnInfo> enemyTypesToSpawn;
