@@ -1,7 +1,9 @@
 using LobbyScripts;
 using Managers;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using System;
 
 namespace Player
 {
@@ -11,6 +13,8 @@ namespace Player
 
         public float Health { get; private set; }
         public float MaxHealth { get; private set; }
+
+        public event Action<ulong> onDeath;
 
         private float healthRegenTimer = 0f;
 
@@ -87,6 +91,7 @@ namespace Player
             // Handle player death (e.g., play animation, destroy object, etc.)
             Debug.Log($"{gameObject.name} has died.");
             gameObject.SetActive(false);
+            onDeath.Invoke(NetworkObject.NetworkObjectId);
             // NetworkObject.Despawn();
         }
     }

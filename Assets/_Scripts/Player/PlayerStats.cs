@@ -171,5 +171,13 @@ namespace Player
                 upgrades[i].percentageWithLuck = weights[i] / totalWeight * 100f;
             }
         }
+        
+        public void ResetStats()
+        {
+            cooldownMultiplier = 1;
+            healthMultiplier = 1;
+            manaMultiplier = 1;
+            manaRegenMultiplier = 1;
+        }
     }
 }

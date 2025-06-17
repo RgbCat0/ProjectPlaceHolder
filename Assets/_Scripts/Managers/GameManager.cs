@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Player;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Managers
 {
@@ -8,8 +10,12 @@ namespace Managers
     {
         public NetworkObject playerPrefab;
         public List<NetworkObject> players = new();
+        public List<GameObject> deadPlayers = new();
         public static GameManager Instance { get; private set; }
         private Transform _playerSpawnPoint; // Set this to the desired spawn point in the scene
+        private WaveManager _waveManager;
+        bool gameOver = false;
+        
 
         private void Awake()
         {
@@ -26,6 +32,9 @@ namespace Managers
             // {
             //     // NetworkObject.SpawnWithOwnership(0);
             // }
+            
+            
+            _waveManager = GetComponent<WaveManager>();
         }
 
         public void StartGame()
@@ -44,8 +53,48 @@ namespace Managers
                     );
                     players.Add(newPlayer);
                 }
+            foreach (NetworkObject player in players)
+            {
+                player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
+            }
 
-            GetComponent<WaveManager>().Init();
+            _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
+            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
+            restartButton.onClick.AddListener(RevivePlayersRpc);
+            // TODO set gameover screen to false
+            _waveManager.Init();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void HandleDeathRpc(ulong playerID)
+        {
+            foreach (NetworkObject player in players)
+            {
+                if (player != null && !player.gameObject.activeInHierarchy)
+                {
+                    deadPlayers.Add(player.gameObject);
+                }
+
+                if (players.Count >= deadPlayers.Count)
+                {
+                    gameOver = true;
+                }
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        public void RevivePlayersRpc()
+        {
+            foreach (GameObject player in deadPlayers)
+            {
+                if (gameOver)
+                {
+                    gameOver = false;
+                    _waveManager.ResetWaves();
+                }
+                player.SetActive(true);
+                player.transform.position = _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right;
+            }
         }
     }
 }

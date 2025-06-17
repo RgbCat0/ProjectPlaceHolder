@@ -170,6 +170,11 @@ namespace Managers
         {
             StartNextWaveEvent?.Invoke();
         }
+
+        public void ResetWaves()
+        {
+            currentWaveIndex = 0;
+        }
     }
 
 }
