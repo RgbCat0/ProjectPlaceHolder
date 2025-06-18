@@ -5,14 +5,15 @@ using System.Linq;
 using Enemies;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Managers
 {
     public class WaveManager : NetworkBehaviour
     {
-        [SerializeField]
-        private List<WaveInfo> waves = new();
+        // [SerializeField]
+        // private List<WaveInfo> waves = new();
 
         [SerializeField]
         private List<Transform> enemies = new();
@@ -25,6 +26,21 @@ namespace Managers
 
         [SerializeField]
         private List<Transform> spawnPoints = new();
+
+        [Header("Spawn Settings")] // not using waveinfo anymore as the waves will be automatically generated
+        [SerializeField]
+        private float spawnInterval = 1f; // time between enemy spawns in seconds
+
+        [SerializeField]
+        private int baseEnemyCount = 10; // base number of enemies to spawn in a wave
+
+        [SerializeField]
+        private float startDelay = 2f; // delay before the first enemy spawns in seconds
+
+        // private int _currentAmountToSpawn = 0;
+
+        private DifficultyScaling _currentDifficultyScaling;
+        public List<EnemySpawnInfo> enemyTypesToSpawn;
 
         private Transform _enemyParent;
         private int _playersDoneUpgrading;
@@ -64,17 +80,19 @@ namespace Managers
         public void Init()
         {
             _enemyParent = GameObject.Find("EnemyParent").transform;
-            spawnPoints = GameObject
-                .FindWithTag("EnemySpawnpoint")
+            var spawnPointParent = GameObject.FindWithTag("EnemySpawnpoint");
+            spawnPoints = spawnPointParent
                 .transform.GetComponentsInChildren<Transform>()
+                .Where(t => t != spawnPointParent.transform)
                 .ToList();
-            if (waves.Count == 0)
-            {
-                Debug.LogError("No waves set up");
-                return;
-            }
+            // if (waves.Count == 0)
+            // {
+            // Debug.LogError("No waves set up");
+            // return;
+            // }
             // load all wave info from resources folder
-            waves = Resources.LoadAll<WaveInfo>("Waves").ToList();
+            // waves = Resources.LoadAll<WaveInfo>("Waves").ToList();
+            _currentDifficultyScaling = GetComponent<DifficultyManager>().GetDifficultyScaling();
 
             currentWaveIndex--; // start at -1 to trigger the first wave
 #if UNITY_EDITOR
@@ -94,11 +112,11 @@ namespace Managers
             if (!IsHost)
                 return;
             currentWaveIndex++;
-            if (currentWaveIndex >= waves.Count)
-            {
-                Debug.Log("All waves completed");
-                return;
-            }
+            // if (currentWaveIndex >= waves.Count)
+            // {
+            // Debug.Log("All waves completed");
+            // return;
+            // }
 
             StartCoroutine(StartWave());
         }
@@ -106,7 +124,7 @@ namespace Managers
         /// <summary>
         /// Starts the current wave.
         /// </summary>
-        private IEnumerator StartWave()
+        /*private IEnumerator StartWave()
         {
             WaveInfo currentWave = waves[currentWaveIndex];
             yield return new WaitForSeconds(currentWave.startDelay);
@@ -119,9 +137,7 @@ namespace Managers
                 }
 
                 EnemyInfo enemyInfo = currentWave.GetRandomInfo();
-                Transform spawnPoint;
-                spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-                Debug.Log(spawnPoint.position);
+                Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
                 NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(
                     enemyBasePrefab,
                     position: spawnPoint.position,
@@ -138,6 +154,56 @@ namespace Managers
                 enemies.Add(enemy.transform);
                 yield return new WaitForSeconds(currentWave.spawnInterval);
             }
+//         } */
+        // new method to incorporate the new wave system and difficulty scaling
+        private IEnumerator StartWave()
+        {
+            yield return new WaitForSeconds(startDelay);
+            int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
+                                              _currentDifficultyScaling.SpawnScaling * (currentWaveIndex + 1));
+            Debug.Log($"Starting wave {currentWaveIndex + 1} with {enemyCount} enemies");
+            while (true)
+            {
+                if (enemies.Count >= enemyCount)
+                {
+                    Debug.Log($"Spawning complete, spawned {enemies.Count} enemies");
+                    yield break;
+                }
+
+                EnemyInfo enemyInfo = GetRandomInfo();
+                Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+                Debug.Log($"Spawnpoint: {spawnPoint.name}, location: {spawnPoint.position}");
+                NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(
+                    enemyBasePrefab,
+                    position: spawnPoint.position,
+                    rotation: Quaternion.identity
+                );
+                enemy.transform.SetParent(_enemyParent);
+#if UNITY_EDITOR
+                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, disableMovement);
+#else
+enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
+#endif
+                enemies.Add(enemy.transform);
+                yield return new WaitForSeconds(spawnInterval);
+            }
+        }
+
+        public EnemyInfo GetRandomInfo()
+        {
+            float totalChance = enemyTypesToSpawn.Sum(e => e.startWave <= currentWaveIndex ? e.spawnChance : 0f);
+            float roll = Random.Range(0f, totalChance);
+            var cumulative = 0f;
+            foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
+            {
+                if (enemy.startWave > currentWaveIndex)
+                    continue; // skip enemies that shouldn't spawn yet
+                cumulative += enemy.spawnChance;
+                if (roll <= cumulative)
+                    return enemy.info;
+            }
+
+            return enemyTypesToSpawn[0].info; // fallback
         }
 
         public void EnemyDeath(NetworkObject enemy)
@@ -178,5 +244,4 @@ namespace Managers
             currentWaveIndex = 0;
         }
     }
-
 }

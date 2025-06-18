@@ -43,4 +43,7 @@ public class EnemySpawnInfo
 
     [Tooltip("Higher value = higher chance to spawn")]
     public float spawnChance;
+
+    [Tooltip("When this enemy type should start spawning")]
+    public int startWave;
 }

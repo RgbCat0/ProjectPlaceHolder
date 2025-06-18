@@ -374,6 +374,14 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: difficultyScaling.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.data[0].enemyCount
       value: 8
       objectReference: {fileID: 0}
@@ -415,6 +423,42 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.data[3].spawnInterval
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[0].info
+      value: 
+      objectReference: {fileID: 11400000, guid: f2bd990e8a3239749b7b23f9143c0b41, type: 2}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[1].info
+      value: 
+      objectReference: {fileID: 11400000, guid: f2bd990e8a3239749b7b23f9143c0b41, type: 2}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[2].info
+      value: 
+      objectReference: {fileID: 11400000, guid: f2bd990e8a3239749b7b23f9143c0b41, type: 2}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[1].startWave
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[2].startWave
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[0].spawnChance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[1].spawnChance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: enemyTypesToSpawn.Array.data[2].spawnChance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: difficultyScaling.Array.data[0].spawnMultiplier
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
@@ -504,8 +548,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8663358488756276622, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1581549545}
   m_SourcePrefab: {fileID: 100100000, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+--- !u!1 &1581549544 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8663358488756276622, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+  m_PrefabInstance: {fileID: 1581549543}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1581549545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581549544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f581e6a631d64583843203dbce9c366b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentDifficulty: 1
+  playerCountMultipliers:
+  - 1
+  - 1.25
+  - 1.5
+  - 2
+  difficultyScalingMultipliers:
+  - 0.5
+  - 1
+  - 1.5
+  - 2
 --- !u!1 &1644267327
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,7 +640,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  quickTest: 0
+  quickTest: 1
   lobbyNetManager: {fileID: 0}
   playerDataSync: {fileID: 0}
   serviceManager: {fileID: 0}
@@ -713,7 +788,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 249249997}
-  - {fileID: 1644267330}
   - {fileID: 1989332576}
   - {fileID: 1010505378}
+  - {fileID: 1644267330}
   - {fileID: 1581549543}

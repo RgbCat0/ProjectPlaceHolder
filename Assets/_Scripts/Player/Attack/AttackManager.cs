@@ -183,6 +183,10 @@ namespace Player.Attack
                 (pos - transform.position).normalized * _castedSpell.travelSpeed;
             while (travel)
             {
+                if (castedSpell == null)
+                {
+                    yield break; // castedspell was already despawned
+                }
                 float distance = Vector3.Distance(spellObject[0].transform.position, castedSpell.transform.position);
                 if (distance > _castedSpell.range)
                 {

@@ -11,7 +11,7 @@ namespace Enemies
         private NavMeshAgent _navMeshAgent;
         private Transform _target;
 
-        private void Start()
+        private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
         }

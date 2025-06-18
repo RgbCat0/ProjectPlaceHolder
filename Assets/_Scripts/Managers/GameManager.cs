@@ -14,6 +14,7 @@ namespace Managers
         public static GameManager Instance { get; private set; }
         private Transform _playerSpawnPoint; // Set this to the desired spawn point in the scene
         private WaveManager _waveManager;
+        
         bool gameOver = false;
         
 
@@ -59,8 +60,8 @@ namespace Managers
             }
 
             _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
-            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
-            restartButton.onClick.AddListener(RevivePlayersRpc);
+            // Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
+            // restartButton.onClick.AddListener(RevivePlayersRpc);
             // TODO set gameover screen to false
             _waveManager.Init();
         }

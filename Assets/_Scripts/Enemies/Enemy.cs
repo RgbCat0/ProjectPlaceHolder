@@ -28,21 +28,25 @@ namespace Enemies
         [SerializeField]
         private bool debug; // for logging purposes, can be set in the inspector
 #endif
+        private void Awake()
+        {
+            _movement = GetComponent<EnemyMovement>();
+            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _navMeshAgent.enabled = false; // causes weird spawning issues if enabled immediately
+        }
+
 
 
         #region init
 
         public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug1 = false)
         {
-            // _attack = GetComponent<EnemyAttack>(); unused kept for future reference
-            _movement = GetComponent<EnemyMovement>();
-            _navMeshAgent = GetComponent<NavMeshAgent>();
             Health = enemyInfo.health;
             _movement.SetSpeed(enemyInfo.speed);
-            // Debug.Log(spawnPoint);
-            // transform.position = spawnPoint;
+            transform.position = spawnPoint;
             GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
             model.transform.localPosition = Vector3.zero;
+            _navMeshAgent.enabled = true; // enable NavMeshAgent after setting position and speed
             if (debug1)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
