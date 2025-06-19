@@ -41,11 +41,11 @@ namespace Managers
 
         public void StartGame()
         {
+            Debug.Log("Is being called");
             _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
             if (NetworkManager.IsHost)
-            {
-                for (var client = 0; client < NetworkManager.Singleton.ConnectedClients.Count; client++)
+                for (var client = 0; client < NetworkManager.Singleton.ConnectedClientsList.Count; client++)
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
                     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(

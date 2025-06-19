@@ -43,6 +43,7 @@ namespace LobbyScripts
 
         [SerializeField]
         private TMP_InputField createLobbyNameField;
+
         public event Action<string> OnCreateLobby;
 
         [SerializeField]
@@ -54,16 +55,21 @@ namespace LobbyScripts
 
         [SerializeField]
         private GameObject joinLobbyPrefab;
+
         private List<GameObject> _lobbies = new();
 
         [SerializeField]
         private Button refreshButton;
+
         public event Action<Lobby> OnJoinLobby;
 
         [SerializeField]
         private Button joinGoBackButton;
 
         [Header("Lobby")]
+        [SerializeField]
+        private Button leaveLobbyButton;
+
         [SerializeField]
         private Button startGameButton;
 
@@ -75,6 +81,7 @@ namespace LobbyScripts
 
         [SerializeField]
         private GameObject playerLobbyPrefab;
+
         private List<GameObject> _playerLobbyPanels = new();
         public event Action OnStartGame;
 
@@ -94,6 +101,8 @@ namespace LobbyScripts
             refreshButton?.onClick.AddListener(PopulateLobbies);
             goBackButton?.onClick.AddListener(ShowMainMenu);
             joinGoBackButton?.onClick.AddListener(ShowMainMenu);
+            leaveLobbyButton?.onClick.AddListener(LobbyController.Instance.Disconnect);
+            
             // GameObject.Find("RestartButton").GetComponent<Button>().onClick.AddListener();
 
             // GetComponent<PlayerDataSync>().SyncedPlayerList.OnListChanged += _ =>
@@ -107,6 +116,7 @@ namespace LobbyScripts
                 createLobbyButton.interactable = false;
                 return;
             }
+
             createLobbyButton.interactable = true;
             createLobbyNameField.text = arg0.Replace(" ", "");
             if (createLobbyNameField.text.Length > 20)
@@ -121,6 +131,7 @@ namespace LobbyScripts
                 clientMenuButton.interactable = false;
                 return;
             }
+
             hostMenuButton.interactable = true;
             clientMenuButton.interactable = true;
             nameInputField.text = arg0.Replace(" ", "");
@@ -131,6 +142,7 @@ namespace LobbyScripts
         private void HostMenuClicked()
         {
             OnMenuCreate?.Invoke(nameInputField.text);
+            createLobbyNameField.text = "";
             ChangeMenu(createParent);
         }
 
@@ -149,6 +161,7 @@ namespace LobbyScripts
                 Debug.LogError("Lobby name cannot be empty.");
                 return;
             }
+
             createLobbyButton.interactable = false;
             OnCreateLobby?.Invoke(lobbyName);
             ChangeMenu(lobbyParent);
@@ -163,6 +176,7 @@ namespace LobbyScripts
                 {
                     Destroy(obj);
                 }
+
                 _lobbies.Clear();
                 // get lobbies from lobbyService
                 List<Lobby> lobbies = await LobbyController.Instance.GetLobbies();
@@ -170,10 +184,10 @@ namespace LobbyScripts
                 {
                     var newPanel = Instantiate(joinLobbyPrefab, joinLobbyPanel.transform);
                     newPanel
-                        .transform.GetChild(0)
-                        .GetChild(1)
-                        .GetComponent<TextMeshProUGUI>()
-                        .text = $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
+                            .transform.GetChild(0)
+                            .GetChild(1)
+                            .GetComponent<TextMeshProUGUI>()
+                            .text = $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
                     newPanel
                         .GetComponentInChildren<Button>()
                         .onClick.AddListener(() => JoinLobby(lobby));
@@ -197,7 +211,6 @@ namespace LobbyScripts
             ChangeMenu(lobbyParent);
             startGameButton.interactable = false;
         }
-
 
 
         public void EnableDisableStartGameButton(bool enable)
@@ -232,27 +245,49 @@ namespace LobbyScripts
             {
                 Destroy(obj);
             }
+
             _playerLobbyPanels.Clear();
             foreach (var playerData in playerDataSync.syncedPlayerList)
             {
                 var newPanel = Instantiate(playerLobbyPrefab, playerLobbyPanel.transform);
+                newPanel.name = playerData.PlayerName.ToString();
                 newPanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text =
                     playerData.PlayerName.ToString();
                 var toggle = newPanel.transform.GetChild(0).GetChild(1).GetComponent<Toggle>();
                 if (playerData.PlayerNetworkId == NetworkManager.Singleton.LocalClientId)
                 {
                     toggle.onValueChanged.AddListener(readyStatus =>
-                        LobbyController.Instance.UpdateReadyButtonRpc(readyStatus, NetworkManager.Singleton.LocalClientId)
+                        LobbyController.Instance.UpdateReadyButtonRpc(readyStatus,
+                            NetworkManager.Singleton.LocalClientId)
                     );
                 }
                 else
                 {
                     toggle.interactable = false;
                 }
+
                 _playerLobbyPanels.Add(newPanel);
             }
         }
+        public void ClearPlayerLobbyPanels()
+        {
+            foreach (var obj in _playerLobbyPanels)
+            {
+                Destroy(obj);
+            }
 
+            _playerLobbyPanels.Clear();
+        }
+        public void RemovePlayerLobbyPanelRpc(string playerName)
+        {
+            Debug.Log("Being run    ");
+            var panel = _playerLobbyPanels.Find(p => p.name == playerName);
+            if (_playerLobbyPanels.Contains(panel))
+            {
+                _playerLobbyPanels.Remove(panel);
+                Destroy(panel);
+            }
+        }
 
 
         public IEnumerator UpdateReadyStatus()
@@ -273,6 +308,7 @@ namespace LobbyScripts
                     .GetComponent<Toggle>()
                     .isOn = playerDataSync.syncedPlayerList[i].IsReady;
             }
+
             LobbyController.Instance.CanStartGame(true);
         }
 
