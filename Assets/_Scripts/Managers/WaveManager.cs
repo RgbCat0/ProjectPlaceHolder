@@ -156,7 +156,7 @@ namespace Managers
             }
 //         } */
         // new method to incorporate the new wave system and difficulty scaling
-        private IEnumerator StartWave()
+        public IEnumerator StartWave()
         {
             yield return new WaitForSeconds(startDelay);
             int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
@@ -164,7 +164,7 @@ namespace Managers
             Debug.Log($"Starting wave {currentWaveIndex + 1} with {enemyCount} enemies");
             while (true)
             {
-                if (enemies.Count >= enemyCount)
+                if (enemies.Count >= enemyCount || GameManager.Instance.gameOver)
                 {
                     Debug.Log($"Spawning complete, spawned {enemies.Count} enemies");
                     yield break;
@@ -234,13 +234,19 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             }
         }
 
-        private void SendNextWaveEventRpc()
+        public void SendNextWaveEventRpc()
         {
+            Debug.Log("Sending next wave event");
             StartNextWaveEvent?.Invoke();
         }
 
         public void ResetWaves()
         {
+            foreach (Transform enemy in enemies)
+            {
+                enemy.GetComponent<NetworkObject>().Despawn();
+            }
+            enemies.Clear();
             currentWaveIndex = 0;
         }
     }

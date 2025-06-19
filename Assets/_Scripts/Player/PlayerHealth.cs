@@ -9,8 +9,8 @@ namespace Player
     public class PlayerHealth : NetworkBehaviour, IDamageable
     {
         private PlayerStats _playerStats;
-        
-        public float Health { get; private set; }
+
+        public float Health { get; set; }
         public float MaxHealth { get; private set; }
 
         public event Action<ulong> onDeath;
