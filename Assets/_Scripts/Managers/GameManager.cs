@@ -61,15 +61,10 @@ namespace Managers
             }
 
             _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
-<<<<<<< Updated upstream
-            // Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
-            // restartButton.onClick.AddListener(RevivePlayersRpc);
-=======
             Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
             restartButton.onClick.AddListener(RevivePlayersRpc);
             gameOverScreen = GameObject.Find("Gameover");
             gameOverScreen.SetActive(false);
->>>>>>> Stashed changes
             // TODO set gameover screen to false
             _waveManager.Init();
         }
