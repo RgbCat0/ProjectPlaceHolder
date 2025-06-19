@@ -28,7 +28,7 @@ namespace Player.Attack
 
         private PlayerStats _playerStats;
         private PlayerMovement _playerMovement;
-        private PlayerAnimator _playerAnimator;
+        private AniManager _playerAnimator;
 
         [SerializeField]
         private GameObject[] spellObject;
@@ -326,7 +326,7 @@ namespace Player.Attack
             InitializeIndicators();
             _playerStats = GetComponent<PlayerStats>();
             _playerMovement = GetComponent<PlayerMovement>();
-            _playerAnimator = GetComponent<PlayerAnimator>();
+            _playerAnimator = GetComponent<AniManager>();
 
             _selectedSpell = SetSpell(Spells.Basic);
             _camera = Camera.main;

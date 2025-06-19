@@ -10,6 +10,7 @@ namespace Enemies
     {
         private NavMeshAgent _navMeshAgent;
         private Transform _target;
+        
 
         private void Awake()
         {

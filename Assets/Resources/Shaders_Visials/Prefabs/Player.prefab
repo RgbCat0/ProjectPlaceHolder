@@ -858,9 +858,6 @@ PrefabInstance:
       addedObject: {fileID: 6659156873106866096}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -2721261289492594639}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1000101673356641984}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
@@ -883,6 +880,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7505744595971648436}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4180062983651414752}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6551814920457179970}
   m_SourcePrefab: {fileID: 100100000, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
 --- !u!1 &8483662577808818326 stripped
 GameObject:
@@ -914,18 +917,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &-2721261289492594639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8483662577808818326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b6ec2cf33ac8ed43903a92b116352c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1000101673356641984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -981,12 +972,10 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   baseMana: 0
   baseMaxMana: 100
-  baseManaRegen: 1
   baseMaxHealth: 100
   baseHealthRegen: 1
   currentMana: 0
   currentMaxMana: 100
-  currentManaRegen: 1
   currentMaxHealth: 100
   currentHealthRegen: 1
   currentLuck: 0
@@ -998,6 +987,7 @@ MonoBehaviour:
   manaMultiplier: 1
   manaRegenMultiplier: 1
   cooldownMultiplier: 1
+  manaRegenAmount: 1
 --- !u!114 &8522605687807288833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1129,6 +1119,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4180062983651414752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8483662577808818326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 7505744595971648436}
+--- !u!114 &6551814920457179970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8483662577808818326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705a03cae705449cb0b8b0450117d29c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &9149017039344605740 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}

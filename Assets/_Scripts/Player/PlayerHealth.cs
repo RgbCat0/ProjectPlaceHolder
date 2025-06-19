@@ -9,7 +9,7 @@ namespace Player
     public class PlayerHealth : NetworkBehaviour, IDamageable
     {
         private PlayerStats _playerStats;
-
+        
         public float Health { get; private set; }
         public float MaxHealth { get; private set; }
 
@@ -81,7 +81,9 @@ namespace Player
             if (Health <= 0)
             {
                 Health = 0;
+                UIManager.Instance.UpdateHealthBar(0, MaxHealth);
                 DieRpc();
+                return;
             }
 
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);

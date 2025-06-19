@@ -8,7 +8,7 @@ namespace Player.Movement
     public class PlayerMovement : NetworkBehaviour
     {
         private PlayerStats _playerStats;
-        private PlayerAnimator _playerAnimator;
+        private AniManager _playerAnimator;
         private AttackManager _attackManager;
         private Vector2 _moveInput;
         private Rigidbody _rb;
@@ -29,7 +29,7 @@ namespace Player.Movement
 
             _playerCam = FindFirstObjectByType<CinemachineCamera>();
             _playerStats = GetComponent<PlayerStats>();
-            _playerAnimator = GetComponent<PlayerAnimator>();
+            _playerAnimator = GetComponent<AniManager>();
             _attackManager = GetComponent<AttackManager>();
             _rb = GetComponent<Rigidbody>();
         
