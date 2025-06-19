@@ -153,7 +153,7 @@ namespace LobbyScripts
 
             return null;
         }
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.NotMe)]
         public void RemovePlayerDataRpc(ulong networkId)
         {
             for (int i = 0; i < syncedPlayerList.Count; i++)

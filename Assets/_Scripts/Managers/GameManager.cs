@@ -45,12 +45,23 @@ namespace Managers
             _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
             if (NetworkManager.IsHost)
+                Debug.LogError(NetworkManager.ConnectedClients.Count + " clients are connected!??!?!?!?!?!?!");
+            foreach (var clientId in NetworkManager.ConnectedClientsIds)
+            {
+                Debug.Log(clientId);
+                NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
+                    playerPrefab,
+                    ownerClientId: clientId, 
+                    isPlayerObject: true,
+                    position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
+                );
+            }
                 for (var client = 0; client < NetworkManager.Singleton.ConnectedClientsList.Count; client++)
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
                     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
                         playerPrefab,
-                        (ulong)client,
+                        
                         isPlayerObject: true,
                         position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
                     );
