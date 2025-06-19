@@ -14,7 +14,10 @@ namespace Player.Attack
         private Collider _collider;
         void Start()
         {
-            StartCoroutine(DestroyAfterTime(2f));
+            if(!IsServer)
+                return; // Only run on the server
+            DestroyAfterTimeRpc(2f);
+            Debug.Log("Script is active"); // testing if this is enabled in both players
         }
     
         public void SetCaster(GameObject player)
@@ -22,7 +25,9 @@ namespace Player.Attack
             _playerStats = player.GetComponent<PlayerStats>();
             _attackManager = player.GetComponent<AttackManager>();
         }
-
+        [Rpc(SendTo.Server)]
+        private void DestroyAfterTimeRpc(float seconds)
+        => StartCoroutine(DestroyAfterTime(2f));
         private IEnumerator DestroyAfterTime(float time)
         {
             yield return new WaitForSeconds(time);

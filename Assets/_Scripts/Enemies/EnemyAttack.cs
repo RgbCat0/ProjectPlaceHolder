@@ -39,6 +39,6 @@ namespace Enemies
             _attackCooldownTimer = 0f;
         }
 
-        private void Attack(Collider other) => other.GetComponent<IDamageable>()?.TakeDamage(damage);
+        private void Attack(Collider other) => other.GetComponent<IDamageable>()?.TakeDamageRpc(damage);
     }
 }

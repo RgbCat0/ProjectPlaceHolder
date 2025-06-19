@@ -24,6 +24,7 @@ namespace Player
                 enabled = false;
                 return;
             }
+
             _playerStats = GetComponent<PlayerStats>();
             MaxHealth = _playerStats.baseMaxHealth;
             Health = MaxHealth; // Set initial health
@@ -52,6 +53,7 @@ namespace Player
                     break;
                 }
             }
+
             playerDataSync.SendFullListRpc();
         }
 
@@ -72,7 +74,8 @@ namespace Player
             }
         }
 
-        public void TakeDamage(float damage)
+        [Rpc(SendTo.Owner)]
+        public void TakeDamageRpc(float damage)
         {
             Health -= damage;
             if (Health <= 0)
@@ -80,18 +83,20 @@ namespace Player
                 Health = 0;
                 DieRpc();
             }
+
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             StartCoroutine(UIManager.Instance.HurtFlashCoroutine());
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.Everyone)]
         private void DieRpc()
         {
             // Handle player death (e.g., play animation, destroy object, etc.)
             Debug.Log($"{gameObject.name} has died.");
             gameObject.SetActive(false);
-            onDeath.Invoke(NetworkObject.NetworkObjectId);
-            // NetworkObject.Despawn();              uu8.n
+            if (IsServer)
+                onDeath.Invoke(NetworkObject.NetworkObjectId);
+
         }
     }
 }

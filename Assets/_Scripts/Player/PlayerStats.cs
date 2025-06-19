@@ -50,11 +50,17 @@ namespace Player
 
         private void Start()
         {
-            damageMultiplier.Initialize(this);
-            damageMultiplier.Value = 1f;
+            DamageMultiRpc();
             currentMana = baseMaxMana;
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
             CalculateUpgradeChance();
+        }
+        // needs to run on the server for writing to the NetworkVariable
+        [Rpc(SendTo.Server)]
+        private void DamageMultiRpc()
+        {
+            damageMultiplier.Initialize(this);
+            damageMultiplier.Value = 1f;
         }
 
         private void Update()

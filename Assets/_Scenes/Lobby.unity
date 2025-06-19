@@ -370,6 +370,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
+      propertyPath: disableSpawning
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: waves.Array.size
       value: 4
       objectReference: {fileID: 0}

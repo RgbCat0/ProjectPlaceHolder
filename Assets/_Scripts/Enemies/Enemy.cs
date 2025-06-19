@@ -44,11 +44,18 @@ namespace Enemies
             Health = enemyInfo.health;
             _movement.SetSpeed(enemyInfo.speed);
             transform.position = spawnPoint;
-            GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
-            model.transform.localPosition = Vector3.zero;
+            ClientInitRpc(enemyInfo.identifier);
             _navMeshAgent.enabled = true; // enable NavMeshAgent after setting position and speed
             if (debug1)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
+        }
+        [Rpc(SendTo.Everyone)]
+        private void ClientInitRpc(string enemyInfoIdentifier)
+        {
+            int index = WaveManager.Instance.enemyTypesToSpawn.FindIndex(e => e.info.name == enemyInfoIdentifier);
+            EnemyInfo enemyInfo = WaveManager.Instance.enemyTypesToSpawn[index].info;
+            GameObject model = Instantiate(enemyInfo.modelPrefab, transform);
+            model.transform.localPosition = Vector3.zero;
         }
 
         #endregion
@@ -86,7 +93,7 @@ namespace Enemies
                     break;
 
                 case SpellType.None:
-                    TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
+                    TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
                     break;
             }
         }
@@ -98,17 +105,17 @@ namespace Enemies
             float duration = Time.time + _spell.effectDuration;
             if (_currentEffect == SpellType.Water)
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
                 _currentEffect = SpellType.None;
             }
             else
             {
                 _currentEffect = _spell.spellType;
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
 
                 while (Time.time < duration)
                 {
-                    TakeDamage(_spell.effectDamage);
+                    TakeDamageRpc(_spell.effectDamage);
                     yield return new WaitForSeconds(0.5f);
                 }
             }
@@ -119,13 +126,13 @@ namespace Enemies
         private void ApplyWater()
         {
             _currentEffect = SpellType.Water;
-            TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
+            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
         }
 
         private IEnumerator ApplyIce()
         {
             Debug.Log("ice");
-            TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
+            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
             float speed = _navMeshAgent.speed;
             if (_currentEffect == SpellType.Water)
             {
@@ -146,12 +153,12 @@ namespace Enemies
             Debug.Log("Lightning");
             if (_currentEffect == SpellType.Water)
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
                 _currentEffect = SpellType.None;
             }
             else
             {
-                TakeDamage(_spell.damage * _playerStats.damageMultiplier.Value);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
             }
         }
 
@@ -161,7 +168,7 @@ namespace Enemies
         #region Health
 
         // ReSharper disable Unity.PerformanceAnalysis
-        public void TakeDamage(float damage)
+        public void TakeDamageRpc(float damage)
         {
             Health -= damage;
             DamageNumbersRpc(damage);
