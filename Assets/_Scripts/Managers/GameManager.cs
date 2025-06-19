@@ -15,7 +15,7 @@ namespace Managers
         private Transform _playerSpawnPoint; // Set this to the desired spawn point in the scene
         private WaveManager _waveManager;
         private GameObject gameOverScreen;
-        bool gameOver = false;
+        public bool gameOver = false;
         
 
         private void Awake()
@@ -83,6 +83,8 @@ namespace Managers
                 if (players.Count >= deadPlayers.Count)
                 {
                     gameOver = true;
+                    gameOverScreen.SetActive(true);
+                    _waveManager.ResetWaves();
                 }
             }
         }
@@ -94,11 +96,16 @@ namespace Managers
             {
                 if (gameOver)
                 {
-                    gameOver = false;
-                    _waveManager.ResetWaves();
+                    gameOverScreen.SetActive(false);
+                    PlayerStats stats = player.GetComponent<PlayerStats>();
+                    stats.currentMana = stats.currentMaxMana;
+                    player.GetComponent<PlayerHealth>().Health = player.GetComponent<PlayerHealth>().MaxHealth;
                 }
+                deadPlayers.Clear();
                 player.SetActive(true);
+                if (gameOver) _waveManager.SendNextWaveEventRpc();
                 player.transform.position = _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right;
+                gameOver = false;
             }
         }
     }

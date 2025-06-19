@@ -17385,16 +17385,71 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gameover
       objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1206415511}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: quitButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Settings, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6378641944616598205, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3348838075638078460, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1206415511}
   m_SourcePrefab: {fileID: 100100000, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
 --- !u!224 &1206415509 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2837326403883642543, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
   m_PrefabInstance: {fileID: 1206415508}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1206415510 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3348838075638078460, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+  m_PrefabInstance: {fileID: 1206415508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1206415511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206415510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 552a1254b2f61104ca171a73366aa98f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainPanel: {fileID: 0}
+  keybindsPanel: {fileID: 0}
+  videoPanel: {fileID: 0}
+  fullScreenDropdown: {fileID: 0}
+  damageNumbersToggle: {fileID: 0}
+  showFPSCounterToggle: {fileID: 0}
+  showUpgradeStatsToggle: {fileID: 0}
 --- !u!1001 &1216601290
 PrefabInstance:
   m_ObjectHideFlags: 0
