@@ -17,7 +17,7 @@ namespace Managers
         private WaveManager _waveManager;
         public GameObject gameOverScreen;
         public bool gameOver = false;
-        
+
 
         private void Awake()
         {
@@ -34,8 +34,8 @@ namespace Managers
             // {
             //     // NetworkObject.SpawnWithOwnership(0);
             // }
-            
-            
+
+
             _waveManager = GetComponent<WaveManager>();
         }
 
@@ -63,17 +63,19 @@ namespace Managers
                     _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
                     _waveManager.Init();
                 }
-            }
+
             niggerRpc();
-            
         }
+
+
+
         [Rpc(SendTo.Everyone)]
         private void niggerRpc()
         {
-            NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUIRpc();  
+            NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUIRpc();
         }
+
         
-        [Rpc(SendTo.Everyone)]
         public void GameOverUIRpc()
         {
             gameOverScreen = GameObject.Find("Gameover");
@@ -81,13 +83,13 @@ namespace Managers
             Button quitButton = GameObject.Find("Quit").GetComponent<Button>();
             quitButton.onClick.AddListener(QuitButton);
             restartButton.onClick.AddListener(RevivePlayersRpc);
-            // gameOverScreen.SetActive(false);
+            gameOverScreen.SetActive(false);
         }
 
         [Rpc(SendTo.Everyone)]
         public void HandleDeathRpc(ulong playerID)
         {
-            if (deadPlayers.Count >= players.Count && IsServer )
+            if (deadPlayers.Count >= players.Count && IsServer)
             {
                 Debug.Log("all players are dead, game over22131313213");
                 gameOver = true;
@@ -120,12 +122,13 @@ namespace Managers
                 gameOver = false;
             }
         }
-                 
+
         private void QuitButton()
         {
             SceneManager.LoadScene("MainMenu");
-        } 
-        
-        
+        }
+
     }
 }
+
+
