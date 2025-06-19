@@ -153,5 +153,27 @@ namespace LobbyScripts
 
             return null;
         }
+        [Rpc(SendTo.Server)]
+        public void RemovePlayerDataRpc(ulong networkId)
+        {
+            for (int i = 0; i < syncedPlayerList.Count; i++)
+            {
+                if (syncedPlayerList[i].PlayerNetworkId == networkId)
+                {
+                    syncedPlayerList.RemoveAt(i);
+                    break;
+                }
+            }
+            SendFullListRpc();
+        }
+        public void ResetPlayerData()
+        {
+            syncedPlayerList.Clear();
+            // listIsSynced.Value = false;
+            localPlayerObjectId = 0;
+            gameStarted = false;
+            _isActuallySpawned = false;
+            OnPlayerJoin = null;
+        }
     }
 }

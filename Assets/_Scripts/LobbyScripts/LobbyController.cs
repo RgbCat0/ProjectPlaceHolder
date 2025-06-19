@@ -17,10 +17,13 @@ namespace LobbyScripts
 #endif
         [HideInInspector]
         public LobbyNetManager lobbyNetManager;
+
         [HideInInspector]
         public PlayerDataSync playerDataSync;
+
         [HideInInspector]
         public LobbyServiceManager serviceManager;
+
         [HideInInspector]
         public LobbyUiManager uiManager;
 
@@ -59,6 +62,7 @@ namespace LobbyScripts
                 uiManager.OnStartGame += StartGameRpc;
                 uiManager.ShowMainMenu();
                 playerDataSync.OnPlayerJoin += () => LobbyLogger.StatusMessage("");
+                NetworkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
 #if UNITY_EDITOR
                 if (quickTest) HandleCreateLobby("TestLobby");
 #endif
@@ -67,6 +71,11 @@ namespace LobbyScripts
             {
                 LobbyLogger.Exception(e);
             }
+        }
+
+        private void NetworkManagerOnOnClientDisconnectCallback(ulong obj)
+        {
+            Debug.Log(NetworkManager.ConnectedClientsList.Count + " clients connected");
         }
 
         #endregion
@@ -145,6 +154,7 @@ namespace LobbyScripts
         [Rpc(SendTo.Server, RequireOwnership = true)]
         private void StartGameRpc()
         {
+            Debug.Log(NetworkManager.ConnectedClientsList.Count + " ?????????");
             if (!NetworkManager.IsHost)
                 return;
             serviceManager.StopHeartbeat();
@@ -168,7 +178,58 @@ namespace LobbyScripts
                 return null;
             }
         }
-        #region readyStatus 
+
+        // public void OnDisconnect(bool isHost)
+        // {
+        //     if (isHost)
+        //     {
+        //         serviceManager.StopHeartbeat();
+        //         serviceManager.DeleteLobbyTask();
+        //     }
+        //     else
+        //     {
+        //         serviceManager.LeaveLobbyTask();
+        //     }
+        //
+        //     ResetReadyStatusRpc();
+        //     SceneManager.LoadScene("MainMenu");
+        // }
+
+        public void Disconnect()
+        {
+            if (NetworkManager.IsHost)
+                HostDisconnect();
+            else
+                ClientDisconnect();
+        }
+
+        private async void ClientDisconnect()
+        {
+            playerDataSync.RemovePlayerDataRpc(NetworkManager.LocalClientId);
+            playerDataSync.ResetPlayerData();
+            RemovePlayerLobbyPanelRpc(AuthenticationService.Instance.PlayerName);
+            uiManager.ClearPlayerLobbyPanels();
+            await serviceManager.LeaveLobbyTask();
+            uiManager.ShowMainMenu();
+            NetworkManager.Shutdown();
+        }
+        [Rpc(SendTo.NotMe)]
+        private void RemovePlayerLobbyPanelRpc(string playerName)
+        {
+            uiManager.RemovePlayerLobbyPanelRpc(playerName);
+        }
+
+        private async void HostDisconnect()
+        {
+            playerDataSync.ResetPlayerData();
+            serviceManager.StopHeartbeat();
+            await serviceManager.DeleteLobbyTask();
+            uiManager.ShowMainMenu();
+            NetworkManager.Shutdown();
+        }
+
+        #region readyStatus
+
         [Rpc(SendTo.Server)]
         public void UpdateReadyButtonRpc(bool readyStatus, ulong clientId)
         {
@@ -185,6 +246,7 @@ namespace LobbyScripts
                         // break;
                     }
                 }
+
                 playerDataSync.SendFullListRpc();
                 UpdateReadyStatusRpc();
             }
@@ -211,6 +273,7 @@ namespace LobbyScripts
         {
             StartCoroutine(uiManager.UpdateReadyStatus());
         }
+
         #endregion
 
         #region Singleton

@@ -38,7 +38,7 @@ namespace LobbyScripts
 
         public async Task JoinLobbyTask(string lobbyId)
         {
-            await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            Lobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
         }
 
         public async Task<List<Lobby>> GetLobbiesAsync()
@@ -71,7 +71,50 @@ namespace LobbyScripts
                 {
                     Debug.LogError("Failed to send heartbeat: " + heartbeatTask.Exception);
                 }
+
                 yield return new WaitForSeconds(15f);
+            }
+        }
+
+        public async Task DeleteLobbyTask()
+        {
+            if (Lobby == null)
+            {
+                Debug.LogWarning("No lobby to delete.");
+                return;
+            }
+
+            try
+            {
+                await LobbyService.Instance.DeleteLobbyAsync(Lobby.Id);
+                Lobby = null;
+                StopHeartbeat();
+                Debug.Log("Lobby deleted successfully.");
+            }
+            catch (LobbyServiceException e)
+            {
+                Debug.LogError($"Failed to delete lobby: {e.Message}");
+            }
+        }
+        public async Task LeaveLobbyTask()
+        {
+            if (Lobby == null)
+            {
+                Debug.LogWarning("No lobby to leave.");
+                return;
+            }
+
+            try
+            {
+                var playerid = AuthenticationService.Instance.PlayerId;
+                await LobbyService.Instance.RemovePlayerAsync(Lobby.Id, playerid);
+                Lobby = null;
+                StopHeartbeat();
+                Debug.Log("Left lobby successfully.");
+            }
+            catch (LobbyServiceException e)
+            {
+                Debug.LogError($"Failed to leave lobby: {e.Message}");
             }
         }
     }
