@@ -16,6 +16,7 @@ namespace Managers
         private WaveManager _waveManager;
         
         bool gameOver = false;
+        private GameObject gameOverScreen;
         
 
         private void Awake()
@@ -60,8 +61,15 @@ namespace Managers
             }
 
             _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
+<<<<<<< Updated upstream
             // Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
             // restartButton.onClick.AddListener(RevivePlayersRpc);
+=======
+            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
+            restartButton.onClick.AddListener(RevivePlayersRpc);
+            gameOverScreen = GameObject.Find("Gameover");
+            gameOverScreen.SetActive(false);
+>>>>>>> Stashed changes
             // TODO set gameover screen to false
             _waveManager.Init();
         }
@@ -79,6 +87,7 @@ namespace Managers
                 if (players.Count >= deadPlayers.Count)
                 {
                     gameOver = true;
+                    gameOverScreen.SetActive(true);
                 }
             }
         }
@@ -92,6 +101,7 @@ namespace Managers
                 {
                     gameOver = false;
                     _waveManager.ResetWaves();
+                    gameOverScreen.SetActive(false);
                 }
                 player.SetActive(true);
                 player.transform.position = _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right;
