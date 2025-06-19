@@ -90,10 +90,5 @@ public class Settings : MonoBehaviour
 
     public void ShowUpgradeStatsToggle(bool isOn)
         => PlayerPrefs.SetInt("ShowUpgradeStats", isOn ? 1 : 0);
-
-
-    public void quitButton()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
+    
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Managers
@@ -14,7 +15,7 @@ namespace Managers
         public static GameManager Instance { get; private set; }
         private Transform _playerSpawnPoint; // Set this to the desired spawn point in the scene
         private WaveManager _waveManager;
-        private GameObject gameOverScreen;
+        public GameObject gameOverScreen;
         public bool gameOver = false;
         
 
@@ -43,6 +44,7 @@ namespace Managers
             _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
             if (NetworkManager.IsHost)
+            {
                 for (var client = 0; client < NetworkManager.Singleton.ConnectedClients.Count; client++)
                 {
                     // spawns in the player (the lobby player is only for lobby purposes)
@@ -53,43 +55,48 @@ namespace Managers
                         position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
                     );
                     players.Add(newPlayer);
-                }
-            foreach (NetworkObject player in players)
-            {
-                player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
-            }
+                    foreach (NetworkObject player in players)
+                    {
+                        player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
+                    }
 
-            _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
-            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
-            restartButton.onClick.AddListener(RevivePlayersRpc);
+                    _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
+                    _waveManager.Init();
+                }
+            }
+            niggerRpc();
+            
+        }
+        [Rpc(SendTo.Everyone)]
+        private void niggerRpc()
+        {
+            NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUIRpc();  
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        public void GameOverUIRpc()
+        {
             gameOverScreen = GameObject.Find("Gameover");
-            gameOverScreen.SetActive(false);
-            // Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
-            // restartButton.onClick.AddListener(RevivePlayersRpc);
-            // TODO set gameover screen to false
-            _waveManager.Init();
+            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
+            Button quitButton = GameObject.Find("Quit").GetComponent<Button>();
+            quitButton.onClick.AddListener(QuitButton);
+            restartButton.onClick.AddListener(RevivePlayersRpc);
+            // gameOverScreen.SetActive(false);
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.Everyone)]
         public void HandleDeathRpc(ulong playerID)
         {
-            foreach (NetworkObject player in players)
+            if (deadPlayers.Count >= players.Count && IsServer )
             {
-                if (player != null && !player.gameObject.activeInHierarchy)
-                {
-                    deadPlayers.Add(player.gameObject);
-                }
-
-                if (players.Count >= deadPlayers.Count)
-                {
-                    gameOver = true;
-                    gameOverScreen.SetActive(true);
-                    _waveManager.ResetWaves();
-                }
+                Debug.Log("all players are dead, game over22131313213");
+                gameOver = true;
+                gameOverScreen.SetActive(true);
+                _waveManager.ResetWaves();
             }
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.Everyone)]
         public void RevivePlayersRpc()
         {
             foreach (GameObject player in deadPlayers)
@@ -101,12 +108,24 @@ namespace Managers
                     stats.currentMana = stats.currentMaxMana;
                     player.GetComponent<PlayerHealth>().Health = player.GetComponent<PlayerHealth>().MaxHealth;
                 }
-                deadPlayers.Clear();
+
                 player.SetActive(true);
-                if (gameOver) _waveManager.SendNextWaveEventRpc();
                 player.transform.position = _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right;
+            }
+
+            if (IsServer)
+            {
+                if (gameOver) _waveManager.SendNextWaveEventRpc();
+                deadPlayers.Clear();
                 gameOver = false;
             }
         }
+                 
+        private void QuitButton()
+        {
+            SceneManager.LoadScene("MainMenu");
+        } 
+        
+        
     }
 }

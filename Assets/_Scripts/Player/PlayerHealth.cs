@@ -80,7 +80,7 @@ namespace Player
             Health -= damage;
             if (Health <= 0)
             {
-                Health = 0;
+                Health = MaxHealth; // Prevents dieRpc from being called multiple times
                 UIManager.Instance.UpdateHealthBar(0, MaxHealth);
                 DieRpc();
                 return;
@@ -96,9 +96,11 @@ namespace Player
             // Handle player death (e.g., play animation, destroy object, etc.)
             Debug.Log($"{gameObject.name} has died.");
             gameObject.SetActive(false);
-            if (IsServer)
-                onDeath.Invoke(NetworkObject.NetworkObjectId);
+            GameManager.Instance.deadPlayers.Add(gameObject);
+            onDeath?.Invoke(NetworkObject.NetworkObjectId);
+            
 
         }
+        
     }
 }
