@@ -39,59 +39,66 @@ namespace Managers
             _waveManager = GetComponent<WaveManager>();
         }
 
-        public void StartGame()
+        public void StartGame() // NOTE: Only runs on host/server
         {
             Debug.Log("Is being called");
             _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
             if (NetworkManager.IsHost)
                 Debug.LogError(NetworkManager.ConnectedClients.Count + " clients are connected!??!?!?!?!?!?!");
-            foreach (var clientId in NetworkManager.ConnectedClientsIds)
+            foreach (var clientId in NetworkManager.ConnectedClientsIds) // ain no way this fixed the ghost player issue
             {
                 Debug.Log(clientId);
                 NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
                     playerPrefab,
-                    ownerClientId: clientId, 
+                    ownerClientId: clientId,
                     isPlayerObject: true,
                     position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
                 );
-            }
-                for (var client = 0; client < NetworkManager.Singleton.ConnectedClientsList.Count; client++)
+                players.Add(newPlayer);
+                foreach (NetworkObject player in players)
                 {
-                    // spawns in the player (the lobby player is only for lobby purposes)
-                    NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
-                        playerPrefab,
-                        
-                        isPlayerObject: true,
-                        position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
-                    );
-                    players.Add(newPlayer);
-                    foreach (NetworkObject player in players)
-                    {
-                        player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
-                    }
-
-                    _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
-                    _waveManager.Init();
+                    player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
                 }
+            }
 
-            niggerRpc();
+            // for (var client = 0; client < NetworkManager.Singleton.ConnectedClientsList.Count; client++)
+            // {
+            //     // spawns in the player (the lobby player is only for lobby purposes)
+            //     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
+            //         playerPrefab,
+            //         isPlayerObject: true,
+            //         position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
+            //     );
+            //     players.Add(newPlayer);
+            //     foreach (NetworkObject player in players)
+            //     {
+            //         player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
+            //     }
+            // }
+
+            _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
+            _waveManager.Init();
+
+            // GameOverUiEveryoneRpc();
         }
 
 
+        // [Rpc(SendTo.Everyone)]
+        // private void GameOverUiEveryoneRpc()
+        // {
+        //     Debug.LogWarning("Im confused");
+        //     NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUI();
+        // }
 
-        [Rpc(SendTo.Everyone)]
-        private void niggerRpc()
-        {
-            NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUIRpc();
-        }
 
-        
-        public void GameOverUIRpc()
+        public void GameOverUI(GameObject gameOverObj)
         {
-            gameOverScreen = GameObject.Find("Gameover");
-            Button restartButton = GameObject.Find("RestartButton").GetComponent<Button>();
-            Button quitButton = GameObject.Find("Quit").GetComponent<Button>();
+            Debug.Log("Being called");
+            gameOverScreen = gameOverObj;
+
+            Button restartButton = gameOverObj.transform.GetChild(0).GetComponent<Button>();
+            Button quitButton = gameOverObj.transform.GetChild(1).GetComponent<Button>();
             quitButton.onClick.AddListener(QuitButton);
             restartButton.onClick.AddListener(RevivePlayersRpc);
             gameOverScreen.SetActive(false);
@@ -138,8 +145,5 @@ namespace Managers
         {
             SceneManager.LoadScene("MainMenu");
         }
-
     }
 }
-
-

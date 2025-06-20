@@ -17,7 +17,6 @@ namespace Player.Attack
             if(!IsServer)
                 return; // Only run on the server
             DestroyAfterTimeRpc(2f);
-            Debug.Log("Script is active"); // testing if this is enabled in both players
         }
     
         public void SetCaster(GameObject player)
@@ -31,7 +30,6 @@ namespace Player.Attack
         private IEnumerator DestroyAfterTime(float time)
         {
             yield return new WaitForSeconds(time);
-            Debug.Log(gameObject.name + " was destroyed");
             NetworkObject.Despawn(this.gameObject);
         }
 

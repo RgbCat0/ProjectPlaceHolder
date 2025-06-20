@@ -16,6 +16,7 @@ namespace Player
         public event Action<ulong> onDeath;
 
         private float healthRegenTimer = 0f;
+        private Rigidbody _rb;
 
         private void Start()
         {
@@ -26,6 +27,7 @@ namespace Player
             }
 
             _playerStats = GetComponent<PlayerStats>();
+            _rb = GetComponent<Rigidbody>();
             MaxHealth = _playerStats.baseMaxHealth;
             Health = MaxHealth; // Set initial health
             SendData();
@@ -65,7 +67,9 @@ namespace Player
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth); // ui manager is not a network object
 
             healthRegenTimer += Time.deltaTime;
-            if (healthRegenTimer >= 1f)
+            if ((healthRegenTimer >= 1f &&
+                 _rb.linearVelocity.magnitude < 0.1f) ||
+                !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate health if the player is not moving and not waiting for the next wave
             {
                 Health += _playerStats.currentHealthRegen;
                 if (Health > MaxHealth)
@@ -82,25 +86,22 @@ namespace Player
             {
                 Health = MaxHealth; // Prevents dieRpc from being called multiple times
                 UIManager.Instance.UpdateHealthBar(0, MaxHealth);
+                UIManager.Instance.StopHurtFlash();
                 DieRpc();
                 return;
             }
 
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
-            StartCoroutine(UIManager.Instance.HurtFlashCoroutine());
+            UIManager.Instance.HurtFlash();
         }
 
         [Rpc(SendTo.Everyone)]
         private void DieRpc()
         {
             // Handle player death (e.g., play animation, destroy object, etc.)
-            Debug.Log($"{gameObject.name} has died.");
             gameObject.SetActive(false);
             GameManager.Instance.deadPlayers.Add(gameObject);
             onDeath?.Invoke(NetworkObject.NetworkObjectId);
-            
-
         }
-        
     }
 }

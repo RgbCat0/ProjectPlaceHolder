@@ -73,7 +73,7 @@ namespace Player
             if (currentMana < currentMaxMana)
             {
                 manaRegenTimer += Time.deltaTime * manaRegenMultiplier;
-                if (manaRegenTimer >= 1f)
+                if (manaRegenTimer >= 1f && !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate mana if not waiting for the next wave
                 {
                     currentMana += manaRegenAmount;
                     if (currentMana > currentMaxMana)

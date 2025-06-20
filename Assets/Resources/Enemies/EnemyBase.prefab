@@ -52,7 +52,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1.8, z: 1}
+  m_Size: {x: 1.3, y: 1.8, z: 1}
   m_Center: {x: 0, y: 1, z: 0.9}
 --- !u!114 &8453368688662401992
 MonoBehaviour:
@@ -68,6 +68,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   attackCooldown: 1
+  isAttacking: 0
 --- !u!1 &8628402995459243573
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,6 +161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  walkAnimationSpeedBase: -0.4
 --- !u!114 &8377735778323373436
 MonoBehaviour:
   m_ObjectHideFlags: 0

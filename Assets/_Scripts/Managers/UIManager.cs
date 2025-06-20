@@ -91,12 +91,6 @@ namespace Managers
 
         public void UpdateHealthBar(float currHealth, float maxHealth)
         {
-            if (healthBar == null)
-            {
-                Debug.LogError("Health bar is not assigned in the inspector.");
-                return;
-            }
-
             if (currHealth <= 0)
             {
                 healthBar.sizeDelta = new Vector2(0, healthBar.sizeDelta.y);
@@ -229,8 +223,17 @@ namespace Managers
             // aka all players are done
             upgradeMenu.SetActive(false);
         }
+        public void HurtFlash() // call this when player is hurt
+        =>
+            StartCoroutine(HurtFlashCoroutine());
+        public void StopHurtFlash()
+        {
+            if (_isHurtFlashing)
+                _hurtFlashTimer = hurtFlashDuration; // set timer to max to end the coroutine
+            
+        }
 
-        public IEnumerator HurtFlashCoroutine()
+        private IEnumerator HurtFlashCoroutine()
         {
             if (_isHurtFlashing)
             {

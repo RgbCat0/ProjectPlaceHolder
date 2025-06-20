@@ -13,7 +13,9 @@ namespace Enemies
 
         private float _attackCooldownTimer;
         private AniManager _aniManager;
-        
+        public bool isAttacking;
+        private bool _playerInsideTrigger;
+
         private void Start()
         {
             _aniManager = transform.parent.GetComponent<AniManager>();
@@ -21,22 +23,25 @@ namespace Enemies
             {
                 Debug.LogError("EnemyAnimator component not found on the GameObject.");
             }
+
+            _aniManager.ChangeFloat("AttackSpeed", 2f);
         }
-        
+
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player"))
                 return;
             _attackCooldownTimer = 0f;
+            _playerInsideTrigger = true;
             StartCoroutine(Attack(other));
         }
 
         private void OnTriggerStay(Collider other)
         {
-            if (!other.CompareTag("Player")) 
+            if (!other.CompareTag("Player"))
                 return;
             _attackCooldownTimer += Time.deltaTime;
-            if(_attackCooldownTimer >= attackCooldown)
+            if (_attackCooldownTimer >= attackCooldown)
             {
                 _attackCooldownTimer = 0f;
                 StartCoroutine(Attack(other));
@@ -47,14 +52,20 @@ namespace Enemies
         {
             if (!other.CompareTag("Player"))
                 return;
+            _playerInsideTrigger = false;
             _attackCooldownTimer = 0f;
         }
 
         private IEnumerator Attack(Collider other)
         {
-            _aniManager.ChangeAnimation("zombattack");
+            isAttacking = true;
+            _aniManager.ChangeAnimation("Attack", 0.2f, 1);
             yield return new WaitForSeconds(0.5f);
-            other.GetComponent<IDamageable>()?.TakeDamageRpc(damage);
+            if (_playerInsideTrigger)
+                other.GetComponent<IDamageable>()?.TakeDamageRpc(damage);
+            // no need to change animation again as it will be changed by the movement script
+            _aniManager.ChangeAnimation("Idle", 0.5f, 1);
+            isAttacking = false;
         }
     }
 }
