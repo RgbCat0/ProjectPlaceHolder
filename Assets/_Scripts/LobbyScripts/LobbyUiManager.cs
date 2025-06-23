@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Managers;
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
@@ -43,8 +44,11 @@ namespace LobbyScripts
 
         [SerializeField]
         private TMP_InputField createLobbyNameField;
+        
+        [SerializeField]
+        private TMP_Dropdown difficultyDropdown;
 
-        public event Action<string> OnCreateLobby;
+        public event Action<string, string> OnCreateLobby;
 
         [SerializeField]
         private Button goBackButton;
@@ -81,6 +85,8 @@ namespace LobbyScripts
 
         [SerializeField]
         private GameObject playerLobbyPrefab;
+        [SerializeField]
+        private TextMeshProUGUI difficultyText;
 
         private List<GameObject> _playerLobbyPanels = new();
         public event Action OnStartGame;
@@ -161,9 +167,11 @@ namespace LobbyScripts
                 Debug.LogError("Lobby name cannot be empty.");
                 return;
             }
-
+            GameManager.Instance.GetComponent<DifficultyManager>().SetDifficulty((Difficulty)difficultyDropdown.value);
             createLobbyButton.interactable = false;
-            OnCreateLobby?.Invoke(lobbyName);
+            string difficulty = GameManager.Instance.GetDifficultyName();
+            OnCreateLobby?.Invoke(lobbyName,difficulty);
+            difficultyText.text = difficulty;
             ChangeMenu(lobbyParent);
         }
 
@@ -187,7 +195,7 @@ namespace LobbyScripts
                             .transform.GetChild(0)
                             .GetChild(1)
                             .GetComponent<TextMeshProUGUI>()
-                            .text = $"{lobby.Name}\n {lobby.Data["HostName"].Value}";
+                            .text = $"{lobby.Name}\n {lobby.Data["HostName"].Value} \n {lobby.Data["Difficulty"].Value}";
                     newPanel
                         .GetComponentInChildren<Button>()
                         .onClick.AddListener(() => JoinLobby(lobby));
@@ -211,7 +219,11 @@ namespace LobbyScripts
             ChangeMenu(lobbyParent);
             startGameButton.interactable = false;
         }
-
+        
+        public void ShowDifficulty(string difficulty)
+        {
+            difficultyText.text = difficulty;
+        }
 
         public void EnableDisableStartGameButton(bool enable)
         {

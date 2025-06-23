@@ -31,6 +31,11 @@ namespace Managers
                 SpawnScaling = scaling
             };
         }
+        public string GetDifficultyName()
+        {
+            return currentDifficulty.ToString();
+        }
+        
     }
     public enum Difficulty
     {

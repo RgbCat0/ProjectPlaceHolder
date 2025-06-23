@@ -141,6 +141,8 @@ namespace Managers
             }
         }
 
+        public string GetDifficultyName() => GetComponent<DifficultyManager>().GetDifficultyName();
+
         private void QuitButton()
         {
             SceneManager.LoadScene("MainMenu");

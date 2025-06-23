@@ -64,7 +64,7 @@ namespace LobbyScripts
                 playerDataSync.OnPlayerJoin += () => LobbyLogger.StatusMessage("");
                 NetworkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
 #if UNITY_EDITOR
-                if (quickTest) HandleCreateLobby("TestLobby");
+                if (quickTest) HandleCreateLobby("TestLobby", "Medium");
 #endif
             }
             catch (Exception e)
@@ -94,15 +94,15 @@ namespace LobbyScripts
             LobbyLogger.StatusMessage("");
         }
 
-        private async void HandleCreateLobby(string obj)
+        private async void HandleCreateLobby(string name, string difficulty)
         {
             LobbyLogger.StatusMessage("Starting Networking...");
             string relayJoinCode = await lobbyNetManager.HostNetworkTask();
             LobbyLogger.StatusMessage("Creating Lobby...");
-            await serviceManager.HostLobbyTask(obj, relayJoinCode);
+            await serviceManager.HostLobbyTask(name, relayJoinCode, difficulty);
             NetworkManager.OnClientConnectedCallback += _ => ResetReadyStatusRpc();
             NetworkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
-            CanStartGame(true);
+            CanStartGame(false);
 #if UNITY_EDITOR
             if (quickTest) StartGameRpc();
 #endif
@@ -117,6 +117,8 @@ namespace LobbyScripts
         {
             LobbyLogger.StatusMessage("Joining Lobby...");
             await serviceManager.JoinLobbyTask(lobby.Id);
+            uiManager.ShowDifficulty(GameManager.Instance.GetDifficultyName
+                ());
             LobbyLogger.StatusMessage("Starting Networking...");
             await lobbyNetManager.ClientNetworkTask(lobby.Data["RelayJoinCode"].Value);
             LobbyLogger.StatusMessage("Hold on...");
@@ -158,6 +160,7 @@ namespace LobbyScripts
             if (!NetworkManager.IsHost)
                 return;
             serviceManager.StopHeartbeat();
+            serviceManager.HideLobby();
             NetworkManager.SceneManager.LoadScene("Main", LoadSceneMode.Single);
             NetworkManager.SceneManager.OnLoadComplete += (id, _, _) =>
             {

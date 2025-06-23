@@ -13,7 +13,7 @@ namespace LobbyScripts
         public Lobby Lobby { get; private set; }
         private Coroutine _heartBeatCoroutine;
 
-        public async Task HostLobbyTask(string lobbyName, string relayJoinCode)
+        public async Task HostLobbyTask(string lobbyName, string relayJoinCode, string difficulty)
         {
             var options = new CreateLobbyOptions
             {
@@ -30,6 +30,10 @@ namespace LobbyScripts
                             AuthenticationService.Instance.PlayerName
                         )
                     },
+                    {
+                        "Difficulty",
+                        new DataObject(DataObject.VisibilityOptions.Public, difficulty)
+                    }
                 },
             };
             Lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, 4, options);
@@ -45,6 +49,11 @@ namespace LobbyScripts
         {
             QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync();
             return response.Results;
+        }
+
+        public void HideLobby()
+        {
+
         }
 
         private void StartHeartbeat()
@@ -96,6 +105,7 @@ namespace LobbyScripts
                 Debug.LogError($"Failed to delete lobby: {e.Message}");
             }
         }
+
         public async Task LeaveLobbyTask()
         {
             if (Lobby == null)
