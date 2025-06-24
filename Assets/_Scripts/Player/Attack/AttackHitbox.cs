@@ -1,3 +1,4 @@
+using System;
 using Enemies;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,6 +10,14 @@ namespace Player.Attack
         private PlayerStats _playerStats;
         private AttackManager _attackManager;
         private Collider _collider;
+
+        [SerializeField]
+        private ParticleSystem particle;
+
+        private void Awake()
+        {
+            particle = GetComponent<ParticleSystem>();
+        }
 
         public void SetCaster(GameObject player)
         {

@@ -68,7 +68,7 @@ namespace Player
 
             healthRegenTimer += Time.deltaTime;
             if ((healthRegenTimer >= 1f &&
-                 _rb.linearVelocity.magnitude < 0.1f) ||
+                 _rb.linearVelocity.magnitude < 0.1f) &&
                 !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate health if the player is not moving and not waiting for the next wave
             {
                 Health += _playerStats.currentHealthRegen;
@@ -84,9 +84,9 @@ namespace Player
             Health -= damage;
             if (Health <= 0)
             {
-                Health = MaxHealth; // Prevents dieRpc from being called multiple times
                 UIManager.Instance.UpdateHealthBar(0, MaxHealth);
                 UIManager.Instance.StopHurtFlash();
+                Health = MaxHealth; // Prevents die Rpc from being called multiple times
                 DieRpc();
                 return;
             }

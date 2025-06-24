@@ -30,6 +30,7 @@ namespace Managers
             {
                 Destroy(gameObject);
             }
+            Application.targetFrameRate = 144;
             // if (NetworkManager.IsHost)
             // {
             //     // NetworkObject.SpawnWithOwnership(0);
@@ -62,34 +63,9 @@ namespace Managers
                 }
             }
 
-            // for (var client = 0; client < NetworkManager.Singleton.ConnectedClientsList.Count; client++)
-            // {
-            //     // spawns in the player (the lobby player is only for lobby purposes)
-            //     NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
-            //         playerPrefab,
-            //         isPlayerObject: true,
-            //         position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
-            //     );
-            //     players.Add(newPlayer);
-            //     foreach (NetworkObject player in players)
-            //     {
-            //         player.GetComponent<PlayerHealth>().onDeath += HandleDeathRpc;
-            //     }
-            // }
-
             _waveManager.OnWaveCompleteEvent += RevivePlayersRpc;
             _waveManager.Init();
-
-            // GameOverUiEveryoneRpc();
         }
-
-
-        // [Rpc(SendTo.Everyone)]
-        // private void GameOverUiEveryoneRpc()
-        // {
-        //     Debug.LogWarning("Im confused");
-        //     NetworkManager.SceneManager.OnLoadComplete += (id, _, _) => GameOverUI();
-        // }
 
 
         public void GameOverUI(GameObject gameOverObj)
@@ -125,11 +101,18 @@ namespace Managers
                 {
                     gameOverScreen.SetActive(false);
                     PlayerStats stats = player.GetComponent<PlayerStats>();
-                    stats.currentMana = stats.currentMaxMana;
+                    stats.currentMana.Value = stats.currentMaxMana;
                     player.GetComponent<PlayerHealth>().Health = player.GetComponent<PlayerHealth>().MaxHealth;
                 }
 
                 player.SetActive(true);
+                if (_playerSpawnPoint == null)
+                {
+                    _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
+                    if (_playerSpawnPoint == null)
+                        Debug.LogError("Player spawn point is null!");
+                }
+
                 player.transform.position = _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right;
             }
 

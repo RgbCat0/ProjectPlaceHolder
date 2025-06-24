@@ -70,7 +70,7 @@ namespace Player.Attack
                         return;
                     }
 
-                    _playerAnimator.ChangeAnimation(_currentSpell.ToString());
+                    _playerAnimator.ChangeAnimationRpc(_currentSpell.ToString());
                     _castedSpell = _selectedSpell;
                     _spellCooldowns[_currentSpell] =
                         Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
@@ -89,10 +89,11 @@ namespace Player.Attack
                 Debug.LogError($"Server: Could not find spell for index {spellIndex}");
                 return;
             }
+            var currentMana = _playerStats.currentMana.Value; // enable writing perms for owner
 
-            if (_playerStats.currentMana >= spell.manaCost)
+            if (currentMana >= spell.manaCost)
             {
-                _playerStats.currentMana -= spell.manaCost;
+                currentMana -= spell.manaCost;
                 _castedSpell = spell; // update server-side reference
                 GameObject objectPos;
 
@@ -125,6 +126,13 @@ namespace Player.Attack
                 if (_castedSpell == null)
                     Debug.LogError("_castedSpell is null");
             }
+            SendManaToOwnerRpc(currentMana);
+            
+        }
+        [Rpc(SendTo.Owner)]
+        private void SendManaToOwnerRpc(float mana)
+        {
+            _playerStats.currentMana.Value = mana;
         }
 
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
@@ -134,14 +142,14 @@ namespace Player.Attack
             while (Time.time < castTime)
             {
                 cd = true;
-                _playerMovement.canMove = false;
+                _playerMovement.canMove.Value = false;
                 Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 50f);
                 yield return new WaitForFixedUpdate();
             }
 
-            _playerMovement.canMove = true;
-            _playerAnimator.ChangeAnimation("Idle");
+            _playerMovement.canMove.Value = true;
+            _playerAnimator.ChangeAnimationRpc("Idle");
 
 
             // Basic attack
@@ -457,7 +465,7 @@ namespace Player.Attack
                     return;
                 }
 
-                _playerAnimator.ChangeAnimation(_currentSpell.ToString());
+                _playerAnimator.ChangeAnimationRpc(_currentSpell.ToString());
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
@@ -486,7 +494,7 @@ namespace Player.Attack
         {
             if (_spellDictionary.TryGetValue(spellName, out var spell) && spell != null)
             {
-                if (_playerStats.currentMana >= spell.manaCost && !cd)
+                if (_playerStats.currentMana.Value >= spell.manaCost && !cd)
                 {
                     _selectedSpell = spell;
                     _currentSpell = spellName;

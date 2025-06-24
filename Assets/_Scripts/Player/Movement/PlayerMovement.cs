@@ -1,3 +1,4 @@
+using System;
 using Player.Attack;
 using Unity.Cinemachine;
 using Unity.Netcode;
@@ -13,11 +14,22 @@ namespace Player.Movement
         private Vector2 _moveInput;
         private Rigidbody _rb;
         private CinemachineCamera _playerCam;
-        public  bool canMove = true;
+        public NetworkVariable<bool> canMove;
 
-        [SerializeField] private float moveSpeed;
-        [SerializeField] private float rotationSpeed;
-        [SerializeField] private float maxVel;
+        [SerializeField]
+        private float moveSpeed;
+
+        [SerializeField]
+        private float rotationSpeed;
+
+        [SerializeField]
+        private float maxVel;
+
+        private void Awake()
+        {
+            if (IsServer)
+                canMove.Initialize(this);
+        }
 
         private void Start()
         {
@@ -32,26 +44,34 @@ namespace Player.Movement
             _playerAnimator = GetComponent<AniManager>();
             _attackManager = GetComponent<AttackManager>();
             _rb = GetComponent<Rigidbody>();
-        
+
             _playerCam.Target.TrackingTarget = gameObject.transform;
             _playerCam.Target.LookAtTarget = gameObject.transform;
             _playerStats.OnSpeedChanged += f => moveSpeed *= f;
         }
 
-    
+        private void OnEnable()
+            => RealRpc();
+
+
+        [Rpc(SendTo.Server)]
+        private void RealRpc()
+            => canMove.Value = true; // reset on respawn
+
+
         private void Update()
         {
             maxVel = moveSpeed;
             _moveInput = InputHandler.Instance.moveInput;
             if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
             {
-                _playerAnimator.ChangeAnimation("Idle", 0.2f);
+                _playerAnimator.ChangeAnimationRpc("Idle", 0.2f);
             }
         }
 
         private void FixedUpdate()
         {
-            if (!canMove) return;
+            if (!canMove.Value) return;
             Move();
         }
 
@@ -62,14 +82,13 @@ namespace Player.Movement
             moveDir.Normalize();
             if (moveDir != Vector3.zero)
             {
-                _playerAnimator.ChangeAnimation("Walking");
+                _playerAnimator.ChangeAnimationRpc("Walking");
                 Rotation(moveDir);
                 _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
                 if (_rb.linearVelocity.magnitude > maxVel)
                 {
                     _rb.linearVelocity = _rb.linearVelocity.normalized * maxVel;
                 }
-
             }
         }
 

@@ -117,8 +117,7 @@ namespace LobbyScripts
         {
             LobbyLogger.StatusMessage("Joining Lobby...");
             await serviceManager.JoinLobbyTask(lobby.Id);
-            uiManager.ShowDifficulty(GameManager.Instance.GetDifficultyName
-                ());
+            uiManager.ShowDifficulty(lobby.Data["Difficulty"].Value);
             LobbyLogger.StatusMessage("Starting Networking...");
             await lobbyNetManager.ClientNetworkTask(lobby.Data["RelayJoinCode"].Value);
             LobbyLogger.StatusMessage("Hold on...");
@@ -216,6 +215,7 @@ namespace LobbyScripts
             uiManager.ShowMainMenu();
             NetworkManager.Shutdown();
         }
+
         [Rpc(SendTo.NotMe)]
         private void RemovePlayerLobbyPanelRpc(string playerName)
         {
