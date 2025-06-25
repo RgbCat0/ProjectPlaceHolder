@@ -49,47 +49,47 @@ namespace Player.Attack
 
         private Camera _camera;
         public bool cd = false;
+
         private void Update()
         {
             if (!IsOwner) return;
             HandleSpellInput();
             HandleCasting();
             RaycastHit hit;
-            if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered)
-            {
-                _currentSpell = Spells.Basic;
-            
-                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundMask)
-                    && Time.time > _spellCooldowns[_currentSpell] && !cd)
+            if (CheckMana())
+                if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered)
                 {
-                    Vector3 hitPos = hit.point;
-                    
+                    _currentSpell = Spells.Basic;
 
-                    if (_selectedSpell == null)
+                    if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity,
+                            groundMask)
+                        && Time.time > _spellCooldowns[_currentSpell] && !cd)
                     {
-                        Debug.LogWarning("No spell selected at cast time.");
-                        return;
-                    }
+                        Vector3 hitPos = hit.point;
 
-                    _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
-                    _castedSpell = _selectedSpell;
-                    _spellCooldowns[_currentSpell] =
-                        Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
-                    
-                    CastSpellRpc(hitPos, (int)_currentSpell);
+
+                        if (_selectedSpell == null)
+                        {
+                            Debug.LogWarning("No spell selected at cast time.");
+                            return;
+                        }
+
+                        _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
+                        _castedSpell = _selectedSpell;
+                        _spellCooldowns[_currentSpell] =
+                            Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+                        CastSpellRpc(hitPos, (int)_currentSpell);
+                    }
                 }
-            }
         }
-    
+
         #region Spell Casting
 
         private bool CheckMana()
         {
             if (_playerStats.currentMana >= _castedSpell.manaCost)
             {
-                _playerStats.currentMana -= _castedSpell.manaCost;
                 return true;
-                
             }
             else
             {
@@ -102,6 +102,7 @@ namespace Player.Attack
                 return false;
             }
         }
+
         [Rpc(SendTo.Server)]
         private void CastSpellRpc(Vector3 pos, int spellIndex)
         {
@@ -110,36 +111,37 @@ namespace Player.Attack
                 Debug.LogError($"Server: Could not find spell for index {spellIndex}");
                 return;
             }
-                _castedSpell = spell; 
-                GameObject objectPos;
-                if (CheckMana())
-                {
-                    if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
-                        _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
-                        _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
-                    {
-                        objectPos = spellObject[0];
-                    }
-                    else
-                    {
-                        objectPos = spellObject[1];
-                    }
 
-                    if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
-                        _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
-                    {
-                        castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.spellPrefab,
-                            _playerId,
-                            position: objectPos.transform.position, rotation: Quaternion.identity);
-                    }
+            _castedSpell = spell;
+            GameObject objectPos;
+            _playerStats.currentMana -= _castedSpell.manaCost;
 
-                    if (castedSpell != null)
-                        castedSpell.GetComponent<Rigidbody>().useGravity = false;
+            if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
+                _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
+                _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
+            {
+                objectPos = spellObject[0];
+            }
+            else
+            {
+                objectPos = spellObject[1];
+            }
 
-                    StartCoroutine(CastSpell(spell, pos));
-                    SendManaToOwnerRpc(_playerStats.currentMana);
-                }
+            if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
+                _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
+            {
+                castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.spellPrefab,
+                    _playerId,
+                    position: objectPos.transform.position, rotation: Quaternion.identity);
+            }
+
+            if (castedSpell != null)
+                castedSpell.GetComponent<Rigidbody>().useGravity = false;
+
+            StartCoroutine(CastSpell(spell, pos));
+            SendManaToOwnerRpc(_playerStats.currentMana);
         }
+
         [Rpc(SendTo.Owner)]
         private void SendManaToOwnerRpc(float mana)
         {
@@ -149,13 +151,14 @@ namespace Player.Attack
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
         {
             float castTime = Time.time + spell.castTime;
-        
+
             while (Time.time < castTime)
             {
                 cd = true;
                 _playerMovement.canMove.Value = false;
                 Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, spell.castTime * Time.deltaTime * 50f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
+                    spell.castTime * Time.deltaTime * 50f);
                 yield return new WaitForFixedUpdate();
             }
 
@@ -183,6 +186,7 @@ namespace Player.Attack
             {
                 SpawnConeAoeAttackRpc(pos);
             }
+
             WaitRpc();
             cd = false;
         }
@@ -203,20 +207,25 @@ namespace Player.Attack
             while (travel)
             {
                 if (castedSpell == null || !castedSpell.IsSpawned || spellObject[0] == null)
-                {  // FIXED: no longer errors on another way of despawning
-                    
+                {
+                    // FIXED: no longer errors on another way of despawning
+
                     yield break; // castedspell was already despawned
                 }
+
                 float distance = Vector3.Distance(spellObject[0].transform.position, castedSpell.transform.position);
                 if (distance > _castedSpell.range)
                 {
                     castedSpell.Despawn();
                     travel = false;
                     yield return new WaitForEndOfFrame();
-                    ;            }
+                    ;
+                }
+
                 yield return null;
             }
         }
+
         /// <summary>
         /// Spawns the circle AOE attack. Fireball.
         /// </summary>
@@ -229,11 +238,13 @@ namespace Player.Attack
                 Debug.LogWarning("_castedSpell is null in SpawnCircleAoeAttackRpc");
                 return;
             }
+
             if (_castedSpell.hitboxPrefab == null)
             {
                 Debug.LogWarning("_castedSpell.hitboxPrefab is null in SpawnCircleAoeAttackRpc");
                 return;
             }
+
             _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
                 _castedSpell.areaOfEffectRadius / 2,
                 _castedSpell.areaOfEffectRadius / 2,
@@ -272,7 +283,7 @@ namespace Player.Attack
                 _castedSpell.areaOfEffectRadius / 2,
                 3,
                 (_castedSpell.range / 4) * 2);
-        
+
             Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
             float offset = ((((_castedSpell.range / 4) * 2) / 10) * 6);
             Vector3 hitboxPosition = transform.position + hitboxRotation * Vector3.forward * offset;
@@ -282,7 +293,7 @@ namespace Player.Attack
                 _playerId,
                 position: hitboxPosition,
                 rotation: hitboxRotation);
-        
+
             hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
             hitbox.transform.rotation = Quaternion.LookRotation(pos - transform.position);
 
@@ -308,8 +319,8 @@ namespace Player.Attack
                 3);
             Quaternion hitboxRotation = Quaternion.LookRotation(pos - transform.position);
             hitboxRotation = Quaternion.Euler(
-                hitboxRotation.eulerAngles.x - 90, 
-                hitboxRotation.eulerAngles.y + 180, 
+                hitboxRotation.eulerAngles.x - 90,
+                hitboxRotation.eulerAngles.y + 180,
                 hitboxRotation.eulerAngles.z);
             NetworkObject hitbox = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
                 _castedSpell.hitboxPrefab,
@@ -327,16 +338,18 @@ namespace Player.Attack
             yield return new WaitForSeconds(_castedSpell.duration);
             hitbox.Despawn(true);
         }
-    
+
 
         [Rpc(SendTo.Everyone)]
         private void WaitRpc()
         {
             _selectedSpell = SetSpell(Spells.Basic);
         }
+
         #endregion
 
         #region Initialization
+
         private void Start()
         {
             _playerId = NetworkManager.Singleton.LocalClientId;
@@ -369,10 +382,12 @@ namespace Player.Attack
             _indicators[Spells.Bolt] = boltIndicator.gameObject;
             _indicators[Spells.Arcane] = arcaneIndicator.gameObject;
         }
+
         #endregion
 
 
         #region Setting indicator values
+
         private void HandleCasting()
         {
             // Indicators
@@ -383,11 +398,12 @@ namespace Player.Attack
                 if (_indicators.TryGetValue(Spells.Fireball, out var fireballIndicator) && fireballIndicator.activeSelf)
                 {
                     fireballIndicator.transform.Find("TargetIndicator").position = hitPos;
-                    fireballIndicator.transform.Find("TargetIndicator").GetComponent<RectTransform>().localScale = new Vector3(
-                        _selectedSpell.areaOfEffectRadius / 2,
-                        _selectedSpell.areaOfEffectRadius / 2,
-                        0
-                    );
+                    fireballIndicator.transform.Find("TargetIndicator").GetComponent<RectTransform>().localScale =
+                        new Vector3(
+                            _selectedSpell.areaOfEffectRadius / 2,
+                            _selectedSpell.areaOfEffectRadius / 2,
+                            0
+                        );
                 }
 
                 foreach (var indicator in _indicators)
@@ -423,6 +439,7 @@ namespace Player.Attack
                 }
             }
         }
+
         #endregion
 
 
@@ -451,6 +468,7 @@ namespace Player.Attack
                         SetSpell(Spells.Arcane);
                         break;
                 }
+
                 _isHoldingSpell = true;
                 _lastHeldSpell = currentHeldSpell;
             }
@@ -539,8 +557,10 @@ namespace Player.Attack
             {
                 return true;
             }
+
             return false;
         }
+
         #endregion
     }
 }
