@@ -70,7 +70,7 @@ namespace Player.Attack
                         return;
                     }
 
-                    _playerAnimator.ChangeAnimationRpc(_currentSpell.ToString());
+                    _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
                     _castedSpell = _selectedSpell;
                     _spellCooldowns[_currentSpell] =
                         Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
@@ -149,7 +149,7 @@ namespace Player.Attack
             }
 
             _playerMovement.canMove.Value = true;
-            _playerAnimator.ChangeAnimationRpc("Idle");
+            _playerAnimator.ChangeAnimation("Idle");
 
 
             // Basic attack
@@ -465,7 +465,7 @@ namespace Player.Attack
                     return;
                 }
 
-                _playerAnimator.ChangeAnimationRpc(_currentSpell.ToString());
+                _playerAnimator.ChangeAnimation(_currentSpell.ToString());
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
