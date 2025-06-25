@@ -34,7 +34,7 @@ namespace Player
         public float healthMultiplier = 1f;
 
         // needs to be a NetworkVariable for syncing to host as it handles damage calculations
-        public float damageMultiplier;
+        public float damageMultiplier = 1f;
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
