@@ -25,10 +25,18 @@ public class Settings : MonoBehaviour
 
     private void Start()
     {
+        
         fullScreenDropdown.onValueChanged.AddListener(FullScreenDropdown);
         damageNumbersToggle.onValueChanged.AddListener(DamageNumbersToggle);
         showFPSCounterToggle.onValueChanged.AddListener(ShowFPSCounterToggle);
         showUpgradeStatsToggle.onValueChanged.AddListener(ShowUpgradeStatsToggle);
+        if(PlayerPrefs.HasKey("DamageNumbersEnabled") == false)
+        {
+            PlayerPrefs.SetInt("DamageNumbersEnabled", 1); // Default to enabled
+            damageNumbersToggle.isOn = true;
+        }
+        damageNumbersToggle.isOn = PlayerPrefs.GetInt("DamageNumbersEnabled") == 1;
+        showUpgradeStatsToggle.isOn = PlayerPrefs.GetInt("ShowUpgradeStats") == 1;
     }
 
     public void SwitchTabs(GameObject newPanel)
