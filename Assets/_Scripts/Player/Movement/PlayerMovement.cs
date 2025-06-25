@@ -90,8 +90,8 @@ namespace Player.Movement
 
         private void Rotation(Vector3 moveDir)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+           Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+           transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
     }
 }
