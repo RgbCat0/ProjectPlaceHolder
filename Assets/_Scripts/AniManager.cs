@@ -4,7 +4,7 @@ using UnityEngine;
 public class AniManager : NetworkBehaviour
 {
     private Animator _animator;
-    private string _currentState = "idle"; // Default state, can be changed as needed
+    private string _currentState = "Idle"; // Default state, can be changed as needed
 
     private void Start()
     {
@@ -19,9 +19,8 @@ public class AniManager : NetworkBehaviour
             Debug.LogError("Animator component not found on the GameObject or its children.");
         }
     }
-
-    [Rpc(SendTo.Everyone)]
-    public void ChangeAnimationRpc(string newState, float crossFade = 0.7f, int layer = 0)
+    
+    public void ChangeAnimation(string newState, float crossFade = 0.7f, int layer = 0)
     {
         if (_currentState == newState)
             return;
