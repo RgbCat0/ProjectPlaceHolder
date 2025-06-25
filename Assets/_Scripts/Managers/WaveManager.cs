@@ -114,7 +114,7 @@ namespace Managers
         {
             if (!IsHost)
                 return;
-            waitingForNextWave.Value = true;
+            waitingForNextWave.Value = false;
             currentWaveIndex++;
             StartCoroutine(StartWave());
         }

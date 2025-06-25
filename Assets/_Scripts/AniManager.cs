@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
-public class AniManager : MonoBehaviour
+public class AniManager : NetworkBehaviour
 {
     private Animator _animator;
     private string _currentState = "idle"; // Default state, can be changed as needed
@@ -19,8 +20,8 @@ public class AniManager : MonoBehaviour
         }
     }
 
-
-    public void ChangeAnimation(string newState, float crossFade = 0.7f, int layer = 0)
+    [Rpc(SendTo.Everyone)]
+    public void ChangeAnimationRpc(string newState, float crossFade = 0.7f, int layer = 0)
     {
         if (_currentState == newState)
             return;

@@ -20,7 +20,7 @@ namespace Player
 
         // Current active stats modified by upgrades
         [Header("----------Current Stats----------")]
-        public float currentMana;
+        public NetworkVariable<float> currentMana = new(writePerm: NetworkVariableWritePermission.Owner);
 
         public float currentMaxMana;
         public float currentMaxHealth;
@@ -32,12 +32,14 @@ namespace Player
 
         [Header("----------Multipliers----------")]
         public float healthMultiplier = 1f;
+
         // needs to be a NetworkVariable for syncing to host as it handles damage calculations
         public NetworkVariable<float> damageMultiplier = new();
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
         public float cooldownMultiplier = 1f;
+
         [Header("----------Misc----------")]
         public float manaRegenAmount = 1f;
 
@@ -51,10 +53,16 @@ namespace Player
         private void Start()
         {
             DamageMultiRpc();
-            currentMana = baseMaxMana;
+            if (IsOwner)
+            {
+                currentMana.Initialize(this);
+                currentMana.Value = baseMaxMana;
+            }
+
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
             CalculateUpgradeChance();
         }
+
         // needs to run on the server for writing to the NetworkVariable
         [Rpc(SendTo.Server)]
         private void DamageMultiRpc()
@@ -70,21 +78,23 @@ namespace Player
             currentMaxHealth = baseMaxHealth * healthMultiplier;
             currentMaxMana = baseMaxMana * manaMultiplier;
 
-            if (currentMana < currentMaxMana)
+            if (currentMana.Value < currentMaxMana)
             {
                 manaRegenTimer += Time.deltaTime * manaRegenMultiplier;
-                if (manaRegenTimer >= 1f && !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate mana if not waiting for the next wave
+                if (manaRegenTimer >= 1f &&
+                    !WaveManager.Instance.waitingForNextWave
+                        .Value) // Only regenerate mana if not waiting for the next wave
                 {
-                    currentMana += manaRegenAmount;
-                    if (currentMana > currentMaxMana)
-                        currentMana = currentMaxMana;
+                    currentMana.Value += manaRegenAmount;
+                    if (currentMana.Value > currentMaxMana)
+                        currentMana.Value = currentMaxMana;
                     manaRegenTimer = 0f;
                 }
             }
 
-            if (currentMana > currentMaxMana)
-                currentMana = currentMaxMana;
-            UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
+            if (currentMana.Value > currentMaxMana)
+                currentMana.Value = currentMaxMana;
+            UIManager.Instance.UpdateManaBar(currentMana.Value, currentMaxMana);
         }
 
         public void ApplyUpgrade(SingleUpgrade upgrade)
@@ -177,7 +187,7 @@ namespace Player
                 upgrades[i].percentageWithLuck = weights[i] / totalWeight * 100f;
             }
         }
-        
+
         public void ResetStats()
         {
             cooldownMultiplier = 1;

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Enemies
 {
-    public class EnemyAttack : MonoBehaviour
+    public class EnemyAttack : NetworkBehaviour
     {
         [SerializeField]
         private float damage;
@@ -59,12 +60,12 @@ namespace Enemies
         private IEnumerator Attack(Collider other)
         {
             isAttacking = true;
-            _aniManager.ChangeAnimation("Attack", 0.2f, 1);
+            _aniManager.ChangeAnimationRpc("Attack", 0.2f, 1);
             yield return new WaitForSeconds(0.5f);
             if (_playerInsideTrigger)
                 other.GetComponent<IDamageable>()?.TakeDamageRpc(damage);
             // no need to change animation again as it will be changed by the movement script
-            _aniManager.ChangeAnimation("Idle", 0.5f, 1);
+            _aniManager.ChangeAnimationRpc("Idle", 0.5f, 1);
             isAttacking = false;
         }
     }

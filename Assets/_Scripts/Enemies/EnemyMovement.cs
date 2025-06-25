@@ -47,11 +47,11 @@ namespace Enemies
             if (_navMeshAgent.velocity.magnitude > 0.1f)
             {
                 _aniManager.ChangeFloat("WalkSpeed", _navMeshAgent.velocity.magnitude + walkAnimationSpeedBase); // base + speed
-                _aniManager.ChangeAnimation("Walk", 0.2f);
+                _aniManager.ChangeAnimationRpc("Walk", 0.2f);
             }
             else
             {
-                _aniManager.ChangeAnimation("Idle", 0.2f);
+                _aniManager.ChangeAnimationRpc("Idle", 0.2f);
             }
         }
 

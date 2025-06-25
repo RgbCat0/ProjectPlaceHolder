@@ -930,7 +930,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  canMove: 1
+  canMove:
+    m_InternalValue: 0
   moveSpeed: 3
   rotationSpeed: 10
   maxVel: 3
@@ -974,7 +975,8 @@ MonoBehaviour:
   baseMaxMana: 100
   baseMaxHealth: 100
   baseHealthRegen: 1
-  currentMana: 0
+  currentMana:
+    m_InternalValue: 0
   currentMaxMana: 100
   currentMaxHealth: 100
   currentHealthRegen: 1
@@ -1066,8 +1068,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
-  RotationInterpolationType: 0
+  PositionInterpolationType: 1
+  RotationInterpolationType: 1
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
   PositionMaxInterpolationTime: 0.1
@@ -1084,9 +1086,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -1146,6 +1148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 705a03cae705449cb0b8b0450117d29c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!4 &9149017039344605740 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 93649b9f2b51ec24c85f8761d8c2d1b1, type: 3}
