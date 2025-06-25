@@ -1026,9 +1026,6 @@ MonoBehaviour:
   moveSpeed: 3
   rotationSpeed: 10
   maxVel: 3
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!114 &4073585264626957247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1076,7 +1073,7 @@ MonoBehaviour:
   currentLuck: 0
   upgrades: []
   healthMultiplier: 1
-  damageMultiplier: 0
+  damageMultiplier: 1
   speedMultiplier: 1
   manaMultiplier: 1
   manaRegenMultiplier: 1
