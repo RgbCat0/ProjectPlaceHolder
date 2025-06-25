@@ -65,7 +65,7 @@ namespace Player.Movement
             _moveInput = InputHandler.Instance.moveInput;
             if (_rb.linearVelocity.magnitude < 0.1f && !_attackManager.cd)
             {
-                _playerAnimator.ChangeAnimationRpc("Idle", 0.2f);
+                _playerAnimator.ChangeAnimation("Idle", 0.2f);
             }
         }
 
@@ -82,7 +82,7 @@ namespace Player.Movement
             moveDir.Normalize();
             if (moveDir != Vector3.zero)
             {
-                _playerAnimator.ChangeAnimationRpc("Walking");
+                _playerAnimator.ChangeAnimation("Walking", layer: 1);
                 Rotation(moveDir);
                 _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
                 if (_rb.linearVelocity.magnitude > maxVel)
