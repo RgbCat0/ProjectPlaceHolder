@@ -19,7 +19,7 @@ namespace Enemies
         private NavMeshAgent _navMeshAgent;
         private Spell _spell;
         private PlayerStats _playerStats;
-        public float Health { get; private set; } = 100f;
+        public float Health { get; private set; } = 70;
 
         [SerializeField]
         private GameObject damageNumberPrefab; // prefab for damage numbers
@@ -93,7 +93,7 @@ namespace Enemies
                     break;
 
                 case SpellType.None:
-                    TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
+                    TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier);
                     break;
             }
         }
@@ -105,13 +105,13 @@ namespace Enemies
             float duration = Time.time + _spell.effectDuration;
             if (_currentEffect == SpellType.Water)
             {
-                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier * 1.5f);
                 _currentEffect = SpellType.None;
             }
             else
             {
                 _currentEffect = _spell.spellType;
-                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier);
 
                 while (Time.time < duration)
                 {
@@ -126,13 +126,13 @@ namespace Enemies
         private void ApplyWater()
         {
             _currentEffect = SpellType.Water;
-            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
+            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier);
         }
 
         private IEnumerator ApplyIce()
         {
             Debug.Log("ice");
-            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
+            TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier);
             float speed = _navMeshAgent.speed;
             if (_currentEffect == SpellType.Water)
             {
@@ -153,12 +153,12 @@ namespace Enemies
             Debug.Log("Lightning");
             if (_currentEffect == SpellType.Water)
             {
-                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value * 1.5f);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier * 1.5f);
                 _currentEffect = SpellType.None;
             }
             else
             {
-                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier.Value);
+                TakeDamageRpc(_spell.damage * _playerStats.damageMultiplier);
             }
         }
 

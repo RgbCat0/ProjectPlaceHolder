@@ -63,6 +63,7 @@ namespace Player.Attack
                     && Time.time > _spellCooldowns[_currentSpell] && !cd)
                 {
                     Vector3 hitPos = hit.point;
+                    
 
                     if (_selectedSpell == null)
                     {
@@ -74,48 +75,21 @@ namespace Player.Attack
                     _castedSpell = _selectedSpell;
                     _spellCooldowns[_currentSpell] =
                         Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
-
+                    
                     CastSpellRpc(hitPos, (int)_currentSpell);
                 }
             }
         }
     
         #region Spell Casting
-        [Rpc(SendTo.Server)]
-        private void CastSpellRpc(Vector3 pos, int spellIndex)
+
+        private bool CheckMana()
         {
-            if (!_spellDictionary.TryGetValue((Spells)spellIndex, out var spell))
+            if (_playerStats.currentMana >= _castedSpell.manaCost)
             {
-                Debug.LogError($"Server: Could not find spell for index {spellIndex}");
-                return;
-            }
-            var currentMana = _playerStats.currentMana.Value; // enable writing perms for owner
-
-            if (currentMana >= spell.manaCost)
-            {
-                currentMana -= spell.manaCost;
-                _castedSpell = spell; // update server-side reference
-                GameObject objectPos;
-
-                if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
-                    _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
-                    _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
-                {
-                    objectPos = spellObject[0];
-                }
-                else {objectPos = spellObject[1];}
-
-                if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
-                    _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
-                {
-                    castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.spellPrefab, _playerId,
-                        position: objectPos.transform.position, rotation: Quaternion.identity);
-                }
-            
-                if(castedSpell != null)
-                    castedSpell.GetComponent<Rigidbody>().useGravity = false;
-
-                StartCoroutine(CastSpell(spell, pos));
+                _playerStats.currentMana -= _castedSpell.manaCost;
+                return true;
+                
             }
             else
             {
@@ -125,14 +99,51 @@ namespace Player.Attack
                     Debug.LogError("_playerStats is null");
                 if (_castedSpell == null)
                     Debug.LogError("_castedSpell is null");
+                return false;
             }
-            SendManaToOwnerRpc(currentMana);
-            
+        }
+        [Rpc(SendTo.Server)]
+        private void CastSpellRpc(Vector3 pos, int spellIndex)
+        {
+            if (!_spellDictionary.TryGetValue((Spells)spellIndex, out var spell))
+            {
+                Debug.LogError($"Server: Could not find spell for index {spellIndex}");
+                return;
+            }
+                _castedSpell = spell; 
+                GameObject objectPos;
+                if (CheckMana())
+                {
+                    if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
+                        _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
+                        _castedSpell.areaOfEffect == Spell.AreaOfEffect.None)
+                    {
+                        objectPos = spellObject[0];
+                    }
+                    else
+                    {
+                        objectPos = spellObject[1];
+                    }
+
+                    if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
+                        _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
+                    {
+                        castedSpell = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(spell.spellPrefab,
+                            _playerId,
+                            position: objectPos.transform.position, rotation: Quaternion.identity);
+                    }
+
+                    if (castedSpell != null)
+                        castedSpell.GetComponent<Rigidbody>().useGravity = false;
+
+                    StartCoroutine(CastSpell(spell, pos));
+                    SendManaToOwnerRpc(_playerStats.currentMana);
+                }
         }
         [Rpc(SendTo.Owner)]
         private void SendManaToOwnerRpc(float mana)
         {
-            _playerStats.currentMana.Value = mana;
+            _playerStats.currentMana = mana;
         }
 
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
@@ -494,7 +505,7 @@ namespace Player.Attack
         {
             if (_spellDictionary.TryGetValue(spellName, out var spell) && spell != null)
             {
-                if (_playerStats.currentMana.Value >= spell.manaCost && !cd)
+                if (_playerStats.currentMana >= spell.manaCost && !cd)
                 {
                     _selectedSpell = spell;
                     _currentSpell = spellName;
