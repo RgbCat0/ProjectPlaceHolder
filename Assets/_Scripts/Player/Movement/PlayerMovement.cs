@@ -24,15 +24,11 @@ namespace Player.Movement
 
         [SerializeField]
         private float maxVel;
-
-        private void Awake()
+        
+        private void Start()
         {
             if (IsServer)
                 canMove.Initialize(this);
-        }
-
-        private void Start()
-        {
             if (!IsOwner)
             {
                 enabled = false;

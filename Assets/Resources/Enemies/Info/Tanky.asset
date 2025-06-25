@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   identifier: Tanky
   modelPrefab: {fileID: 8789685859759040801, guid: bf532d6d4241fd5479a30e28ea2fab59, type: 3}
-  health: 150
+  health: 90
   speed: 2
+  damage: 8

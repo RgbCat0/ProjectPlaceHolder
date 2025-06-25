@@ -64,7 +64,7 @@ namespace Player
             if (!IsOwner)
                 return;
             MaxHealth = _playerStats.currentMaxHealth;
-            UIManager.Instance.UpdateHealthBar(Health, MaxHealth); // ui manager is not a network object
+            UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
 
             healthRegenTimer += Time.deltaTime;
             if ((healthRegenTimer >= 1f &&
@@ -81,6 +81,7 @@ namespace Player
         [Rpc(SendTo.Owner)]
         public void TakeDamageRpc(float damage)
         {
+            var oldHealth = Health;
             Health -= damage;
             if (Health <= 0)
             {

@@ -85,7 +85,6 @@ namespace Managers
         {
             if (deadPlayers.Count >= players.Count && IsServer)
             {
-                Debug.Log("all players are dead, game over22131313213");
                 gameOver = true;
                 gameOverScreen.SetActive(true);
                 _waveManager.ResetWaves();

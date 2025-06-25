@@ -19,6 +19,8 @@ namespace Enemies
         private NavMeshAgent _navMeshAgent;
         private Spell _spell;
         private PlayerStats _playerStats;
+        private EnemyHealthBar _healthBar;
+        private EnemyAttack _enemyAttack;
         public float Health { get; private set; } = 100f;
 
         [SerializeField]
@@ -32,6 +34,8 @@ namespace Enemies
         {
             _movement = GetComponent<EnemyMovement>();
             _navMeshAgent = GetComponent<NavMeshAgent>();
+            _healthBar = GetComponent<EnemyHealthBar>();
+            _enemyAttack = GetComponentInChildren<EnemyAttack>();
             _navMeshAgent.enabled = false; // causes weird spawning issues if enabled immediately
         }
 
@@ -43,11 +47,32 @@ namespace Enemies
         {
             Health = enemyInfo.health;
             _movement.SetSpeed(enemyInfo.speed);
+            _enemyAttack.damage = enemyInfo.damage;
             transform.position = spawnPoint;
             ClientInitRpc(enemyInfo.identifier);
-            _navMeshAgent.enabled = true; // enable NavMeshAgent after setting position and speed
+            StartCoroutine(SpawnAnimation());
+            
             if (debug1)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
+        }
+
+        private IEnumerator SpawnAnimation() // moves the player 2f underground and lerps up
+        {
+            Vector3 startPosition = transform.position;
+            Vector3 downUnder = startPosition + Vector3.down * 2f;
+            float elapsedTime = 0f;
+            float duration = 1f; // duration of the spawn animation
+            transform.position = downUnder;
+
+            // Move back to original position
+            elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                transform.position = Vector3.Lerp(downUnder, startPosition, elapsedTime / duration);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            _navMeshAgent.enabled = true; // enable NavMeshAgent after setting position and speed
         }
         [Rpc(SendTo.Everyone)]
         private void ClientInitRpc(string enemyInfoIdentifier)
@@ -172,6 +197,7 @@ namespace Enemies
         {
             Health -= damage;
             DamageNumbersRpc(damage);
+            _healthBar.UpdateHealthBar();
             if (Health <= 0f)
                 DieRpc();
 
@@ -197,6 +223,7 @@ namespace Enemies
         [Rpc(SendTo.Everyone)]
         private void DamageNumbersRpc(float damage)
         {
+            Debug.Log("Is running damage numbers rpc");
             if (PlayerPrefs.GetInt("DamageNumbersEnabled") == 0)
                 return;
             GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position, Quaternion.identity);
