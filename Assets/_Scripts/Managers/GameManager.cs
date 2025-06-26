@@ -96,8 +96,9 @@ namespace Managers
                 {
                     gameOverScreen.SetActive(false);
                     PlayerStats stats = player.GetComponent<PlayerStats>();
+                    PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
                     stats.currentMana = stats.currentMaxMana;
-                    player.GetComponent<PlayerHealth>().Health = player.GetComponent<PlayerHealth>().MaxHealth;
+                    playerHealth.Health = playerHealth.MaxHealth;
                 }
 
                 player.SetActive(true);
