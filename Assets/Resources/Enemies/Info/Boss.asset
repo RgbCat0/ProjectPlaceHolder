@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd9f880b1384a598add3ec2330609e6, type: 3}
-  m_Name: Tanky
+  m_Name: Boss
   m_EditorClassIdentifier: 
-  identifier: Tanky
-  modelPrefab: {fileID: 7075256511675206043, guid: aac07d487bb93fd47886b779c14aa7ef, type: 3}
-  health: 90
-  speed: 2
-  damage: 8
+  identifier: Boss
+  modelPrefab: {fileID: 173081996103848717, guid: bf56804786ab20343a03953cdb6e5dfc, type: 3}
+  health: 150
+  speed: 4
+  damage: 25
