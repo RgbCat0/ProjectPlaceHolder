@@ -22,6 +22,8 @@ public class Settings : MonoBehaviour
     private Toggle showFPSCounterToggle;
     [SerializeField]
     private Toggle showUpgradeStatsToggle;
+    [SerializeField]
+    private Toggle showStatusToggle;
 
     private void Start()
     {
@@ -30,6 +32,7 @@ public class Settings : MonoBehaviour
         damageNumbersToggle.onValueChanged.AddListener(DamageNumbersToggle);
         showFPSCounterToggle.onValueChanged.AddListener(ShowFPSCounterToggle);
         showUpgradeStatsToggle.onValueChanged.AddListener(ShowUpgradeStatsToggle);
+        showStatusToggle.onValueChanged.AddListener(ShowStatusLobbyToggle);
         if(PlayerPrefs.HasKey("DamageNumbersEnabled") == false)
         {
             PlayerPrefs.SetInt("DamageNumbersEnabled", 1); // Default to enabled
@@ -98,5 +101,7 @@ public class Settings : MonoBehaviour
 
     public void ShowUpgradeStatsToggle(bool isOn)
         => PlayerPrefs.SetInt("ShowUpgradeStats", isOn ? 1 : 0);
+    public void ShowStatusLobbyToggle(bool isOn)
+    => PlayerPrefs.SetInt("Status", isOn ? 1 : 0);
     
 }

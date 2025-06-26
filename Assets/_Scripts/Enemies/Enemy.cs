@@ -224,8 +224,9 @@ namespace Enemies
         {
             if (PlayerPrefs.GetInt("DamageNumbersEnabled") == 0)
                 return;
-            GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position, Quaternion.identity);
+            GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position + Vector3.up * 2f, Quaternion.identity);
             damageNumber.GetComponent<HitAnimation>().ShowHitText(damage.ToString(CultureInfo.CurrentCulture));
+            damageNumber.transform.parent = transform;
         }
 
         #endregion

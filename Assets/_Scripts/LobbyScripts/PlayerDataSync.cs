@@ -67,6 +67,7 @@ namespace LobbyScripts
             bool isHost
         )
         {
+            playerName = playerName.Substring(0, playerName.Length - 5);
             var newData = new PlayerData(
                 new FixedString64Bytes(playerName),
                 new FixedString64Bytes(lobbyId),

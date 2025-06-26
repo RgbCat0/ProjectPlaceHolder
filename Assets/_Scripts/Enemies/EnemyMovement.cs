@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using JetBrains.Annotations;
 using Managers;
@@ -14,9 +15,12 @@ namespace Enemies
         private Transform _target;
         private EnemyAttack _enemyAttack;
         private AniManager _aniManager;
+        
 
         [SerializeField]
         private float walkAnimationSpeedBase = 1.5f;
+        [SerializeField]
+        private float rotationSpeed = 700f; 
 
 
         private void Awake()
@@ -37,6 +41,19 @@ namespace Enemies
                 _navMeshAgent = GetComponent<NavMeshAgent>();
             _navMeshAgent.stoppingDistance = 1f;
             _navMeshAgent.speed = speed;
+            _navMeshAgent.updateRotation = false;
+        }
+
+        private void Update()
+        {
+            Vector3 direction = _navMeshAgent.steeringTarget - transform.position;
+            direction.y = 0f; // Optional: keep rotation flat on Y-axis
+
+            if (direction.magnitude > 0.1f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
         }
 
         private void FixedUpdate()
@@ -63,7 +80,7 @@ namespace Enemies
                 _target = GetTarget();
                 if (_target != null)
                     _navMeshAgent.SetDestination(_target.position);
-                yield return new WaitForSeconds(0.5f); // Update every 0.5 seconds
+                yield return new WaitForSeconds(0.1f); // Update every 0.5 seconds
             }
         }
 

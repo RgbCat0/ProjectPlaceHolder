@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LobbyScripts
 {
-    public static class LobbyLogger
+    public static class LobbyLogger // never even used this except for the status text lol
     {
         public static bool EnableLogging = true;
         public static bool EnableWarnings = true;
@@ -13,7 +13,7 @@ namespace LobbyScripts
         public static void Initialize(TextMeshProUGUI statusText)
         {
             _statusText = statusText;
-            _statusText.gameObject.SetActive(true);
+            StatusMessage("");
         }
 
         public static void Log(object message)
@@ -46,10 +46,20 @@ namespace LobbyScripts
 
         public static void StatusMessage(string message, Color color = default)
         {
-            if (color == default)
-                color = Color.white;
-            _statusText.color = color;
-            _statusText.text = message;
+            if (!PlayerPrefs.HasKey("Status"))
+                PlayerPrefs.SetInt("Status", 0); // Default to disabled
+            if (PlayerPrefs.GetInt("Status") == 0)
+            {
+                _statusText.transform.parent.gameObject.SetActive(false);
+            }
+            else if(color != default || PlayerPrefs.GetInt("Status") == 1) // always show if color is set (means error or warning)
+            {
+                _statusText.transform.parent.gameObject.SetActive(true);
+                if (color == default)
+                    color = Color.white;
+                _statusText.color = color;
+                _statusText.text = message;
+            }
         }
     }
 }

@@ -90,7 +90,7 @@ namespace Player
                 DieRpc();
                 return;
             }
-            ScreenShake.Instance.Shake(0.2f, 0.2f);
+            ScreenShake.Instance.Shake(0.4f, 1f, 1f);
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             UIManager.Instance.HurtFlash();
         }

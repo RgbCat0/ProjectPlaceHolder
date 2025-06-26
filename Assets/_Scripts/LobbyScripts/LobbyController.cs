@@ -75,7 +75,7 @@ namespace LobbyScripts
 
         private void NetworkManagerOnOnClientDisconnectCallback(ulong obj)
         {
-            Debug.Log(NetworkManager.ConnectedClientsList.Count + " clients connected");
+            // Debug.Log(NetworkManager.ConnectedClientsList.Count + " clients connected");
         }
 
         #endregion

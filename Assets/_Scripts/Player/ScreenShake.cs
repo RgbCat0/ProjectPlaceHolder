@@ -30,24 +30,25 @@ public class ScreenShake : MonoBehaviour
         }
     }
 
-    public void Shake(float duration, float magnitude)
+    public void Shake(float duration, float magnitude, float frequency = 2f)
     {
         if (_shakeCoroutine != null)
             StopCoroutine(_shakeCoroutine);
         _perlinNoise.FrequencyGain = 0f;
         _perlinNoise.AmplitudeGain = 0f;
-        _shakeCoroutine = StartCoroutine(ShakeCoroutine(duration, magnitude));
+        _shakeCoroutine = StartCoroutine(ShakeCoroutine(duration, magnitude, frequency));
     }
 
-    private IEnumerator ShakeCoroutine(float duration, float magnitude)
+    private IEnumerator ShakeCoroutine(float duration, float magnitude, float frequency)
     {
+        _perlinNoise.FrequencyGain = frequency;
         while (true) // smoothly transition the shake effect
         {
             float elapsed = 0f;
             while (elapsed < duration)
             {
                 float t = elapsed / duration;
-                _perlinNoise.FrequencyGain = Mathf.Lerp(0f, magnitude, t);
+                
                 _perlinNoise.AmplitudeGain = Mathf.Lerp(0f, magnitude, t);
                 elapsed += Time.deltaTime;
                 yield return null;

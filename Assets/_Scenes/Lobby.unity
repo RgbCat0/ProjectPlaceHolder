@@ -375,7 +375,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: baseEnemyCount
-      value: 30
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: disableSpawning

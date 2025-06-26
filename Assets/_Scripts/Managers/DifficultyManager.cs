@@ -22,7 +22,7 @@ namespace Managers
         
         public DifficultyScaling GetDifficultyScaling()
         {
-            float spawnMultiplier = playerCountMultipliers[NetworkManager.Singleton.ConnectedClients.Count - 1]; // Adjust based on number of players
+            float spawnMultiplier = playerCountMultipliers[GameManager.Instance.players.Count - 1]; // Adjust based on number of players
             float scaling = difficultyScalingMultipliers[(int)currentDifficulty]; // Adjust based on current difficulty
 
             return new DifficultyScaling
