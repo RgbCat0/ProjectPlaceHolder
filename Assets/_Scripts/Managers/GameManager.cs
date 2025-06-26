@@ -42,11 +42,8 @@ namespace Managers
 
         public void StartGame() // NOTE: Only runs on host/server
         {
-            Debug.Log("Is being called");
             _playerSpawnPoint = GameObject.Find("Playerspawn").transform;
             // spawns the players
-            if (NetworkManager.IsHost)
-                Debug.LogError(NetworkManager.ConnectedClients.Count + " clients are connected!??!?!?!?!?!?!");
             foreach (var clientId in NetworkManager.ConnectedClientsIds) // ain no way this fixed the ghost player issue
             {
                 Debug.Log(clientId);
@@ -70,7 +67,6 @@ namespace Managers
 
         public void GameOverUI(GameObject gameOverObj)
         {
-            Debug.Log("Being called");
             gameOverScreen = gameOverObj;
 
             Button restartButton = gameOverObj.transform.GetChild(0).GetComponent<Button>();

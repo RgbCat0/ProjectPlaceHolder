@@ -81,7 +81,6 @@ namespace Player
         [Rpc(SendTo.Owner)]
         public void TakeDamageRpc(float damage)
         {
-            var oldHealth = Health;
             Health -= damage;
             if (Health <= 0)
             {
@@ -91,7 +90,7 @@ namespace Player
                 DieRpc();
                 return;
             }
-
+            ScreenShake.Instance.Shake(0.2f, 0.2f);
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             UIManager.Instance.HurtFlash();
         }

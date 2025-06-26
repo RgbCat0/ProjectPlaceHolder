@@ -113,7 +113,6 @@ namespace Managers
                 Debug.LogError("Mana bar is not assigned in the inspector.");
                 return;
             }
-            Debug.Log("CRANK THAT SOULJA BOY");
             if (currMana <= 0)
             {
                 manaBar.sizeDelta = new Vector2(0, manaBar.sizeDelta.y);
