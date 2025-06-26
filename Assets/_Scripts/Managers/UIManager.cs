@@ -213,8 +213,8 @@ namespace Managers
                 newSmall.SetText(desc);
                 newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
             }
-
-            WaveManager.Instance.ReportPlayerUpgradeDone();
+            
+            WaveManager.Instance.ReportPlayerUpgradeDoneRpc();
         }
 
         private void HideUpgradeMenu()
