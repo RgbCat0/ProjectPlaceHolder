@@ -104,7 +104,7 @@ namespace Player
                     OnManaChanged?.Invoke(manaMultiplier);
                     break;
                 case UpgradeTypes.ManaRegen:
-                    manaRegenMultiplier += upgrade.value;
+                    manaRegenMultiplier += upgrade.value / 2;
                     OnManaRegenChanged?.Invoke(manaRegenMultiplier);
                     break;
                 case UpgradeTypes.Cooldown:

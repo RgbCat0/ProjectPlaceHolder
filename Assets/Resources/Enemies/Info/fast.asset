@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: fast
   m_EditorClassIdentifier: 
   identifier: Fast
-  modelPrefab: {fileID: 919132149155446097, guid: b417c42aaf32cf74c969f1b64b7eafc7, type: 3}
+  modelPrefab: {fileID: 4380973048324756042, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
   health: 40
   speed: 5
   damage: 3

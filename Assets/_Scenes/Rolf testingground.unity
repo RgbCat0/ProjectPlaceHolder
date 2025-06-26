@@ -240,6 +240,63 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1001 &738144097
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4380973048324756042, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_Name
+      value: speedzombie (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
 --- !u!1 &912105176
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,6 +885,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fde8d9001c742a44eaa15b19610f72b3, type: 3}
+--- !u!1001 &7696672327108617804
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 11.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00000047683716
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4001315684104882416, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4380973048324756042, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
+      propertyPath: m_Name
+      value: speedzombie
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bd004332f4f4ac442b62984c98db4596, type: 3}
 --- !u!1001 &8766907857068931908
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -899,3 +1013,5 @@ SceneRoots:
   - {fileID: 1868021741}
   - {fileID: 1590277177}
   - {fileID: 3942821125078787048}
+  - {fileID: 7696672327108617804}
+  - {fileID: 738144097}
