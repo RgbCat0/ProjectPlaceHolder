@@ -6,8 +6,7 @@ namespace Enemies
 {
     public class EnemyAttack : NetworkBehaviour
     {
-        [SerializeField]
-        private float damage;
+        public float damage;
 
         [SerializeField]
         private float attackCooldown = 1f; // ex: 1f

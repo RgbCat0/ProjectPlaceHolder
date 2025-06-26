@@ -155,7 +155,6 @@ namespace LobbyScripts
         [Rpc(SendTo.Server, RequireOwnership = true)]
         private void StartGameRpc()
         {
-            Debug.Log(NetworkManager.ConnectedClientsList.Count + " ?????????");
             if (!NetworkManager.IsHost)
                 return;
             serviceManager.StopHeartbeat();

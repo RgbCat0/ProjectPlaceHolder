@@ -24,15 +24,11 @@ namespace Player.Movement
 
         [SerializeField]
         private float maxVel;
-
-        private void Awake()
+        
+        private void Start()
         {
             if (IsServer)
                 canMove.Initialize(this);
-        }
-
-        private void Start()
-        {
             if (!IsOwner)
             {
                 enabled = false;
@@ -94,8 +90,8 @@ namespace Player.Movement
 
         private void Rotation(Vector3 moveDir)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+           Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+           transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Managers
         private List<Transform> enemies = new();
 
         [SerializeField]
-        private int 
+        private int
             currentWaveIndex;
 
         [SerializeField]
@@ -30,10 +30,10 @@ namespace Managers
 
         [Header("Spawn Settings")] // not using waveinfo anymore as the waves will be automatically generated
         [SerializeField]
-        private float spawnInterval = 1f; // time between enemy spawns in seconds
+        private float spawnInterval = 0.4f; // time between enemy spawns in seconds
 
         [SerializeField]
-        private int baseEnemyCount = 10; // base number of enemies to spawn in a wave
+        private int baseEnemyCount = 30; // base number of enemies to spawn in a wave
 
         [SerializeField]
         private float startDelay = 2f; // delay before the first enemy spawns in seconds
@@ -118,25 +118,22 @@ namespace Managers
             currentWaveIndex++;
             StartCoroutine(StartWave());
         }
-        
+
         // new method to incorporate the new wave system and difficulty scaling
         public IEnumerator StartWave()
         {
             yield return new WaitForSeconds(startDelay);
             int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
                                               _currentDifficultyScaling.SpawnScaling * (currentWaveIndex + 1));
-            // Debug.Log($"Starting wave {currentWaveIndex + 1} with {enemyCount} enemies");
             while (true)
             {
                 if (enemies.Count >= enemyCount || GameManager.Instance.gameOver)
                 {
-                    // Debug.Log($"Spawning complete, spawned {enemies.Count} enemies");
                     yield break;
                 }
 
                 EnemyInfo enemyInfo = GetRandomInfo();
                 Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-                // Debug.Log($"Spawnpoint: {spawnPoint.name}, location: {spawnPoint.position}");
                 NetworkObject enemy = NetworkManager.SpawnManager.InstantiateAndSpawn(
                     enemyBasePrefab,
                     position: spawnPoint.position,
@@ -188,10 +185,11 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             OnWaveCompleteEvent?.Invoke();
         }
 
-        public void ReportPlayerUpgradeDone()
+        [Rpc(SendTo.Server)]
+        public void ReportPlayerUpgradeDoneRpc()
         {
             _playersDoneUpgrading++;
-            if (_playersDoneUpgrading == NetworkManager.Singleton.ConnectedClients.Count)
+            if (_playersDoneUpgrading == GameManager.Instance.players.Count)
             {
                 _waitingForUpgrade = false;
                 _playersDoneUpgrading = 0;
@@ -199,6 +197,7 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             }
         }
 
+        [Rpc(SendTo.Everyone)]
         public void SendNextWaveEventRpc()
         {
             Debug.Log("Sending next wave event");
@@ -211,6 +210,7 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             {
                 enemy.GetComponent<NetworkObject>().Despawn();
             }
+
             enemies.Clear();
             currentWaveIndex = 0;
         }

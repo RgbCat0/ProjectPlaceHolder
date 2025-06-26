@@ -9,5 +9,6 @@ namespace Enemies
         public GameObject modelPrefab; // (model to add to the base)
         public float health;
         public float speed;
+        public float damage;
     }
 }

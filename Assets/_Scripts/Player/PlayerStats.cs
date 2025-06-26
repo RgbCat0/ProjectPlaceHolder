@@ -20,7 +20,7 @@ namespace Player
 
         // Current active stats modified by upgrades
         [Header("----------Current Stats----------")]
-        public NetworkVariable<float> currentMana = new(writePerm: NetworkVariableWritePermission.Owner);
+        public float currentMana;
 
         public float currentMaxMana;
         public float currentMaxHealth;
@@ -34,7 +34,7 @@ namespace Player
         public float healthMultiplier = 1f;
 
         // needs to be a NetworkVariable for syncing to host as it handles damage calculations
-        public NetworkVariable<float> damageMultiplier = new();
+        public float damageMultiplier = 1f;
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
@@ -52,23 +52,9 @@ namespace Player
 
         private void Start()
         {
-            DamageMultiRpc();
-            if (IsOwner)
-            {
-                currentMana.Initialize(this);
-                currentMana.Value = baseMaxMana;
-            }
-
+            currentMana = baseMaxMana;
             upgrades = Resources.LoadAll<ScriptableUpgrades>("Upgrades").ToList();
             CalculateUpgradeChance();
-        }
-
-        // needs to run on the server for writing to the NetworkVariable
-        [Rpc(SendTo.Server)]
-        private void DamageMultiRpc()
-        {
-            damageMultiplier.Initialize(this);
-            damageMultiplier.Value = 1f;
         }
 
         private void Update()
@@ -78,23 +64,23 @@ namespace Player
             currentMaxHealth = baseMaxHealth * healthMultiplier;
             currentMaxMana = baseMaxMana * manaMultiplier;
 
-            if (currentMana.Value < currentMaxMana)
+            if (currentMana < currentMaxMana)
             {
                 manaRegenTimer += Time.deltaTime * manaRegenMultiplier;
                 if (manaRegenTimer >= 1f &&
                     !WaveManager.Instance.waitingForNextWave
                         .Value) // Only regenerate mana if not waiting for the next wave
                 {
-                    currentMana.Value += manaRegenAmount;
-                    if (currentMana.Value > currentMaxMana)
-                        currentMana.Value = currentMaxMana;
+                    currentMana += manaRegenAmount;
+                    if (currentMana > currentMaxMana)
+                        currentMana = currentMaxMana;
                     manaRegenTimer = 0f;
                 }
             }
 
-            if (currentMana.Value > currentMaxMana)
-                currentMana.Value = currentMaxMana;
-            UIManager.Instance.UpdateManaBar(currentMana.Value, currentMaxMana);
+            if (currentMana > currentMaxMana)
+                currentMana = currentMaxMana;
+            UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
         }
 
         public void ApplyUpgrade(SingleUpgrade upgrade)
@@ -106,8 +92,8 @@ namespace Player
                     OnHealthChanged?.Invoke(healthMultiplier);
                     break;
                 case UpgradeTypes.Damage:
-                    damageMultiplier.Value += upgrade.value / 100f;
-                    OnDamageChanged?.Invoke(damageMultiplier.Value);
+                    damageMultiplier += upgrade.value / 100f;
+                    OnDamageChanged?.Invoke(damageMultiplier);
                     break;
                 case UpgradeTypes.Speed:
                     speedMultiplier += upgrade.value / 100f;
@@ -118,7 +104,7 @@ namespace Player
                     OnManaChanged?.Invoke(manaMultiplier);
                     break;
                 case UpgradeTypes.ManaRegen:
-                    manaRegenMultiplier += upgrade.value / 100f;
+                    manaRegenMultiplier += upgrade.value;
                     OnManaRegenChanged?.Invoke(manaRegenMultiplier);
                     break;
                 case UpgradeTypes.Cooldown:

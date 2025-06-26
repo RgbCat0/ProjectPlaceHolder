@@ -113,7 +113,6 @@ namespace Managers
                 Debug.LogError("Mana bar is not assigned in the inspector.");
                 return;
             }
-
             if (currMana <= 0)
             {
                 manaBar.sizeDelta = new Vector2(0, manaBar.sizeDelta.y);
@@ -214,8 +213,8 @@ namespace Managers
                 newSmall.SetText(desc);
                 newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
             }
-
-            WaveManager.Instance.ReportPlayerUpgradeDone();
+            
+            WaveManager.Instance.ReportPlayerUpgradeDoneRpc();
         }
 
         private void HideUpgradeMenu()

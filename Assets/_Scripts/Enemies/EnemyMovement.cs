@@ -57,6 +57,7 @@ namespace Enemies
 
         private IEnumerator UpdateTarget()
         {
+            yield return new WaitUntil(() => _navMeshAgent.enabled); // still spawning, wait for NavMeshAgent to be enabled
             while (true)
             {
                 _target = GetTarget();

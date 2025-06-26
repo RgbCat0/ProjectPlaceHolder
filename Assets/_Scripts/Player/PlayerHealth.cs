@@ -64,7 +64,7 @@ namespace Player
             if (!IsOwner)
                 return;
             MaxHealth = _playerStats.currentMaxHealth;
-            UIManager.Instance.UpdateHealthBar(Health, MaxHealth); // ui manager is not a network object
+            UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
 
             healthRegenTimer += Time.deltaTime;
             if ((healthRegenTimer >= 1f &&
@@ -90,7 +90,7 @@ namespace Player
                 DieRpc();
                 return;
             }
-
+            ScreenShake.Instance.Shake(0.2f, 0.2f);
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             UIManager.Instance.HurtFlash();
         }

@@ -28,7 +28,7 @@ MonoBehaviour:
     customDescription: 0
     description: 
   - type: 3
-    value: 15
+    value: 1.5
     customDescription: 0
     description: 
   - type: 4
@@ -36,5 +36,5 @@ MonoBehaviour:
     customDescription: 0
     description: 
   rarity: 7.5
-  percentageChance: 0.6842276
+  percentageChance: 1.0680991
   percentageWithLuck: 0

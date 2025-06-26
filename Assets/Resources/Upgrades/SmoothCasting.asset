@@ -16,9 +16,9 @@ MonoBehaviour:
   shortText: MR+
   upgrades:
   - type: 4
-    value: 30
+    value: 3
     customDescription: 1
     description: +30% Mana Regen
   rarity: 3
-  percentageChance: 0
+  percentageChance: 2.6702478
   percentageWithLuck: 0
