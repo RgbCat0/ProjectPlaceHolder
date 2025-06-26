@@ -14,7 +14,7 @@ namespace Player
         [Tooltip("Used in place of icon in game jam\n(ex: Di == Damage Increase)")]
         public string shortText; // used in place of icon in game jam (ex: Di == Damage Increase)
 
-        public Image icon; 
+        public Sprite icon; 
 
         public List<SingleUpgrade> upgrades; // made for multiple upgrades so it can buff 1 and debuff 1 for example
 
