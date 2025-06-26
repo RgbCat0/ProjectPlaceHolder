@@ -95,7 +95,6 @@ namespace Enemies
         [Rpc(SendTo.Server)]
         public void ApplyElementEffectRpc()
         {
-            Debug.Log(_currentEffect);
             switch (_spell.spellType)
             {
                 case SpellType.Fire:
@@ -223,7 +222,6 @@ namespace Enemies
         [Rpc(SendTo.Everyone)]
         private void DamageNumbersRpc(float damage)
         {
-            Debug.Log("Is running damage numbers rpc");
             if (PlayerPrefs.GetInt("DamageNumbersEnabled") == 0)
                 return;
             GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position, Quaternion.identity);
