@@ -185,10 +185,11 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             OnWaveCompleteEvent?.Invoke();
         }
 
-        public void ReportPlayerUpgradeDone()
+        [Rpc(SendTo.Server)]
+        public void ReportPlayerUpgradeDoneRpc()
         {
             _playersDoneUpgrading++;
-            if (_playersDoneUpgrading == NetworkManager.Singleton.ConnectedClients.Count)
+            if (_playersDoneUpgrading == GameManager.Instance.players.Count)
             {
                 _waitingForUpgrade = false;
                 _playersDoneUpgrading = 0;
@@ -196,6 +197,7 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
             }
         }
 
+        [Rpc(SendTo.Everyone)]
         public void SendNextWaveEventRpc()
         {
             Debug.Log("Sending next wave event");

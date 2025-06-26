@@ -258,7 +258,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBar: {fileID: 1701256501}
-  healthBarYellow: {fileID: 0}
   manaBar: {fileID: 1559174885}
   healthText: {fileID: 660827702}
   manaText: {fileID: 1425065636}
