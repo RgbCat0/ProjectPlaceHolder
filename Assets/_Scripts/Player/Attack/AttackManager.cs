@@ -50,20 +50,21 @@ namespace Player.Attack
         private Camera _camera;
         public bool cd = false;
 
+        private bool fireballCd;
+
         private void Update()
         {
             if (!IsOwner) return;
             HandleSpellInput();
             HandleCasting();
             RaycastHit hit;
-            if (CheckMana())
-                if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered)
+                if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered && !fireballCd)
                 {
                     _currentSpell = Spells.Basic;
 
                     if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity,
                             groundMask)
-                        && Time.time > _spellCooldowns[_currentSpell] && !cd)
+                        && Time.time > _spellCooldowns[_currentSpell] && !fireballCd)
                     {
                         Vector3 hitPos = hit.point;
 
@@ -135,6 +136,7 @@ namespace Player.Attack
                     position: objectPos.transform.position, rotation: Quaternion.identity);
             }
 
+            
             if (castedSpell != null)
                 castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
@@ -150,12 +152,22 @@ namespace Player.Attack
 
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
         {
+            if(spell.areaOfEffect != Spell.AreaOfEffect.None)
+                fireballCd = true;
+            
+            foreach (var _indicator in _indicators.Values)
+            {
+                _indicator.SetActive(false);
+            }
+            
+            
             float castTime = Time.time + spell.castTime;
 
             while (Time.time < castTime)
             {
                 cd = true;
                 _playerMovement.canMove.Value = false;
+                _isHoldingSpell = false;
                 Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
                     spell.castTime * Time.deltaTime * 50f);
@@ -272,6 +284,7 @@ namespace Player.Attack
                 position: pos,
                 rotation: Quaternion.identity);
             hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+            fireballCd = false;
             yield return new WaitForSeconds(_castedSpell.duration);
             hitbox.Despawn(true);
         }
@@ -302,12 +315,9 @@ namespace Player.Attack
 
         private IEnumerator LineAoeAttack(NetworkObject hitbox, Vector3 pos)
         {
-            // TODO: Implement line spell visual effects
-
-            //castedSpell.Despawn(true);
             yield return new WaitForSeconds(_castedSpell.duration);
             hitbox.Despawn(true);
-            //Destroy(castedSpell);
+            fireballCd = false;
         }
 
         [Rpc(SendTo.Server)]
@@ -334,9 +344,9 @@ namespace Player.Attack
 
         private IEnumerator ConeAoeAttack(NetworkObject hitbox, Spell spell, Vector3 pos)
         {
-            //castedSpell.Despawn(true);
             yield return new WaitForSeconds(_castedSpell.duration);
             hitbox.Despawn(true);
+            fireballCd = false;
         }
 
 
@@ -498,24 +508,25 @@ namespace Player.Attack
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
-
-                CastSpellRpc(hitPos, (int)_currentSpell);
+                if(CheckMana())
+                    CastSpellRpc(hitPos, (int)_currentSpell);
             }
-
-            _isHoldingSpell = false;
             _lastHeldSpell = 0;
         }
 
         private void SetIndicator(Spells selectedSpell)
         {
-            foreach (var _indicator in _indicators.Values)
+            if (!cd)
             {
-                _indicator.SetActive(false);
-            }
+                foreach (var _indicator in _indicators.Values)
+                {
+                    _indicator.SetActive(false);
+                }
 
-            if (_indicators.TryGetValue(selectedSpell, out var indicator))
-            {
-                indicator.SetActive(true);
+                if (_indicators.TryGetValue(selectedSpell, out var indicator))
+                {
+                    indicator.SetActive(true);
+                }
             }
         }
 
@@ -549,16 +560,6 @@ namespace Player.Attack
         public Spell GetCastedSpell()
         {
             return _castedSpell;
-        }
-
-        public bool CheckCastedSpell(Spells spell)
-        {
-            if (_castedSpell == _spellDictionary[spell])
-            {
-                return true;
-            }
-
-            return false;
         }
 
         #endregion
