@@ -23,6 +23,12 @@ namespace Managers
         private TextMeshProUGUI healthText;
 
         [SerializeField]
+        private TextMeshProUGUI currWaveText;
+
+        [SerializeField]
+        private TextMeshProUGUI currEnemiesRemainText;
+
+        [SerializeField]
         private TextMeshProUGUI manaText;
 
         [Header("Spell Selection")]
@@ -113,6 +119,7 @@ namespace Managers
                 Debug.LogError("Mana bar is not assigned in the inspector.");
                 return;
             }
+
             if (currMana <= 0)
             {
                 manaBar.sizeDelta = new Vector2(0, manaBar.sizeDelta.y);
@@ -167,11 +174,14 @@ namespace Managers
                     .transform.GetChild(0)
                     .GetComponent<TextMeshProUGUI>()
                     .text = upgrade.name;
-                upgradeObject
-                    .transform.GetChild(1)
-                    .GetChild(0)
-                    .GetComponent<TextMeshProUGUI>()
-                    .text = upgrade.shortText; // icon replacement
+                if (upgrade.icon != null)
+                    upgradeObject
+                        .transform.GetChild(1)
+                        .GetChild(0)
+                        .GetComponent<TextMeshProUGUI>()
+                        .text = upgrade.shortText; // icon replacement
+                else
+                    upgradeObject.transform.GetChild(1).GetComponent<Image>().sprite = upgrade.icon.sprite;
 
                 foreach (var singleUpgrade in upgrade.upgrades)
                 {
@@ -212,8 +222,9 @@ namespace Managers
                 string desc = string.Join("\n", upgrade.upgrades.ConvertAll(x => x.description));
                 newSmall.SetText(desc);
                 newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
+                newSmall.GetComponent<HoverDesc>().SetIcon(upgrade.icon.sprite);
             }
-            
+
             WaveManager.Instance.ReportPlayerUpgradeDoneRpc();
         }
 
@@ -222,14 +233,15 @@ namespace Managers
             // aka all players are done
             upgradeMenu.SetActive(false);
         }
+
         public void HurtFlash() // call this when player is hurt
-        =>
-            StartCoroutine(HurtFlashCoroutine());
+            =>
+                StartCoroutine(HurtFlashCoroutine());
+
         public void StopHurtFlash()
         {
             if (_isHurtFlashing)
                 _hurtFlashTimer = hurtFlashDuration; // set timer to max to end the coroutine
-            
         }
 
         private IEnumerator HurtFlashCoroutine()
@@ -240,10 +252,11 @@ namespace Managers
                 _hurtFlashTimer = 0f;
                 yield break;
             }
+
             _isHurtFlashing = true;
             _hurtFlashTimer = 0f;
             hurtFlashImage.color = new Color(1, 1, 1, 0);
-            
+
             while (_hurtFlashTimer < hurtFlashDuration)
             {
                 _hurtFlashTimer += Time.deltaTime;
