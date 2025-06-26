@@ -652,7 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  quickTest: 0
+  quickTest: 1
   lobbyNetManager: {fileID: 0}
   playerDataSync: {fileID: 0}
   serviceManager: {fileID: 0}
