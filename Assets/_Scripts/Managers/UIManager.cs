@@ -134,6 +134,27 @@ namespace Managers
                 manaText.text = $"{currMana}/{maxMana}";
             }
         }
+        public void UpdateWaveText(int waveNumber)
+        {
+            if (currWaveText == null)
+            {
+                Debug.LogError("Current wave text is not assigned in the inspector.");
+                return;
+            }
+
+            currWaveText.text = $"Wave {waveNumber}";
+        }
+
+        public void UpdateEnemiesRemainText(int enemiesRemain)
+        {
+            if (currEnemiesRemainText == null)
+            {
+                Debug.LogError("Current enemies remain text is not assigned in the inspector.");
+                return;
+            }
+
+            currEnemiesRemainText.text = $"Enemies Remaining: {enemiesRemain}";
+        }
 
         public void UpdateSelectedSpell(int spellIndex)
         {
@@ -181,7 +202,7 @@ namespace Managers
                         .GetComponent<TextMeshProUGUI>()
                         .text = upgrade.shortText; // icon replacement
                 else
-                    upgradeObject.transform.GetChild(1).GetComponent<Image>().sprite = upgrade.icon.sprite;
+                    upgradeObject.transform.GetChild(1).GetComponent<Image>().sprite = upgrade.icon;
 
                 foreach (var singleUpgrade in upgrade.upgrades)
                 {
@@ -222,7 +243,7 @@ namespace Managers
                 string desc = string.Join("\n", upgrade.upgrades.ConvertAll(x => x.description));
                 newSmall.SetText(desc);
                 newSmall.GetComponent<HoverDesc>().SetIconReplaceText(upgrade.shortText);
-                newSmall.GetComponent<HoverDesc>().SetIcon(upgrade.icon.sprite);
+                newSmall.GetComponent<HoverDesc>().SetIcon(upgrade.icon);
             }
 
             WaveManager.Instance.ReportPlayerUpgradeDoneRpc();

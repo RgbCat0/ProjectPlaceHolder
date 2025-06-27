@@ -116,6 +116,7 @@ namespace Managers
                 return;
             waitingForNextWave.Value = false;
             currentWaveIndex++;
+            UIManager.Instance.UpdateWaveText(currentWaveIndex + 1);
             StartCoroutine(StartWave());
         }
 
@@ -146,6 +147,7 @@ namespace Managers
 enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
 #endif
                 enemies.Add(enemy.transform);
+                UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
                 yield return new WaitForSeconds(spawnInterval);
             }
         }
@@ -175,6 +177,7 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
                 _waitingForUpgrade = true;
                 Debug.Log("Wave complete, showing upgrade menu");
                 SendCompleteEventRpc();
+                UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
             }
         }
 
