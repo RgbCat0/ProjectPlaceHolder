@@ -21421,11 +21421,39 @@ PrefabInstance:
       value: Restart Button
       objectReference: {fileID: 0}
     - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 7e4e8f22ebdbdff4db9a2f1f85e6a58c, type: 3}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
       propertyPath: m_FillCenter
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4378774215234281875, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
+      propertyPath: m_PreserveAspect
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4624610227147858505, guid: f251cd8b7c3fd284f8307ffe73237efc, type: 3}
