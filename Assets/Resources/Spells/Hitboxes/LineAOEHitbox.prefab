@@ -119,7 +119,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.08, z: 6}
-  m_LocalScale: {x: 2.5, y: 3, z: 10}
+  m_LocalScale: {x: 4, y: 3, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 346829475549887952}
@@ -212,6 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67d285e308378f94a9b950f970523a06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particle: {fileID: 0}
 --- !u!114 &-7852783532370799962
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   upgradeName: Speedster
   shortText: Sp
+  icon: {fileID: 21300000, guid: d8bbf99391895e2489f05a7aa0779f3d, type: 3}
   upgrades:
   - type: 2
     value: 10
+    customDescription: 1
     description: +10% Speed
   rarity: 1
+  percentageChance: 0
+  percentageWithLuck: 0
