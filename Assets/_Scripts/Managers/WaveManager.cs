@@ -126,6 +126,8 @@ namespace Managers
             yield return new WaitForSeconds(startDelay);
             int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
                                               _currentDifficultyScaling.SpawnScaling * (currentWaveIndex + 1));
+            float healthScaling = _currentDifficultyScaling.HealthScaling * (currentWaveIndex + 1);
+            float damageScaling = _currentDifficultyScaling.DamageScaling * (currentWaveIndex + 1);
             while (true)
             {
                 if (enemies.Count >= enemyCount || GameManager.Instance.gameOver)
@@ -141,11 +143,9 @@ namespace Managers
                     rotation: Quaternion.identity
                 );
                 enemy.transform.SetParent(_enemyParent);
-#if UNITY_EDITOR
-                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, disableMovement);
-#else
-enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
-#endif
+
+                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, healthScaling, damageScaling, disableMovement);
+
                 enemies.Add(enemy.transform);
                 UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
                 yield return new WaitForSeconds(spawnInterval);
@@ -189,12 +189,12 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
         public void EnemyDeath(NetworkObject enemy)
         {
             enemies.Remove(enemy.transform);
+            UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
             if (enemies.Count == 0 && !_waitingForUpgrade)
             {
                 _waitingForUpgrade = true;
                 Debug.Log("Wave complete, showing upgrade menu");
                 SendCompleteEventRpc();
-                UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
             }
         }
 

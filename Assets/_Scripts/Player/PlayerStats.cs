@@ -38,7 +38,6 @@ namespace Player
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
         public float manaRegenMultiplier = 1f;
-        public float cooldownMultiplier = 1f;
 
         [Header("----------Misc----------")]
         public float manaRegenAmount = 1f;
@@ -48,7 +47,6 @@ namespace Player
         public event Action<float> OnSpeedChanged;
         public event Action<float> OnManaChanged;
         public event Action<float> OnManaRegenChanged;
-        public event Action<float> OnCooldownChanged;
 
         private void Start()
         {
@@ -106,10 +104,6 @@ namespace Player
                 case UpgradeTypes.ManaRegen:
                     manaRegenMultiplier += upgrade.value / 100 / 2;
                     OnManaRegenChanged?.Invoke(manaRegenMultiplier);
-                    break;
-                case UpgradeTypes.Cooldown:
-                    cooldownMultiplier -= upgrade.value / 100f;
-                    OnCooldownChanged?.Invoke(cooldownMultiplier);
                     break;
                 case UpgradeTypes.Luck:
                     currentLuck += upgrade.value;
@@ -176,7 +170,6 @@ namespace Player
 
         public void ResetStats()
         {
-            cooldownMultiplier = 1;
             healthMultiplier = 1;
             manaMultiplier = 1;
             manaRegenMultiplier = 1;
