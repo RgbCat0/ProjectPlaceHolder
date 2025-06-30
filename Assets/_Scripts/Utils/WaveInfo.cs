@@ -19,31 +19,23 @@ public class WaveInfo : ScriptableObject
 
     [Tooltip("Delay before the first enemy spawns in seconds")]
     public float startDelay;
-
-    public EnemyInfo GetRandomInfo()
-    {
-        float totalChance = enemyTypesToSpawn.Sum(e => e.spawnChance);
-        float roll = Random.Range(0f, totalChance);
-        var cumulative = 0f;
-        foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
-        {
-            cumulative += enemy.spawnChance;
-            if (roll <= cumulative)
-                return enemy.info;
-        }
-
-        return enemyTypesToSpawn[0].info; // fallback
-    }
 }
 
 [Serializable]
 public class EnemySpawnInfo
 {
     public EnemyInfo info;
+    
+    public List<EnemySpawnChances> spawnChanceList;
+    
+}
 
-    [Tooltip("Higher value = higher chance to spawn")]
-    public float spawnChance;
-
-    [Tooltip("When this enemy type should start spawning")]
-    public int startWave;
+[System.Serializable]
+public class EnemySpawnChances
+{
+    public float spawnChance; // chance to spawn this enemy type
+    public int startWave; // wave at which this enemy type starts spawning
+    
+    
+    
 }

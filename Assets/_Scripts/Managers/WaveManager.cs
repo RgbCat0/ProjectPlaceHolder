@@ -154,19 +154,36 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
 
         public EnemyInfo GetRandomInfo()
         {
-            float totalChance = enemyTypesToSpawn.Sum(e => e.startWave <= currentWaveIndex ? e.spawnChance : 0f);
-            float roll = Random.Range(0f, totalChance);
-            var cumulative = 0f;
+            List<(EnemySpawnInfo enemy, float chance)> eligibleEnemies = new();
+
             foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
             {
-                if (enemy.startWave > currentWaveIndex)
-                    continue; // skip enemies that shouldn't spawn yet
-                cumulative += enemy.spawnChance;
-                if (roll <= cumulative)
-                    return enemy.info;
-            }
+                var applicableSpawn = enemy.spawnChanceList
+                    .Where(f => f.startWave <= currentWaveIndex)
+                    .OrderByDescending(f => f.startWave)
+                    .FirstOrDefault();
 
-            return enemyTypesToSpawn[0].info; // fallback
+                if (applicableSpawn != null)
+                {
+                    eligibleEnemies.Add((enemy, applicableSpawn.spawnChance));
+                }
+            }
+            
+            float totalChance = eligibleEnemies.Sum(e => e.chance);
+            
+            float roll = Random.Range(0f, totalChance);
+            float cumulative = 0f;
+
+            foreach (var (enemy, chance) in eligibleEnemies)
+            {
+                cumulative += chance;
+                if (roll <= cumulative)
+                {
+                    return enemy.info;
+                }
+            }
+            
+            return eligibleEnemies.Count > 0 ? eligibleEnemies[0].enemy.info : enemyTypesToSpawn[0].info;
         }
 
         public void EnemyDeath(NetworkObject enemy)
@@ -219,3 +236,4 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
         }
     }
 }
+

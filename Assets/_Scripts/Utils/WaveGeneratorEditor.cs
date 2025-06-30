@@ -87,7 +87,7 @@ public class WaveEditorWindow : EditorWindow
                 .Select(e => new EnemySpawnInfo
                 {
                     info = e.enemyInfo,
-                    spawnChance = e.spawnChance
+                    //spawnChance = e.spawnChance
                 })
                 .ToList();
 
