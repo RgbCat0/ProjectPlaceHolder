@@ -116,7 +116,7 @@ namespace Managers
                 return;
             waitingForNextWave.Value = false;
             currentWaveIndex++;
-            UIManager.Instance.UpdateWaveText(currentWaveIndex + 1);
+            UIManager.Instance.UpdateWaveText(currentWaveIndex);
             StartCoroutine(StartWave());
         }
 
