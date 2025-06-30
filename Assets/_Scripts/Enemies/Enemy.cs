@@ -40,18 +40,18 @@ namespace Enemies
         }
 
 
-
         #region init
 
-        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, bool debug1 = false)
+        public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, float healthMulti, float damageMulti,
+            bool debug1 = false)
         {
-            Health = enemyInfo.health;
+            Health = enemyInfo.health * healthMulti;
             _movement.SetSpeed(enemyInfo.speed);
-            _enemyAttack.damage = enemyInfo.damage;
+            _enemyAttack.damage = enemyInfo.damage * damageMulti;
             transform.position = spawnPoint;
             ClientInitRpc(enemyInfo.identifier);
             StartCoroutine(SpawnAnimation());
-            
+
             if (debug1)
                 _movement.SetSpeed(0f); // UNITY_EDITOR debugging
         }
@@ -59,7 +59,7 @@ namespace Enemies
         private IEnumerator SpawnAnimation() // moves the player 2f underground and lerps up
         {
             Vector3 startPosition = transform.position;
-            Vector3 downUnder = startPosition + Vector3.down * 2f;
+            Vector3 downUnder = startPosition + Vector3.down * 2.2f;
             float elapsedTime = 0f;
             float duration = 1f; // duration of the spawn animation
             transform.position = downUnder;
@@ -72,8 +72,10 @@ namespace Enemies
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+
             _navMeshAgent.enabled = true; // enable NavMeshAgent after setting position and speed
         }
+
         [Rpc(SendTo.Everyone)]
         private void ClientInitRpc(string enemyInfoIdentifier)
         {
@@ -224,7 +226,8 @@ namespace Enemies
         {
             if (PlayerPrefs.GetInt("DamageNumbersEnabled") == 0)
                 return;
-            GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position + Vector3.up * 2f, Quaternion.identity);
+            GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position + Vector3.up * 2f,
+                Quaternion.identity);
             damageNumber.GetComponent<HitAnimation>().ShowHitText(damage.ToString(CultureInfo.CurrentCulture));
             damageNumber.transform.parent = transform;
         }

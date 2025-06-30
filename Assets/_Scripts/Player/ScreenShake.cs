@@ -49,7 +49,7 @@ public class ScreenShake : MonoBehaviour
             {
                 float t = elapsed / duration;
                 
-                _perlinNoise.AmplitudeGain = Mathf.Lerp(0f, magnitude, t);
+                _perlinNoise.AmplitudeGain = Mathf.Lerp(magnitude, 0f, t);
                 elapsed += Time.deltaTime;
                 yield return null;
             }

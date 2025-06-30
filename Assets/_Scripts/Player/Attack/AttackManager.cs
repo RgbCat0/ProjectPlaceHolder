@@ -78,7 +78,7 @@ namespace Player.Attack
                         _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
                         _castedSpell = _selectedSpell;
                         _spellCooldowns[_currentSpell] =
-                            Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+                            Time.time + _selectedSpell.cooldown;
                         CastSpellRpc(hitPos, (int)_currentSpell);
                     }
                 }
@@ -507,7 +507,7 @@ namespace Player.Attack
                 _playerAnimator.ChangeAnimation(_currentSpell.ToString());
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
-                    Time.time + (_selectedSpell.cooldown * _playerStats.cooldownMultiplier);
+                    Time.time + _selectedSpell.cooldown;
                 if(CheckMana())
                     CastSpellRpc(hitPos, (int)_currentSpell);
             }

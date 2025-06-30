@@ -27,8 +27,6 @@ namespace Player.Movement
         
         private void Start()
         {
-            if (IsServer)
-                canMove.Initialize(this);
             if (!IsOwner)
             {
                 enabled = false;
@@ -52,7 +50,10 @@ namespace Player.Movement
 
         [Rpc(SendTo.Server)]
         private void RealRpc()
-            => canMove.Value = true; // reset on respawn
+        {
+            canMove.Initialize(this);   
+            canMove.Value = true; // reset on respawn
+        }
 
 
         private void Update()
