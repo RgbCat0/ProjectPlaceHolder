@@ -39,16 +39,6 @@ namespace LobbyScripts
         {
             try
             {
-                if (lobbyUIPrefab != null)
-                {
-                    _lobbyUI = Instantiate(lobbyUIPrefab);
-                    _lobbyUI.name = "LobbyUI";
-                    uiManager = _lobbyUI.GetComponent<LobbyUiManager>();
-                }
-                else
-                {
-                    LobbyLogger.Error("Lobby UI prefab is not assigned!");
-                }
 
                 // _uiManager = GetComponent<LobbyUiManager>();
                 lobbyNetManager = GetComponent<LobbyNetManager>();
@@ -70,6 +60,19 @@ namespace LobbyScripts
             catch (Exception e)
             {
                 LobbyLogger.Exception(e);
+            }
+        }
+        public void SpawnInLobbyUI()
+        {
+            if (_lobbyUI == null)
+            {
+                _lobbyUI = Instantiate(lobbyUIPrefab);
+                _lobbyUI.name = "LobbyUI";
+                uiManager = _lobbyUI.GetComponent<LobbyUiManager>();
+            }
+            else
+            {
+                LobbyLogger.Error("Lobby UI already spawned!");
             }
         }
 
