@@ -23,6 +23,7 @@ namespace Enemies
         private EnemyAttack _enemyAttack;
         public float Health { get; private set; } = 100f;
 
+        private bool isDead;
         [SerializeField]
         private GameObject damageNumberPrefab; // prefab for damage numbers
 
@@ -196,12 +197,14 @@ namespace Enemies
         // ReSharper disable Unity.PerformanceAnalysis
         public void TakeDamageRpc(float damage)
         {
-            Health -= damage;
-            DamageNumbersRpc(damage);
-            _healthBar.UpdateHealthBar();
-            if (Health <= 0f)
-                DieRpc();
-
+            if (!isDead)
+            {
+                Health -= damage;
+                DamageNumbersRpc(damage);
+                _healthBar.UpdateHealthBar();
+                if (Health <= 0f)
+                    DieRpc();
+            }
 #if UNITY_EDITOR
             if (debug)
                 Debug.Log($"{gameObject.name} took {damage} damage. Remaining health: {Health}");
@@ -212,12 +215,37 @@ namespace Enemies
         [Rpc(SendTo.Server)]
         private void DieRpc()
         {
-            // Handle enemy death (e.g., play animation, destroy object, etc.)
+            isDead = true;
             WaveManager.Instance.EnemyDeath(NetworkObject);
-#if UNITY_EDITOR
-            if (debug)
-                Debug.Log($"{gameObject.name} has died.");
-#endif
+            NetworkObject.GetComponent<EnemyMovement>().enabled = false;
+            _navMeshAgent.enabled = false;
+             Destroy(_enemyAttack);
+            gameObject.GetComponentInChildren<Animator>().enabled = false;  
+            gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
+            
+            StartCoroutine(FallAndDespawn());
+        }
+
+        private IEnumerator FallAndDespawn()
+        {
+            Quaternion startRot = transform.rotation;
+            Quaternion endRot = Quaternion.Euler(90f, transform.eulerAngles.y, transform.eulerAngles.z);
+            Vector3 startPos = transform.position;
+            Vector3 endPos = startPos + Vector3.up * 0.5f;
+
+            float elapsed = 0f;
+            float duration = 0.5f;
+            while (elapsed < duration)
+            {
+                transform.rotation = Quaternion.Slerp(startRot, endRot, elapsed / duration);
+                transform.position = Vector3.Lerp(startPos, endPos, elapsed / duration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            transform.rotation = endRot;
+            transform.position = endPos;
+
+            yield return new WaitForSeconds(3f);
             NetworkObject.Despawn();
         }
 
