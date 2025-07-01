@@ -220,6 +220,7 @@ namespace Enemies
             NetworkObject.GetComponent<EnemyMovement>().enabled = false;
             _navMeshAgent.enabled = false;
              Destroy(_enemyAttack);
+             _healthBar.enabled = false;
             gameObject.GetComponentInChildren<Animator>().enabled = false;  
             gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
             
@@ -245,9 +246,23 @@ namespace Enemies
             transform.rotation = endRot;
             transform.position = endPos;
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(2.5f);
+            
+            Vector3 sinkStart = transform.position;
+            Vector3 sinkEnd = sinkStart + Vector3.down * 2f;
+            float sinkDuration = 1f;
+            elapsed = 0f;
+            while (elapsed < sinkDuration)
+            {
+                transform.position = Vector3.Lerp(sinkStart, sinkEnd, elapsed / sinkDuration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            transform.position = sinkEnd;
+
             NetworkObject.Despawn();
         }
+        
 
         [Rpc(SendTo.Everyone)]
         private void DamageNumbersRpc(float damage)
