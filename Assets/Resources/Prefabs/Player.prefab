@@ -1335,6 +1335,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   cd: 0
+  fireballCd: 0
 --- !u!114 &3430485792608797232
 MonoBehaviour:
   m_ObjectHideFlags: 0

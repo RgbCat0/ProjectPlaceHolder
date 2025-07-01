@@ -28,6 +28,7 @@ namespace Player.Movement
         private void Awake()
         {
             canMove.Initialize(this); 
+            canMove.Value = true;
         }
 
         private void Start()

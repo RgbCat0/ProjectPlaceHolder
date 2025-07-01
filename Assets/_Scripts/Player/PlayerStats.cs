@@ -59,9 +59,20 @@ namespace Player
         {
             if (!IsOwner)
                 return;
+            UpdateManaRpc();
             currentMaxHealth = baseMaxHealth * healthMultiplier;
             currentMaxMana = baseMaxMana * manaMultiplier;
 
+
+
+            if (currentMana > currentMaxMana)
+                currentMana = currentMaxMana;
+            UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void UpdateManaRpc()
+        {
             if (currentMana < currentMaxMana)
             {
                 manaRegenTimer += Time.deltaTime * manaRegenMultiplier;
@@ -75,12 +86,7 @@ namespace Player
                     manaRegenTimer = 0f;
                 }
             }
-
-            if (currentMana > currentMaxMana)
-                currentMana = currentMaxMana;
-            UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
         }
-
         public void ApplyUpgrade(SingleUpgrade upgrade)
         {
             switch (upgrade.type)
