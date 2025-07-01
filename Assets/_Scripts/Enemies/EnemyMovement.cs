@@ -15,12 +15,13 @@ namespace Enemies
         private Transform _target;
         private EnemyAttack _enemyAttack;
         private AniManager _aniManager;
-        
+
 
         [SerializeField]
         private float walkAnimationSpeedBase = 1.5f;
+
         [SerializeField]
-        private float rotationSpeed = 700f; 
+        private float rotationSpeed = 700f;
 
 
         private void Awake()
@@ -39,20 +40,31 @@ namespace Enemies
         {
             if (_navMeshAgent == null)
                 _navMeshAgent = GetComponent<NavMeshAgent>();
-            _navMeshAgent.stoppingDistance = 1f;
+            _navMeshAgent.stoppingDistance = 0.6f;
             _navMeshAgent.speed = speed;
             _navMeshAgent.updateRotation = false;
         }
 
         private void Update()
         {
-            Vector3 direction = _navMeshAgent.steeringTarget - transform.position;
-            direction.y = 0f; // Optional: keep rotation flat on Y-axis
-
-            if (direction.magnitude > 0.1f)
+            if(!_navMeshAgent.enabled)
+                return;
+            if (_navMeshAgent.remainingDistance >= 1.5f)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                Vector3 direction = _navMeshAgent.steeringTarget - transform.position;
+                direction.y = 0f; // Optional: keep rotation flat on Y-axis
+
+                if (direction.magnitude > 0.1f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation,
+                        rotationSpeed * Time.deltaTime);
+                }
+            }
+            else
+            {
+                // if close enough lock on to the target
+                transform.rotation = Quaternion.LookRotation(_target.position - transform.position);
             }
         }
 
@@ -63,7 +75,8 @@ namespace Enemies
             // set animation based on speed
             if (_navMeshAgent.velocity.magnitude > 0.1f)
             {
-                _aniManager.ChangeFloat("WalkSpeed", _navMeshAgent.velocity.magnitude + walkAnimationSpeedBase); // base + speed
+                _aniManager.ChangeFloat("WalkSpeed",
+                    _navMeshAgent.velocity.magnitude + walkAnimationSpeedBase); // base + speed
                 _aniManager.ChangeAnimation("Walk", 0.2f);
             }
             else
@@ -74,7 +87,8 @@ namespace Enemies
 
         private IEnumerator UpdateTarget()
         {
-            yield return new WaitUntil(() => _navMeshAgent.enabled); // still spawning, wait for NavMeshAgent to be enabled
+            yield return
+                new WaitUntil(() => _navMeshAgent.enabled); // still spawning, wait for NavMeshAgent to be enabled
             while (true)
             {
                 _target = GetTarget();

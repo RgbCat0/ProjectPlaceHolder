@@ -129,6 +129,7 @@ namespace Managers
 
         private void QuitButton()
         {
+            LobbyController.Instance.Disconnect();
             SceneManager.LoadScene("MainMenu");
         }
     }
