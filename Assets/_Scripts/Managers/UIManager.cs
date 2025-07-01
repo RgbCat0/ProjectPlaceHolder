@@ -195,15 +195,14 @@ namespace Managers
                     .transform.GetChild(0)
                     .GetComponent<TextMeshProUGUI>()
                     .text = upgrade.name;
-                if (upgrade.icon != null)
+                if (upgrade.icon == null)
                     upgradeObject
                         .transform.GetChild(1)
-                        .GetChild(0)
                         .GetComponent<TextMeshProUGUI>()
                         .text = upgrade.shortText; // icon replacement
                 else
-                    upgradeObject.transform.GetChild(1).GetComponent<Image>().sprite = upgrade.icon;
-
+                    upgradeObject.transform.GetChild(2).GetComponent<Image>().sprite = upgrade.icon; 
+                // I made 1 change to the prefab and all the getChild calls are broken lol
                 foreach (var singleUpgrade in upgrade.upgrades)
                 {
                     if (!singleUpgrade.customDescription)
@@ -211,12 +210,12 @@ namespace Managers
                         singleUpgrade.description = singleUpgrade.GenerateDescription();
                     }
 
-                    upgradeObject.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text +=
+                    upgradeObject.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text +=
                         singleUpgrade.description + "\n";
                 }
 
                 upgradeObject
-                    .transform.GetChild(3)
+                    .transform.GetChild(4)
                     .GetComponent<Button>()
                     .onClick.AddListener(() => UpgradeCall(upgrade));
             }

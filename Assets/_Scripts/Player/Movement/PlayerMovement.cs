@@ -24,9 +24,15 @@ namespace Player.Movement
 
         [SerializeField]
         private float maxVel;
-        
+
+        private void Awake()
+        {
+            canMove.Initialize(this); 
+        }
+
         private void Start()
         {
+            
             if (!IsOwner)
             {
                 enabled = false;
@@ -51,7 +57,7 @@ namespace Player.Movement
         [Rpc(SendTo.Server)]
         private void RealRpc()
         {
-            canMove.Initialize(this);   
+              
             canMove.Value = true; // reset on respawn
         }
 

@@ -35,8 +35,8 @@ namespace Enemies
             var timer = 0f;
             var startPosition = Vector3.up * 1.5f; 
             transform.localScale = Vector3.zero;
-            var randomX = Random.Range(-0.1f, 0.1f);
-            var randomZ = Random.Range(-0.1f, 0.1f);
+            var randomX = Random.Range(-0.4f, 0.4f);
+            var randomZ = Random.Range(-0.4f, 0.4f);
             while (timer < destroyTime)
             {
                 timer += Time.deltaTime;

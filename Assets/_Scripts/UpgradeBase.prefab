@@ -29,8 +29,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7650230198363844469}
+  m_Children: []
   m_Father: {fileID: 1260893888880140998}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
@@ -362,6 +361,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1905860661549611294}
+  - {fileID: 7650230198363844469}
   - {fileID: 5523541446510640046}
   - {fileID: 9042511000735442291}
   - {fileID: 3291162170995718598}
@@ -402,12 +402,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5523541446510640046}
+  m_Father: {fileID: 1260893888880140998}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 55.37555}
+  m_SizeDelta: {x: -167.58871, y: -230.7511}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4769953367244080616
 CanvasRenderer:
@@ -437,7 +437,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: asdasd
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 29fcefd1661c31c4ea08d2ee869eb24a, type: 2}
   m_sharedMaterial: {fileID: -7759276733634121272, guid: 29fcefd1661c31c4ea08d2ee869eb24a, type: 2}
@@ -446,7 +446,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 4281547070
   m_fontColor: {r: 0.24313726, g: 0.22352941, b: 0.2, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -464,7 +464,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 27.9
+  m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4281547070
   m_fontColor: {r: 0.24313726, g: 0.22352941, b: 0.2, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -612,7 +612,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 35
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
