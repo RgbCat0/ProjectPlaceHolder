@@ -749,6 +749,16 @@ MonoBehaviour:
   - 1
   - 1.5
   - 2
+  healthScalingMultipliers:
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.4
+  damageScalingMultipliers:
+  - 0.2
+  - 0.4
+  - 0.6
+  - 0.8
 --- !u!1 &1644267327
 GameObject:
   m_ObjectHideFlags: 0
