@@ -1362,7 +1362,7 @@ MonoBehaviour:
   damageMultiplier: 1
   speedMultiplier: 1
   manaMultiplier: 1
-  manaRegenMultiplier: 1
+  manaRegenMultiplier: 2
   manaRegenAmount: 1
 --- !u!114 &8522605687807288833
 MonoBehaviour:

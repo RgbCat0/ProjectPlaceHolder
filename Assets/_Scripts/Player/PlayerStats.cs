@@ -37,7 +37,7 @@ namespace Player
         public float damageMultiplier = 1f;
         public float speedMultiplier = 1f;
         public float manaMultiplier = 1f;
-        public float manaRegenMultiplier = 1f;
+        public float manaRegenMultiplier = 2f;
 
         [Header("----------Misc----------")]
         public float manaRegenAmount = 1f;
