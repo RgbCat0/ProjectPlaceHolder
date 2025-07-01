@@ -58,30 +58,30 @@ namespace Player.Attack
             HandleSpellInput();
             HandleCasting();
             RaycastHit hit;
-                if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered && !fireballCd)
+            if (_isHoldingSpell == false && InputHandler.Instance.attackTriggered && !fireballCd)
+            {
+                _currentSpell = Spells.Basic;
+
+                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity,
+                        groundMask)
+                    && Time.time > _spellCooldowns[_currentSpell] && !fireballCd)
                 {
-                    _currentSpell = Spells.Basic;
+                    Vector3 hitPos = hit.point;
 
-                    if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity,
-                            groundMask)
-                        && Time.time > _spellCooldowns[_currentSpell] && !fireballCd)
+
+                    if (_selectedSpell == null)
                     {
-                        Vector3 hitPos = hit.point;
-
-
-                        if (_selectedSpell == null)
-                        {
-                            Debug.LogWarning("No spell selected at cast time.");
-                            return;
-                        }
-
-                        _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
-                        _castedSpell = _selectedSpell;
-                        _spellCooldowns[_currentSpell] =
-                            Time.time + _selectedSpell.cooldown;
-                        CastSpellRpc(hitPos, (int)_currentSpell);
+                        Debug.LogWarning("No spell selected at cast time.");
+                        return;
                     }
+
+                    _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 0);
+                    _castedSpell = _selectedSpell;
+                    _spellCooldowns[_currentSpell] =
+                        Time.time + _selectedSpell.cooldown;
+                    CastSpellRpc(hitPos, (int)_currentSpell);
                 }
+            }
         }
 
         #region Spell Casting
@@ -136,31 +136,45 @@ namespace Player.Attack
                     position: objectPos.transform.position, rotation: Quaternion.identity);
             }
 
-            
+
             if (castedSpell != null)
                 castedSpell.GetComponent<Rigidbody>().useGravity = false;
 
             StartCoroutine(CastSpell(spell, pos));
-            SendManaToOwnerRpc(_playerStats.currentMana);
+
+            SendInfoToOwnerRpc(_playerStats.currentMana, spell.castTime, pos);
         }
 
         [Rpc(SendTo.Owner)]
-        private void SendManaToOwnerRpc(float mana)
+        private void SendInfoToOwnerRpc(float mana, float castTime, Vector3 pos)
         {
             _playerStats.currentMana = mana;
+            StartCoroutine(SetRotationLocal(castTime, pos));
+        }
+
+        private IEnumerator SetRotationLocal(float castTime, Vector3 pos)
+        {
+            float castTime1 = Time.time + castTime;
+            while (Time.time < castTime1)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
+                    castTime * Time.deltaTime * 50f);
+                yield return new WaitForFixedUpdate();
+            }
         }
 
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
         {
-            if(spell.areaOfEffect != Spell.AreaOfEffect.None)
+            if (spell.areaOfEffect != Spell.AreaOfEffect.None)
                 fireballCd = true;
-            
+
             foreach (var _indicator in _indicators.Values)
             {
                 _indicator.SetActive(false);
             }
-            
-            
+
+
             float castTime = Time.time + spell.castTime;
 
             while (Time.time < castTime)
@@ -168,9 +182,7 @@ namespace Player.Attack
                 cd = true;
                 _playerMovement.canMove.Value = false;
                 _isHoldingSpell = false;
-                Quaternion targetRotation = Quaternion.LookRotation(pos - transform.position).normalized;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
-                    spell.castTime * Time.deltaTime * 50f);
+
                 yield return new WaitForFixedUpdate();
             }
 
@@ -508,9 +520,10 @@ namespace Player.Attack
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + _selectedSpell.cooldown;
-                if(CheckMana())
+                if (CheckMana())
                     CastSpellRpc(hitPos, (int)_currentSpell);
             }
+
             _lastHeldSpell = 0;
         }
 

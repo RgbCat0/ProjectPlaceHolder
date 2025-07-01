@@ -46,9 +46,9 @@ namespace Enemies
         public void Initialize(EnemyInfo enemyInfo, Vector3 spawnPoint, float healthMulti, float damageMulti,
             bool debug1 = false)
         {
-            Health = enemyInfo.health * healthMulti;
+            Health = enemyInfo.health * ( 1 + healthMulti);
             _movement.SetSpeed(enemyInfo.speed);
-            _enemyAttack.damage = enemyInfo.damage * damageMulti;
+            _enemyAttack.damage = enemyInfo.damage * (1 + damageMulti);
             transform.position = spawnPoint;
             ClientInitRpc(enemyInfo.identifier);
             StartCoroutine(SpawnAnimation());
