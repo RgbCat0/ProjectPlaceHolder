@@ -86,7 +86,7 @@ namespace Player.Movement
             moveDir.Normalize();
             if (moveDir != Vector3.zero)
             {
-                _playerAnimator.ChangeAnimation("Walking", layer: 1);
+                _playerAnimator.ChangeAnimation("Walking", layer: 0);
                 Rotation(moveDir);
                 _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
                 if (_rb.linearVelocity.magnitude > maxVel)

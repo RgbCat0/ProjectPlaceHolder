@@ -77,7 +77,6 @@ namespace Player.Attack
         [Rpc(SendTo.Server)]
         private void CastSpellRpc(Vector3 pos, int spellIndex)
         {
-            Debug.Log("rpc cast spell" + NetworkManager.LocalClientId);
             if (!_spellDictionary.TryGetValue((Spells)spellIndex, out var spell))
             {
                 Debug.LogError($"Server: Could not find spell for index {spellIndex}");
@@ -140,7 +139,6 @@ namespace Player.Attack
 
         private IEnumerator CastSpell(Spell spell, Vector3 pos)
         {
-            Debug.Log("normal cast spell");
             foreach (var _indicator in _indicators.Values)
             {
                 _indicator.SetActive(false);
@@ -153,7 +151,7 @@ namespace Player.Attack
             yield return new WaitForSeconds(spell.castTime);
 
             _playerMovement.canMove.Value = true;
-            _playerAnimator.ChangeAnimation("Idle");
+            _playerAnimator.ChangeAnimation("Idle", layer: 1);
 
 
             // Basic attack
@@ -466,7 +464,7 @@ namespace Player.Attack
                     return;
                 }
 
-                _playerAnimator.ChangeAnimation(_currentSpell.ToString());
+                _playerAnimator.ChangeAnimation(_currentSpell.ToString(), layer: 1);
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + _selectedSpell.cooldown;
