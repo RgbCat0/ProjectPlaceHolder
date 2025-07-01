@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Enemies
 {
-    public class EnemyHealthBar : MonoBehaviour
+    public class EnemyHealthBar : NetworkBehaviour
     {
         private Enemy _enemy;
 
@@ -32,8 +33,8 @@ namespace Enemies
             _startHealth = _enemy.Health;
             _maxHealthBarWidth = healthBar.sizeDelta.x;
         }
-
-        public void UpdateHealthBar()
+        [Rpc(SendTo.Everyone)]
+        public void UpdateHealthBarRpc()
         {
             _hideTimer += _hideTime;
             if (_enemy == null)

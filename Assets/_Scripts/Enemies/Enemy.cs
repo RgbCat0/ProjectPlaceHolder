@@ -201,7 +201,7 @@ namespace Enemies
             {
                 Health -= damage;
                 DamageNumbersRpc(damage);
-                _healthBar.UpdateHealthBar();
+                _healthBar.UpdateHealthBarRpc();
                 if (Health <= 0f)
                     DieRpc();
             }
