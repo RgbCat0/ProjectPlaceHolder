@@ -93,8 +93,10 @@ namespace Player
         public void TakeDamageRpc(float damage)
         {
             Health -= damage;
+            SoundManager.Instance.PlaySound3D("PlayerHit", transform.position);
             if (Health <= 0)
             {
+                
                 UIManager.Instance.UpdateHealthBar(0, MaxHealth);
                 UIManager.Instance.StopHurtFlash();
                 Health = MaxHealth; // Prevents die Rpc from being called multiple times

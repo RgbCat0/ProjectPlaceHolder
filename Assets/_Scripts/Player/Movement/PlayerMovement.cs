@@ -36,6 +36,7 @@ namespace Player.Movement
             
             if (!IsOwner)
             {
+                GetComponentInChildren<AudioListener>().enabled = false;
                 enabled = false;
                 return;
             }

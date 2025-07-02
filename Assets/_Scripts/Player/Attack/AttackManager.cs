@@ -71,6 +71,7 @@ namespace Player.Attack
         {
             if (_playerStats.currentMana >= _castedSpell.manaCost) return true;
             Debug.Log("Not enough mana to cast " + _castedSpell.name);
+            SoundManager.Instance.PlaySound2D("NoMana");
             return false;
         }
 
@@ -97,7 +98,8 @@ namespace Player.Attack
             {
                 objectPos = spellObject[1];
             }
-
+            if(_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone) SoundManager.Instance.PlaySound3D("FrostWave", transform.position);
+            if(_castedSpell.areaOfEffect == Spell.AreaOfEffect.Circle) SoundManager.Instance.PlaySound3D("FireballWindup", transform.position);
             if (_castedSpell.areaOfEffect == (Spell.AreaOfEffect.None) ||
                 _castedSpell.areaOfEffect == (Spell.AreaOfEffect.Circle))
             {
@@ -174,6 +176,7 @@ namespace Player.Attack
 
         private IEnumerator BasicAttack(Vector3 pos)
         {
+            SoundManager.Instance.PlaySound3D("BasicAttack", transform.position);
             bool travel = true;
             castedSpell.GetComponent<Basic>().SetCaster(gameObject);
             castedSpell.GetComponent<Rigidbody>().useGravity = false;
@@ -219,7 +222,6 @@ namespace Player.Attack
                 Debug.LogWarning("_castedSpell.hitboxPrefab is null in SpawnCircleAoeAttackRpc");
                 return;
             }
-
             _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
                 _castedSpell.areaOfEffectRadius / 2,
                 _castedSpell.areaOfEffectRadius / 2,
@@ -232,7 +234,6 @@ namespace Player.Attack
         {
             
             if(!IsServer) yield break;
-            SoundManager.Instance.PlaySound3D("FireballWindup", transform.position);
             while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
             {
                 castedSpell.transform.position = Vector3.Slerp(
@@ -290,7 +291,7 @@ namespace Player.Attack
         [Rpc(SendTo.Server)]
         private void SpawnConeAoeAttackRpc(Vector3 pos)
         {
-            SoundManager.Instance.PlaySound3D("FrostWave", transform.position);
+            
             _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
                 (_castedSpell.areaOfEffectRadius / 5) * 11,
                 (_castedSpell.range / 15) * 8.5f,

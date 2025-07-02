@@ -5739,7 +5739,7 @@ MonoBehaviour:
   - groupID: FrostWave
     clips:
     - {fileID: 8300000, guid: 32b8fc310afca214a8f8e8fb079c1727, type: 3}
-  - groupID: EnemyHit
+  - groupID: PlayerHit
     clips:
     - {fileID: 8300000, guid: bd1408fc445350848be34ecd3cf3ec75, type: 3}
     - {fileID: 8300000, guid: 38a1238ed0bf00b4da0107946dcb5b21, type: 3}
@@ -5747,6 +5747,15 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 48181013e6382744aade00b7afbe4763, type: 3}
     - {fileID: 8300000, guid: 5bb7bc0953f69414ba89a569593abcf6, type: 3}
+  - groupID: NoMana
+    clips:
+    - {fileID: 8300000, guid: 85c0e556c7da21b4088a72e86a87bb06, type: 3}
+  - groupID: BasicAttack
+    clips:
+    - {fileID: 8300000, guid: 287e80c4f9b5df54e94f70cc35e9a13d, type: 3}
+  - groupID: EnemyHit
+    clips:
+    - {fileID: 8300000, guid: b23f7880d1002c846824c741c62783b5, type: 3}
 --- !u!114 &1655180295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6728,7 +6737,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -6738,7 +6747,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 5000
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -6788,7 +6797,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.22222222
       inSlope: 0
       outSlope: 0
       tangentMode: 0

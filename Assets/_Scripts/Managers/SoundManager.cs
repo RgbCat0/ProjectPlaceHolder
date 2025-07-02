@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
  
 public class SoundManager : MonoBehaviour
@@ -22,7 +23,8 @@ public class SoundManager : MonoBehaviour
         }
     }
  
-    public void PlaySound3D(AudioClip clip, Vector3 pos)
+    [Rpc(SendTo.Server)]
+    public void PlaySound3DRpc(AudioClip clip, Vector3 pos)
     {
         if (clip != null)
         {
@@ -32,7 +34,7 @@ public class SoundManager : MonoBehaviour
  
     public void PlaySound3D(string soundName, Vector3 pos)
     {
-        PlaySound3D(sfxLibrary.GetClipFromName(soundName), pos);
+        PlaySound3DRpc(sfxLibrary.GetClipFromName(soundName), pos);
     }
  
     public void PlaySound2D(string soundName)
