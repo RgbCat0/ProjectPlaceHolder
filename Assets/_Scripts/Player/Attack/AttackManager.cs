@@ -230,7 +230,9 @@ namespace Player.Attack
 
         private IEnumerator CircleAoeAttack(Vector3 pos)
         {
-            if (!IsServer) yield break;
+            
+            if(!IsServer) yield break;
+            SoundManager.Instance.PlaySound3D("FireballWindup", transform.position);
             while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
             {
                 castedSpell.transform.position = Vector3.Slerp(
@@ -248,6 +250,7 @@ namespace Player.Attack
                 position: pos,
                 rotation: Quaternion.identity);
             hitbox.GetComponent<AttackHitbox>().SetCaster(gameObject);
+            SoundManager.Instance.PlaySound3D("FireballExplode", transform.position);
             fireballCd = false;
             yield return new WaitForSeconds(_castedSpell.duration);
             hitbox.Despawn(true);
@@ -287,6 +290,7 @@ namespace Player.Attack
         [Rpc(SendTo.Server)]
         private void SpawnConeAoeAttackRpc(Vector3 pos)
         {
+            SoundManager.Instance.PlaySound3D("FrostWave", transform.position);
             _castedSpell.hitboxPrefab.transform.localScale = new Vector3(
                 (_castedSpell.areaOfEffectRadius / 5) * 11,
                 (_castedSpell.range / 15) * 8.5f,
