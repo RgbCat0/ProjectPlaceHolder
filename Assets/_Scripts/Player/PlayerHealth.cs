@@ -3,6 +3,7 @@ using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using System;
+using TMPro;
 
 namespace Player
 {
@@ -12,6 +13,8 @@ namespace Player
 
         public float Health { get; set; }
         public float MaxHealth { get; private set; }
+        
+        private ParticleSystem _hurtParticleSystem;
 
         public event Action<ulong> onDeath;
 
@@ -27,10 +30,18 @@ namespace Player
             }
 
             _playerStats = GetComponent<PlayerStats>();
+            _hurtParticleSystem = GetComponent<ParticleSystem>();
             _rb = GetComponent<Rigidbody>();
             MaxHealth = _playerStats.baseMaxHealth;
             Health = MaxHealth; // Set initial health
             SendData();
+        }
+        [Rpc(SendTo.Everyone)]
+        public void SetNameRpc(ulong clientId)
+        {
+            var name1 = PlayerDataSync.Instance.syncedPlayerList.Find(x => x.PlayerNetworkId == clientId).PlayerName.ToString();
+            name = name1;
+            GetComponentInChildren<TextMeshProUGUI>().text = name1;
         }
 
         private void SendData()
@@ -90,9 +101,10 @@ namespace Player
                 DieRpc();
                 return;
             }
-            ScreenShake.Instance.Shake(0.4f, 1f, 1f);
+            ScreenShake.Instance.Shake(0.4f, 2f, 1.3f);
             UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             UIManager.Instance.HurtFlash();
+            // _hurtParticleSystem.Play();
         }
 
         [Rpc(SendTo.Everyone)]

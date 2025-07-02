@@ -116,7 +116,7 @@ namespace Managers
                 return;
             waitingForNextWave.Value = false;
             currentWaveIndex++;
-            UIManager.Instance.UpdateWaveText(currentWaveIndex + 1);
+            UIManager.Instance.UpdateWaveText(currentWaveIndex);
             StartCoroutine(StartWave());
         }
 
@@ -126,6 +126,8 @@ namespace Managers
             yield return new WaitForSeconds(startDelay);
             int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
                                               _currentDifficultyScaling.SpawnScaling * (currentWaveIndex + 1));
+            float healthScaling = _currentDifficultyScaling.HealthScaling * (currentWaveIndex + 1);
+            float damageScaling = _currentDifficultyScaling.DamageScaling * (currentWaveIndex + 1);
             while (true)
             {
                 if (enemies.Count >= enemyCount || GameManager.Instance.gameOver)
@@ -141,11 +143,9 @@ namespace Managers
                     rotation: Quaternion.identity
                 );
                 enemy.transform.SetParent(_enemyParent);
-#if UNITY_EDITOR
-                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, disableMovement);
-#else
-enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
-#endif
+
+                enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position, healthScaling, damageScaling, disableMovement);
+
                 enemies.Add(enemy.transform);
                 UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
                 yield return new WaitForSeconds(spawnInterval);
@@ -154,30 +154,47 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
 
         public EnemyInfo GetRandomInfo()
         {
-            float totalChance = enemyTypesToSpawn.Sum(e => e.startWave <= currentWaveIndex ? e.spawnChance : 0f);
-            float roll = Random.Range(0f, totalChance);
-            var cumulative = 0f;
+            List<(EnemySpawnInfo enemy, float chance)> eligibleEnemies = new();
+
             foreach (EnemySpawnInfo enemy in enemyTypesToSpawn)
             {
-                if (enemy.startWave > currentWaveIndex)
-                    continue; // skip enemies that shouldn't spawn yet
-                cumulative += enemy.spawnChance;
-                if (roll <= cumulative)
-                    return enemy.info;
-            }
+                var applicableSpawn = enemy.spawnChanceList
+                    .Where(f => f.startWave <= currentWaveIndex)
+                    .OrderByDescending(f => f.startWave)
+                    .FirstOrDefault();
 
-            return enemyTypesToSpawn[0].info; // fallback
+                if (applicableSpawn != null)
+                {
+                    eligibleEnemies.Add((enemy, applicableSpawn.spawnChance));
+                }
+            }
+            
+            float totalChance = eligibleEnemies.Sum(e => e.chance);
+            
+            float roll = Random.Range(0f, totalChance);
+            float cumulative = 0f;
+
+            foreach (var (enemy, chance) in eligibleEnemies)
+            {
+                cumulative += chance;
+                if (roll <= cumulative)
+                {
+                    return enemy.info;
+                }
+            }
+            
+            return eligibleEnemies.Count > 0 ? eligibleEnemies[0].enemy.info : enemyTypesToSpawn[0].info;
         }
 
         public void EnemyDeath(NetworkObject enemy)
         {
             enemies.Remove(enemy.transform);
+            UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
             if (enemies.Count == 0 && !_waitingForUpgrade)
             {
                 _waitingForUpgrade = true;
                 Debug.Log("Wave complete, showing upgrade menu");
                 SendCompleteEventRpc();
-                UIManager.Instance.UpdateEnemiesRemainText(enemies.Count);
             }
         }
 
@@ -219,3 +236,4 @@ enemy.GetComponent<Enemy>().Initialize(enemyInfo, spawnPoint.position);
         }
     }
 }
+

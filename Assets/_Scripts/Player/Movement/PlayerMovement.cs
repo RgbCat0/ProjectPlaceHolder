@@ -24,11 +24,16 @@ namespace Player.Movement
 
         [SerializeField]
         private float maxVel;
-        
+
+        private void Awake()
+        {
+            canMove.Initialize(this); 
+            canMove.Value = true;
+        }
+
         private void Start()
         {
-            if (IsServer)
-                canMove.Initialize(this);
+            
             if (!IsOwner)
             {
                 enabled = false;
@@ -52,7 +57,10 @@ namespace Player.Movement
 
         [Rpc(SendTo.Server)]
         private void RealRpc()
-            => canMove.Value = true; // reset on respawn
+        {
+              
+            canMove.Value = true; // reset on respawn
+        }
 
 
         private void Update()
@@ -78,7 +86,7 @@ namespace Player.Movement
             moveDir.Normalize();
             if (moveDir != Vector3.zero)
             {
-                _playerAnimator.ChangeAnimation("Walking", layer: 1);
+                _playerAnimator.ChangeAnimation("Walking", layer: 0);
                 Rotation(moveDir);
                 _rb.AddForce(moveDir * moveSpeed, ForceMode.VelocityChange);
                 if (_rb.linearVelocity.magnitude > maxVel)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LobbyScripts;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
@@ -53,6 +54,10 @@ namespace Managers
                     isPlayerObject: true,
                     position: _playerSpawnPoint.position + Random.Range(0f, 1f) * Vector3.right
                 );
+                // set name
+                newPlayer.GetComponent<PlayerHealth>().SetNameRpc(clientId);
+                
+                    
                 players.Add(newPlayer);
                 foreach (NetworkObject player in players)
                 {
@@ -124,6 +129,7 @@ namespace Managers
 
         private void QuitButton()
         {
+            LobbyController.Instance.Disconnect();
             SceneManager.LoadScene("MainMenu");
         }
     }

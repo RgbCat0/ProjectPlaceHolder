@@ -55,15 +55,6 @@ namespace Player
             }
             return true;
         }
-
-        private bool ValidateValue2()
-        {
-            if (value < -100 || value > 100)
-            {
-                return false;
-            }
-            return true;
-        }
         
         public string GenerateDescription()
         {
@@ -83,7 +74,9 @@ namespace Player
         Speed,
         Mana,
         ManaRegen,
-        Cooldown,
-        Luck
+        Luck,
+        FireDamage,
+        WaterDamage,
+        IceDamage
     }
 }
