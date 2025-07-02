@@ -200,6 +200,7 @@ namespace Enemies
             if (!isDead)
             {
                 Health -= damage;
+                SoundManager.Instance.PlaySound3D("EnemyHit", transform.position);
                 DamageNumbersRpc(damage);
                 _healthBar.UpdateHealthBarRpc();
                 if (Health <= 0f)

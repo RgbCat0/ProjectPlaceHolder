@@ -60,6 +60,7 @@ namespace Enemies
         {
             isAttacking = true;
             _aniManager.ChangeAnimation("Attack", 0.2f, 1);
+            SoundManager.Instance.PlaySound3D("EnemyAttack", transform.position);
             yield return new WaitForSeconds(0.5f);
             if (_playerInsideTrigger)
                 other.GetComponent<IDamageable>()?.TakeDamageRpc(damage);
