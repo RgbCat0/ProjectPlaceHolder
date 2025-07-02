@@ -34,7 +34,7 @@ namespace Enemies
             _maxHealthBarWidth = healthBar.sizeDelta.x;
         }
         [Rpc(SendTo.Everyone)]
-        public void UpdateHealthBarRpc()
+        public void UpdateHealthBarRpc(float health)
         {
             _hideTimer += _hideTime;
             if (_enemy == null)
@@ -49,7 +49,7 @@ namespace Enemies
                 return;
             }
 
-            float currentHealth = _enemy.Health;
+            float currentHealth = health;
             if (currentHealth <= 0)
             {
                 healthBar.sizeDelta = new Vector2(0, healthBar.sizeDelta.y);

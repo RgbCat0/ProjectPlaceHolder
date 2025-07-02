@@ -53,6 +53,7 @@ namespace LobbyScripts
                 uiManager.ShowMainMenu();
                 playerDataSync.OnPlayerJoin += () => LobbyLogger.StatusMessage("");
                 NetworkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
+                NetworkManager.OnTransportFailure += NetworkManagerOnOnTransportFailure;
 #if UNITY_EDITOR
                 if (quickTest) HandleCreateLobby("TestLobby", "Medium");
 #endif
@@ -62,6 +63,12 @@ namespace LobbyScripts
                 LobbyLogger.Exception(e);
             }
         }
+
+        private void NetworkManagerOnOnTransportFailure()
+        {
+            SceneManager.LoadScene("_Scenes/MainMenu");
+        }
+
         public void SpawnInLobbyUI()
         {
             if (_lobbyUI == null)

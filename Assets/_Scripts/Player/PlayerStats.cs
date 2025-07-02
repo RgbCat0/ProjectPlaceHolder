@@ -59,7 +59,7 @@ namespace Player
         {
             if (!IsOwner)
                 return;
-            UpdateManaRpc();
+            UpdateMana();
             currentMaxHealth = baseMaxHealth * healthMultiplier;
             currentMaxMana = baseMaxMana * manaMultiplier;
 
@@ -69,9 +69,8 @@ namespace Player
                 currentMana = currentMaxMana;
             UIManager.Instance.UpdateManaBar(currentMana, currentMaxMana);
         }
-
-        [Rpc(SendTo.Everyone)]
-        private void UpdateManaRpc()
+        
+        private void UpdateMana()
         {
             if (currentMana < currentMaxMana)
             {

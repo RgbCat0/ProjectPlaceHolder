@@ -259,6 +259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 1701256501}
   manaBar: {fileID: 1559174885}
+  manaBarBackgroundImage: {fileID: 1062776895}
   healthText: {fileID: 660827702}
   currWaveText: {fileID: 293988233}
   currEnemiesRemainText: {fileID: 1839507612}

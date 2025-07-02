@@ -15,6 +15,7 @@ namespace Enemies
         private Transform _target;
         private EnemyAttack _enemyAttack;
         private AniManager _aniManager;
+        private bool _breaker;
 
 
         [SerializeField]
@@ -65,6 +66,11 @@ namespace Enemies
             {
                 // if close enough lock on to the target
                 transform.rotation = Quaternion.LookRotation(_target.position - transform.position);
+                // ensure enemy is always upright
+                Vector3 eulerAngles = transform.eulerAngles;
+                eulerAngles.x = 0f;
+                eulerAngles.z = 0f;
+                transform.eulerAngles = eulerAngles;
             }
         }
 
@@ -91,11 +97,21 @@ namespace Enemies
                 new WaitUntil(() => _navMeshAgent.enabled); // still spawning, wait for NavMeshAgent to be enabled
             while (true)
             {
+                if (_breaker)
+                {
+                    // _navMeshAgent.ResetPath();
+                    yield break; // exit the coroutine if breaker is true
+                }
                 _target = GetTarget();
                 if (_target != null)
                     _navMeshAgent.SetDestination(_target.position);
-                yield return new WaitForSeconds(0.1f); // Update every 0.5 seconds
+                yield return new WaitForFixedUpdate();
             }
+        }
+
+        public void StopTarget()
+        {
+            _breaker = true;
         }
 
         [CanBeNull]

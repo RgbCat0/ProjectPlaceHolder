@@ -70,12 +70,12 @@ namespace Player.Attack
         private bool CheckMana()
         {
             if (_playerStats.currentMana >= _castedSpell.manaCost) return true;
-                Debug.Log("Not enough mana to cast " + _castedSpell.name);
-                return false;
+            Debug.Log("Not enough mana to cast " + _castedSpell.name);
+            return false;
         }
 
         [Rpc(SendTo.Server)]
-        private void CastSpellRpc(Vector3 pos, int spellIndex)
+        private void CastSpellRpc(Vector3 pos, int spellIndex, float currentMana)
         {
             if (!_spellDictionary.TryGetValue((Spells)spellIndex, out var spell))
             {
@@ -85,7 +85,7 @@ namespace Player.Attack
 
             _castedSpell = spell;
             GameObject objectPos;
-            _playerStats.currentMana -= _castedSpell.manaCost;
+            currentMana -= _castedSpell.manaCost;
 
             if (_castedSpell.areaOfEffect == Spell.AreaOfEffect.Cone ||
                 _castedSpell.areaOfEffect == Spell.AreaOfEffect.Line ||
@@ -112,10 +112,10 @@ namespace Player.Attack
 
             if (spell.areaOfEffect != Spell.AreaOfEffect.None)
                 fireballCd = true;
-            
+
             StartCoroutine(CastSpell(spell, pos));
 
-            SendInfoToOwnerRpc(_playerStats.currentMana, spell.castTime, pos);
+            SendInfoToOwnerRpc(currentMana, spell.castTime, pos);
         }
 
         [Rpc(SendTo.Owner)]
@@ -143,7 +143,7 @@ namespace Player.Attack
             {
                 _indicator.SetActive(false);
             }
-            
+
             cd = true;
             _playerMovement.canMove.Value = false;
             _isHoldingSpell = false;
@@ -159,7 +159,7 @@ namespace Player.Attack
             // Circle AOE Spells
             else if (spell.areaOfEffect == Spell.AreaOfEffect.Circle) SpawnCircleAoeAttackRpc(pos);
             // Line AOE Spells
-            else if (spell.areaOfEffect == Spell.AreaOfEffect.Line)SpawnLineAoeAttackRpc(pos);
+            else if (spell.areaOfEffect == Spell.AreaOfEffect.Line) SpawnLineAoeAttackRpc(pos);
             // Cone AOE Spells
             else if (spell.areaOfEffect == Spell.AreaOfEffect.Cone) SpawnConeAoeAttackRpc(pos);
             WaitRpc();
@@ -230,8 +230,7 @@ namespace Player.Attack
 
         private IEnumerator CircleAoeAttack(Vector3 pos)
         {
-            
-            if(!IsServer) yield break;
+            if (!IsServer) yield break;
             while (Vector3.Distance(castedSpell.transform.position, pos) > 0.8f)
             {
                 castedSpell.transform.position = Vector3.Slerp(
@@ -468,9 +467,9 @@ namespace Player.Attack
                 _castedSpell = _selectedSpell;
                 _spellCooldowns[_currentSpell] =
                     Time.time + _selectedSpell.cooldown;
-                
+
                 if (CheckMana() && IsOwner)
-                    CastSpellRpc(hitPos, (int)_currentSpell);
+                    CastSpellRpc(hitPos, (int)_currentSpell, _playerStats.currentMana);
             }
 
             _isHoldingSpell = false;
@@ -508,7 +507,12 @@ namespace Player.Attack
                 }
                 else
                 {
-                    Debug.Log("Not enough mana to cast " + spell.name);
+                    if (!cd) // Only log if not in cooldown 
+                    {
+                        UIManager.Instance.FlashManaBarBackground();
+                        Debug.Log("Not enough mana to cast " + spell.name);
+                    }
+
                     _selectedSpell = _spellDictionary[Spells.Basic];
                     _currentSpell = Spells.Basic;
                     UIManager.Instance.UpdateSelectedSpell((int)_currentSpell);

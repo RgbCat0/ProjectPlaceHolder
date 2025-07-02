@@ -20,6 +20,9 @@ namespace Managers
         private RectTransform manaBar;
 
         [SerializeField]
+        private Image manaBarBackgroundImage; // used to flash if mana is too low
+
+        [SerializeField]
         private TextMeshProUGUI healthText;
 
         [SerializeField]
@@ -133,6 +136,31 @@ namespace Managers
                 );
                 manaText.text = $"{currMana}/{maxMana}";
             }
+        }
+        public void FlashManaBarBackground()
+        {
+            if (manaBarBackgroundImage == null)
+            {
+                Debug.LogError("Mana bar background image is not assigned in the inspector.");
+                return;
+            }
+
+            // Flash the mana bar background to indicate low mana
+            StartCoroutine(FlashManaBarBackgroundCoroutine());
+        }
+        private IEnumerator FlashManaBarBackgroundCoroutine()
+        {
+            Color originalColor = new Color(1,1,1,1);
+            Color flashColor = new Color(1, 0, 0, 1); // red with some transparency
+            float flashDuration = 0.5f;
+            manaBarBackgroundImage.color = flashColor; // set to flash color
+            yield return new WaitForSeconds(flashDuration / 2);
+            manaBarBackgroundImage.color = originalColor;
+            yield return new WaitForSeconds(flashDuration / 2);
+            manaBarBackgroundImage.color = flashColor;
+            yield return new WaitForSeconds(flashDuration / 2);
+
+            manaBarBackgroundImage.color = originalColor; // reset to original color
         }
         public void UpdateWaveText(int waveNumber)
         {

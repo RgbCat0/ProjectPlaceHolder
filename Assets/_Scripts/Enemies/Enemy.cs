@@ -201,7 +201,7 @@ namespace Enemies
             {
                 Health -= damage;
                 DamageNumbersRpc(damage);
-                _healthBar.UpdateHealthBarRpc();
+                _healthBar.UpdateHealthBarRpc(Health);
                 if (Health <= 0f)
                     DieRpc();
             }
@@ -218,6 +218,7 @@ namespace Enemies
             isDead = true;
             WaveManager.Instance.EnemyDeath(NetworkObject);
             NetworkObject.GetComponent<EnemyMovement>().enabled = false;
+            NetworkObject.GetComponent<EnemyMovement>().StopTarget();
             _navMeshAgent.enabled = false;
              Destroy(_enemyAttack);
              _healthBar.enabled = false;

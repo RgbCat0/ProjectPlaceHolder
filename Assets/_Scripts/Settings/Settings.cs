@@ -40,6 +40,7 @@ public class Settings : MonoBehaviour
         }
         damageNumbersToggle.isOn = PlayerPrefs.GetInt("DamageNumbersEnabled") == 1;
         showUpgradeStatsToggle.isOn = PlayerPrefs.GetInt("ShowUpgradeStats") == 1;
+        showStatusToggle.isOn = PlayerPrefs.GetInt("Status") == 1;
     }
 
     public void SwitchTabs(GameObject newPanel)
