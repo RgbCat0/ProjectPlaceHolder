@@ -41,7 +41,7 @@ namespace Enemies
         {
             if (_navMeshAgent == null)
                 _navMeshAgent = GetComponent<NavMeshAgent>();
-            _navMeshAgent.stoppingDistance = 0.6f;
+            _navMeshAgent.stoppingDistance = 1.5f;
             _navMeshAgent.speed = speed;
             _navMeshAgent.updateRotation = false;
         }

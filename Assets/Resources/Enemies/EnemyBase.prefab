@@ -52,7 +52,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3, y: 1.8, z: 1.49}
+  m_Size: {x: 1.65, y: 1.8, z: 1.69}
   m_Center: {x: 0, y: 1, z: 1.07}
 --- !u!114 &8453368688662401992
 MonoBehaviour:
@@ -236,7 +236,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 40
   avoidancePriority: 50
   m_AngularSpeed: 1200
   m_StoppingDistance: 0
@@ -282,6 +282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c64984a299b26044981e53750729eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   healthBar: {fileID: 6461118176678799224}
   canvas: {fileID: 7388807101184467183}
 --- !u!1001 &7715039084773814961
