@@ -415,7 +415,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: spawnInterval
-      value: 0.4
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: baseEnemyCount
@@ -794,9 +794,9 @@ MonoBehaviour:
   - 1.3
   difficultyScalingMultipliers:
   - 0.5
+  - 0.7
   - 1
-  - 1.5
-  - 2
+  - 1.3
   healthScalingMultipliers:
   - 0.1
   - 0.2

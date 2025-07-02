@@ -3,6 +3,7 @@ using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using System;
+using System.Collections;
 using TMPro;
 
 namespace Player
@@ -86,6 +87,24 @@ namespace Player
                 if (Health > MaxHealth)
                     Health = MaxHealth;
                 healthRegenTimer = 0f;
+            }
+        }
+
+        private IEnumerator HealthRegen() // regens faster and faster if you dont get hit
+        {
+            // var 
+            while (true)
+            {
+                if (Health < MaxHealth &&
+                    !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate health if the player is not moving and not waiting for the next wave
+                {
+                    Health += _playerStats.currentHealthRegen;
+                    if (Health > MaxHealth)
+                        Health = MaxHealth;
+                    UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
+                }
+
+                yield return new WaitForFixedUpdate();
             }
         }
 

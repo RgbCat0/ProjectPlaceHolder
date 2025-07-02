@@ -125,7 +125,7 @@ namespace Managers
         {
             yield return new WaitForSeconds(startDelay);
             int enemyCount = Mathf.RoundToInt((baseEnemyCount * _currentDifficultyScaling.SpawnMultiplier) *
-                                              _currentDifficultyScaling.SpawnScaling * (currentWaveIndex + 1));
+                                              _currentDifficultyScaling.SpawnScaling * ((currentWaveIndex + 1) / 6));
             float healthScaling = _currentDifficultyScaling.HealthScaling * (currentWaveIndex + 1);
             float damageScaling = _currentDifficultyScaling.DamageScaling * (currentWaveIndex + 1);
             while (true)
