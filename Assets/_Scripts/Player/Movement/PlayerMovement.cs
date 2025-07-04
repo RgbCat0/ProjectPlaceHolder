@@ -52,14 +52,16 @@ namespace Player.Movement
             _playerStats.OnSpeedChanged += f => moveSpeed *= f;
         }
 
-        private void OnEnable()
-            => RealRpc();
-
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            RealRpc();
+        }
 
         [Rpc(SendTo.Server)]
         private void RealRpc()
         {
-              
+            
             canMove.Value = true; // reset on respawn
         }
 

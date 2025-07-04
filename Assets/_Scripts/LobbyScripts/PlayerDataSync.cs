@@ -67,7 +67,7 @@ namespace LobbyScripts
             bool isHost
         )
         {
-            playerName = playerName.Substring(0, playerName.Length - 5);
+            playerName = playerName.Substring(0, playerName.Length - 5); // remove the "#1234" at the end of the name
             var newData = new PlayerData(
                 new FixedString64Bytes(playerName),
                 new FixedString64Bytes(lobbyId),

@@ -434,7 +434,7 @@ namespace Player.Attack
             // Spell selection when button is held
             if (currentHeldSpell != 0 && currentHeldSpell != _lastHeldSpell)
             {
-                Debug.Log(currentHeldSpell);
+                // Debug.Log(currentHeldSpell);
                 switch (currentHeldSpell)
                 {
                     case 1: SetSpell(Spells.Fireball); break;

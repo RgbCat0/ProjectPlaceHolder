@@ -193,7 +193,7 @@ namespace Managers
             if (enemies.Count == 0 && !_waitingForUpgrade)
             {
                 _waitingForUpgrade = true;
-                Debug.Log("Wave complete, showing upgrade menu");
+                // Debug.Log("Wave complete, showing upgrade menu");
                 SendCompleteEventRpc();
             }
         }

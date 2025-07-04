@@ -51,7 +51,7 @@ namespace Player.Attack
         [Rpc(SendTo.Server)]
         private void SendDamageRpc()
         {
-            Debug.Log($"Hit {_collider.gameObject.name} ");
+            // Debug.Log($"Hit {_collider.gameObject.name} ");
             Enemy enemy = _collider.gameObject.GetComponent<Enemy>();
             if (enemy != null)
             {

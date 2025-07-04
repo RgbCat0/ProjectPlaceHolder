@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Managers;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace LobbyScripts
         {
             try
             {
-
+                
                 // _uiManager = GetComponent<LobbyUiManager>();
                 lobbyNetManager = GetComponent<LobbyNetManager>();
                 serviceManager = GetComponent<LobbyServiceManager>();

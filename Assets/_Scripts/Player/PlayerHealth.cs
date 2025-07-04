@@ -3,24 +3,23 @@ using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using System;
-using System.Collections;
 using TMPro;
 
 namespace Player
 {
-    public class PlayerHealth : NetworkBehaviour, IDamageable
+    public class PlayerHealth : NetworkBehaviour
     {
         private PlayerStats _playerStats;
 
-        public float Health { get; set; }
+        public NetworkVariable<float> Health = new NetworkVariable<float>(writePerm: NetworkVariableWritePermission.Server);
         public float MaxHealth { get; private set; }
-        
-        private ParticleSystem _hurtParticleSystem;
+
+        private Rigidbody _rb;
 
         public event Action<ulong> onDeath;
 
-        private float healthRegenTimer = 0f;
-        private Rigidbody _rb;
+        private float regenDelayTimer = 0f; // Time since last hit
+        private float regenAcceleration = 1f; // Regen multiplier, grows over time
 
         private void Start()
         {
@@ -31,18 +30,41 @@ namespace Player
             }
 
             _playerStats = GetComponent<PlayerStats>();
-            _hurtParticleSystem = GetComponent<ParticleSystem>();
             _rb = GetComponent<Rigidbody>();
+
             MaxHealth = _playerStats.baseMaxHealth;
-            Health = MaxHealth; // Set initial health
+
+            if (IsServer)
+                Health.Value = MaxHealth;
+
+            Health.OnValueChanged += OnHealthChanged;
+
             SendData();
         }
         [Rpc(SendTo.Everyone)]
         public void SetNameRpc(ulong clientId)
         {
-            var name1 = PlayerDataSync.Instance.syncedPlayerList.Find(x => x.PlayerNetworkId == clientId).PlayerName.ToString();
+            var name1 = PlayerDataSync.Instance.syncedPlayerList.Find(x => x.PlayerNetworkId == clientId).PlayerName
+                .ToString();
             name = name1;
             GetComponentInChildren<TextMeshProUGUI>().text = name1;
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (IsOwner)
+                Health.OnValueChanged -= OnHealthChanged;
+        }
+
+        private void OnHealthChanged(float oldValue, float newValue)
+        {
+            UIManager.Instance.UpdateHealthBar(newValue, MaxHealth);
+
+            if (newValue <= 0)
+            {
+                UIManager.Instance.StopHurtFlash();
+            }
         }
 
         private void SendData()
@@ -75,63 +97,77 @@ namespace Player
         {
             if (!IsOwner)
                 return;
-            MaxHealth = _playerStats.currentMaxHealth;
-            UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
 
-            healthRegenTimer += Time.deltaTime;
-            if ((healthRegenTimer >= 1f &&
-                 _rb.linearVelocity.magnitude < 0.1f) &&
-                !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate health if the player is not moving and not waiting for the next wave
+            MaxHealth = _playerStats.currentMaxHealth;
+
+            // Only regen if player is standing still and not in between waves
+            if (!WaveManager.Instance.waitingForNextWave.Value)
             {
-                Health += _playerStats.currentHealthRegen;
-                if (Health > MaxHealth)
-                    Health = MaxHealth;
-                healthRegenTimer = 0f;
+                regenDelayTimer += Time.deltaTime;
+
+                if (regenDelayTimer >= 1f && Health.Value < MaxHealth)
+                {
+                    // Heal faster the longer you stay unharmed
+                    regenAcceleration += Time.deltaTime; // Gradually increase regen rate
+                    float regenAmount = _playerStats.currentHealthRegen * regenAcceleration * Time.deltaTime;
+
+                    RequestHealthRegenServerRpc(regenAmount);
+                }
+            }
+            else
+            {
+                // Reset acceleration if moving
+                regenAcceleration = 1f;
             }
         }
 
-        private IEnumerator HealthRegen() // regens faster and faster if you dont get hit
+        [Rpc(SendTo.Server)]
+        private void RequestHealthRegenServerRpc(float regenAmount)
         {
-            // var 
-            while (true)
-            {
-                if (Health < MaxHealth &&
-                    !WaveManager.Instance.waitingForNextWave.Value) // Only regenerate health if the player is not moving and not waiting for the next wave
-                {
-                    Health += _playerStats.currentHealthRegen;
-                    if (Health > MaxHealth)
-                        Health = MaxHealth;
-                    UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
-                }
+            if (Health.Value <= 0 || WaveManager.Instance.waitingForNextWave.Value)
+                return;
 
-                yield return new WaitForFixedUpdate();
+            Health.Value += regenAmount;
+            if (Health.Value > MaxHealth)
+                Health.Value = MaxHealth;
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TakeDamageServerRpc(float damage)
+        {
+            if (Health.Value <= 0)
+                return;
+
+            Health.Value -= damage;
+
+            // Reset regen delay and speed on hit
+            regenDelayTimer = 0f;
+            regenAcceleration = 1f;
+
+            ShowDamageClientRpc();
+
+            if (Health.Value <= 0)
+            {
+                Die();
             }
         }
 
         [Rpc(SendTo.Owner)]
-        public void TakeDamageRpc(float damage)
+        private void ShowDamageClientRpc()
         {
-            Health -= damage;
             SoundManager.Instance.PlaySound3D("PlayerHit", transform.position);
-            if (Health <= 0)
-            {
-                
-                UIManager.Instance.UpdateHealthBar(0, MaxHealth);
-                UIManager.Instance.StopHurtFlash();
-                Health = MaxHealth; // Prevents die Rpc from being called multiple times
-                DieRpc();
-                return;
-            }
             ScreenShake.Instance.Shake(0.4f, 2f, 1.3f);
-            UIManager.Instance.UpdateHealthBar(Health, MaxHealth);
             UIManager.Instance.HurtFlash();
-            // _hurtParticleSystem.Play();
+        }
+
+        private void Die()
+        {
+            DieRpc();
         }
 
         [Rpc(SendTo.Everyone)]
         private void DieRpc()
         {
-            // Handle player death (e.g., play animation, destroy object, etc.)
             gameObject.SetActive(false);
             GameManager.Instance.deadPlayers.Add(gameObject);
             onDeath?.Invoke(NetworkObject.NetworkObjectId);

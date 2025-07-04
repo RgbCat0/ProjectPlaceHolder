@@ -47,7 +47,6 @@ namespace Managers
             // spawns the players
             foreach (var clientId in NetworkManager.ConnectedClientsIds) // ain no way this fixed the ghost player issue
             {
-                Debug.Log(clientId);
                 NetworkObject newPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(
                     playerPrefab,
                     ownerClientId: clientId,
@@ -103,7 +102,7 @@ namespace Managers
                     PlayerStats stats = player.GetComponent<PlayerStats>();
                     PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
                     stats.currentMana = stats.currentMaxMana;
-                    playerHealth.Health = playerHealth.MaxHealth;
+                    playerHealth.Health.Value = playerHealth.MaxHealth;
                 }
 
                 player.SetActive(true);

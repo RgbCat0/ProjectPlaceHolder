@@ -292,7 +292,8 @@ namespace LobbyScripts
         }
         public void RemovePlayerLobbyPanelRpc(string playerName)
         {
-            Debug.Log("Being run    ");
+            // strip the #0650 from the player name as it is not included in the panel name
+            playerName = playerName.Substring(0, playerName.Length - 5);
             var panel = _playerLobbyPanels.Find(p => p.name == playerName);
             if (_playerLobbyPanels.Contains(panel))
             {

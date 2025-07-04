@@ -111,7 +111,8 @@ namespace Managers
                     _maxHealthManaBarWidth * healthPercentage,
                     healthBar.sizeDelta.y
                 );
-                healthText.text = $"{currHealth}/{maxHealth}";
+                var roundedHealth = Mathf.RoundToInt(currHealth);
+                healthText.text = $"{roundedHealth}/{maxHealth}";
             }
         }
 

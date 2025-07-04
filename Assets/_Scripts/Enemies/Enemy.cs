@@ -273,6 +273,7 @@ namespace Enemies
                 return;
             GameObject damageNumber = Instantiate(damageNumberPrefab, transform.position + Vector3.up * 2f,
                 Quaternion.identity);
+            damage = Mathf.RoundToInt(damage); // round to nearest integer
             damageNumber.GetComponent<HitAnimation>().ShowHitText(damage.ToString(CultureInfo.CurrentCulture));
             damageNumber.transform.parent = transform;
         }
