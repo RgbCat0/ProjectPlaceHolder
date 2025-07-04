@@ -415,7 +415,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: spawnInterval
-      value: 0.01
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 5409219445174652452, guid: db3718f825dad5148ab5feb9f0e507ba, type: 3}
       propertyPath: baseEnemyCount
